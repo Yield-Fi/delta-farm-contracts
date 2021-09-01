@@ -1,0 +1,24 @@
+{
+  "name": "deficentral-blockchain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "coverage": "truffle run coverage",
+    "compile": "truffle compile",
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.nextrope.com:deficentral/deficentral-blockchain.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "solidity-coverage": "^0.7.17"
+  }
+}

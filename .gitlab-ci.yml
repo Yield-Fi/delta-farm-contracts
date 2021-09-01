@@ -1,0 +1,46 @@
+stages:
+  - build
+  - security
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+  - node_modules/
+  - build/
+
+build:
+  image: node:lts
+  stage: build
+  script:
+    - apt-get update && apt-get install -y gawk
+    - npm install
+    - npm install -g truffle
+    - npm install -g ganache-cli
+    - npx truffle compile
+    - truffle run coverage
+  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+  artifacts:
+    paths:
+      - coverage
+    expire_in: 10 days
+    reports:
+      cobertura: coverage/cobertura-coverage.xml
+
+
+mythril:
+  image: sharathkumaranbu/mythril-ci
+  stage: security
+  script:
+    # - python ./scripts/processor.py
+    - myth --truffle > test-results.log
+  artifacts:
+    paths:
+      - test-results.log
+    expire_in: 1 week
+
+solium:
+  image: node:lts
+  stage: security
+  script:
+    - npm install -g solium
+    - solium -d contracts/
+
