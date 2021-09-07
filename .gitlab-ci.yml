@@ -1,5 +1,6 @@
 stages:
-  - build
+  - lint
+  - test
   - security
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -7,35 +8,32 @@ cache:
   - node_modules/
   - build/
 
-build:
+
+test:
   image: node:lts
-  stage: build
+  stage: test
   script:
+    # node_modules inherited from pipeline cache
     - apt-get update && apt-get install -y gawk
-    - npm install
-    - npm install -g truffle
-    - npm install -g ganache-cli
-    - npx truffle compile
-    - truffle run coverage
+    - npm run compile
+    - npm run coverage
+    # Flatten out the contracts for symbolic analysis
+    - npm run flatten
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     paths:
       - coverage
+      - flatten.sol
     expire_in: 10 days
     reports:
       cobertura: coverage/cobertura-coverage.xml
-
 
 mythril:
   image: sharathkumaranbu/mythril-ci
   stage: security
   script:
-    # - python ./scripts/processor.py
-    - myth --truffle > test-results.log
-  artifacts:
-    paths:
-      - test-results.log
-    expire_in: 1 week
+    # From artifacts
+    - myth -x flatten.sol
 
 solium:
   image: node:lts
@@ -44,3 +42,10 @@ solium:
     - npm install -g solium
     - solium -d contracts/
 
+linters:
+  image: node:lts
+  stage: lint
+  script:
+    - npm install
+    - npm run lint
+    - npm run solhint
