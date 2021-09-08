@@ -7,10 +7,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
-import "../../libs/pancake/IPancakeRouter.sol";
+import "../../libs/pancake/interfaces/IPancakeFactory.sol";
+import "../../libs/pancake/interfaces/IPancakePair.sol";
+import "../../libs/pancake/interfaces/IPancakeRouter.sol";
 import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
 import "../../utils/CustomMath.sol";

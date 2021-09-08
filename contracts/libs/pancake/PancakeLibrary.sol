@@ -4,8 +4,8 @@ pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
+import "./interfaces/IPancakePair.sol";
+import "./interfaces/IPancakeFactory.sol";
 
 library PancakeLibrary {
   using SafeMathUpgradeable for uint256;

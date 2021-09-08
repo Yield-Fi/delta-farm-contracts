@@ -4,11 +4,11 @@ pragma solidity ^0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
 
+import "./interfaces/IPancakeFactory.sol";
+import "./interfaces/IPancakeRouter.sol";
 import "../../interfaces/IWBNB.sol";
 import "./PancakeLibrary.sol";
-import "./IPancakeRouter.sol";
 import "../../utils/SafeToken.sol";
 
 contract PancakeRouter is IPancakeRouter {
