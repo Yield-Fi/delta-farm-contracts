@@ -1,9 +1,11 @@
+// SPDX-License-Identifier: UNLICENSED
+
 pragma solidity >=0.5.0;
 
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
+import "./interfaces/IPancakePair.sol";
+import "./interfaces/IPancakeFactory.sol";
 
 library PancakeLibraryV2 {
   using SafeMathUpgradeable for uint256;

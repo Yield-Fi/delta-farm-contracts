@@ -1,25 +1,22 @@
 import "@openzeppelin/test-helpers";
 
-import { BigNumberish, Signer, Wallet, utils } from "ethers";
+import { Signer } from "ethers";
 import {
-  MockERC20,
-  MockERC20__factory,
+  MockToken,
+  MockToken__factory,
   PancakeFactory,
   PancakeFactory__factory,
   PancakePair,
   PancakePair__factory,
-  PancakeRouter,
-  PancakeRouter__factory,
-  PancakeswapV2StrategyAddBaseTokenOnly,
-  PancakeswapV2StrategyAddBaseTokenOnly__factory,
-  StrategyAddBaseTokenOnly,
-  StrategyAddBaseTokenOnly__factory,
-  WETH,
-  WETH__factory,
+  PancakeRouterV2,
+  PancakeswapStrategyAddBaseTokenOnly,
+  PancakeswapStrategyAddBaseTokenOnly__factory,
+  WBNB,
+  WBNB__factory,
 } from "../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
-import { PancakeRouterV2__factory } from "./../typechain/factories/PancakeRouterV2__factory";
+import { PancakeRouterV2__factory } from "../typechain/factories/PancakeRouterV2__factory";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 
@@ -31,16 +28,16 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
 
   /// Pancakeswap-related instance(s)
   let factoryV2: PancakeFactory;
-  let routerV2: PancakeRouter;
+  let routerV2: PancakeRouterV2;
   let lpV2: PancakePair;
 
   /// Token-related instance(s)
-  let wbnb: WETH;
-  let baseToken: MockERC20;
-  let farmingToken: MockERC20;
+  let wbnb: WBNB;
+  let baseToken: MockToken;
+  let farmingToken: MockToken;
 
   /// Strategy-ralted instance(s)
-  let strat: PancakeswapV2StrategyAddBaseTokenOnly;
+  let strat: PancakeswapStrategyAddBaseTokenOnly;
 
   // Accounts
   let deployer: Signer;
@@ -48,20 +45,16 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
   let bob: Signer;
 
   // Contract Signer
-  let baseTokenAsAlice: MockERC20;
-  let baseTokenAsBob: MockERC20;
+  let baseTokenAsAlice: MockToken;
+  let baseTokenAsBob: MockToken;
 
-  let lpAsAlice: PancakePair;
   let lpAsBob: PancakePair;
 
-  let farmingTokenAsAlice: MockERC20;
-  let farmingTokenAsBob: MockERC20;
+  let farmingTokenAsAlice: MockToken;
 
-  let routerV2AsAlice: PancakeRouter;
-  let routerV2AsBob: PancakeRouter;
+  let routerV2AsAlice: PancakeRouterV2;
 
-  let stratAsAlice: PancakeswapV2StrategyAddBaseTokenOnly;
-  let stratAsBob: PancakeswapV2StrategyAddBaseTokenOnly;
+  let stratAsBob: PancakeswapStrategyAddBaseTokenOnly;
 
   async function fixture() {
     [deployer, alice, bob] = await ethers.getSigners();
@@ -75,9 +68,9 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     await factoryV2.deployed();
 
     const WBNB = (await ethers.getContractFactory(
-      "WETH",
+      "WBNB",
       deployer
-    )) as WETH__factory;
+    )) as WBNB__factory;
     wbnb = await WBNB.deploy();
     await factoryV2.deployed();
 
@@ -89,14 +82,14 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     await routerV2.deployed();
 
     /// Setup token stuffs
-    const MockERC20 = (await ethers.getContractFactory(
-      "MockERC20",
+    const MockToken = (await ethers.getContractFactory(
+      "MockToken",
       deployer
-    )) as MockERC20__factory;
-    baseToken = (await upgrades.deployProxy(MockERC20, [
+    )) as MockToken__factory;
+    baseToken = (await upgrades.deployProxy(MockToken, [
       "BTOKEN",
       "BTOKEN",
-    ])) as MockERC20;
+    ])) as MockToken;
     await baseToken.deployed();
     await baseToken.mint(
       await alice.getAddress(),
@@ -106,10 +99,10 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
       await bob.getAddress(),
       ethers.utils.parseEther("100")
     );
-    farmingToken = (await upgrades.deployProxy(MockERC20, [
+    farmingToken = (await upgrades.deployProxy(MockToken, [
       "FTOKEN",
       "FTOKEN",
-    ])) as MockERC20;
+    ])) as MockToken;
     await farmingToken.deployed();
     await farmingToken.mint(
       await alice.getAddress(),
@@ -127,37 +120,33 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
       deployer
     );
 
-    const PancakeswapV2StrategyAddBaseTokenOnly =
+    const PancakeswapStrategyAddBaseTokenOnly =
       (await ethers.getContractFactory(
-        "PancakeswapV2StrategyAddBaseTokenOnly",
+        "PancakeswapStrategyAddBaseTokenOnly",
         deployer
-      )) as PancakeswapV2StrategyAddBaseTokenOnly__factory;
-    strat = (await upgrades.deployProxy(PancakeswapV2StrategyAddBaseTokenOnly, [
+      )) as PancakeswapStrategyAddBaseTokenOnly__factory;
+    strat = (await upgrades.deployProxy(PancakeswapStrategyAddBaseTokenOnly, [
       routerV2.address,
-    ])) as PancakeswapV2StrategyAddBaseTokenOnly;
+    ])) as PancakeswapStrategyAddBaseTokenOnly;
     await strat.deployed();
 
     // Assign contract signer
-    baseTokenAsAlice = MockERC20__factory.connect(baseToken.address, alice);
-    baseTokenAsBob = MockERC20__factory.connect(baseToken.address, bob);
+    baseTokenAsAlice = MockToken__factory.connect(baseToken.address, alice);
+    baseTokenAsBob = MockToken__factory.connect(baseToken.address, bob);
 
-    farmingTokenAsAlice = MockERC20__factory.connect(
+    farmingTokenAsAlice = MockToken__factory.connect(
       farmingToken.address,
       alice
     );
-    farmingTokenAsBob = MockERC20__factory.connect(farmingToken.address, bob);
 
-    routerV2AsAlice = PancakeRouter__factory.connect(routerV2.address, alice);
-    routerV2AsBob = PancakeRouter__factory.connect(routerV2.address, bob);
+    routerV2AsAlice = PancakeRouterV2__factory.connect(routerV2.address, alice);
 
-    lpAsAlice = PancakePair__factory.connect(lpV2.address, alice);
     lpAsBob = PancakePair__factory.connect(lpV2.address, bob);
 
-    stratAsAlice = StrategyAddBaseTokenOnly__factory.connect(
+    stratAsBob = PancakeswapStrategyAddBaseTokenOnly__factory.connect(
       strat.address,
-      alice
+      bob
     );
-    stratAsBob = StrategyAddBaseTokenOnly__factory.connect(strat.address, bob);
   }
 
   beforeEach(async () => {

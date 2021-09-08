@@ -1,45 +1,46 @@
-// SPDX-License-Identifier: MIT
-/**
-  ∩~~~~∩ 
-  ξ ･×･ ξ 
-  ξ　~　ξ 
-  ξ　　 ξ 
-  ξ　　 “~～~～〇 
-  ξ　　　　　　 ξ 
-  ξ ξ ξ~～~ξ ξ ξ 
-　 ξ_ξξ_ξ　ξ_ξξ_ξ
-Alpaca Fin Corporation
-*/
-
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
+// SPDX-License-Identifier: UNLICENSED
 
 pragma solidity 0.8.3;
 
-import "../../apis/pancake/IPancakeRouter02.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+
+import "../../libs/pancake/interfaces/IPancakeFactory.sol";
+import "../../libs/pancake/interfaces/IPancakePair.sol";
+
+import "../../../contracts/libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
 import "../../utils/CustomMath.sol";
 
-contract StrategyAddBaseTokenOnly is ReentrancyGuardUpgradeable, IStrategy {
+contract PancakeswapStrategyAddBaseTokenOnly is
+  Initializable,
+  OwnableUpgradeable,
+  UUPSUpgradeable,
+  ReentrancyGuardUpgradeable,
+  IStrategy
+{
   using SafeToken for address;
   using SafeMathUpgradeable for uint256;
 
   IPancakeFactory public factory;
-  IPancakeRouter02 public router;
+  IPancakeRouterV2 public router;
 
   /// @dev Create a new add Token only strategy instance.
   /// @param _router The PancakeSwap Router smart contract.
-  function initialize(IPancakeRouter02 _router) external initializer {
+  function initialize(IPancakeRouterV2 _router) external initializer {
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+    __Ownable_init();
+    __UUPSUpgradeable_init();
 
     factory = IPancakeFactory(_router.factory());
     router = _router;
   }
+
+  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
   /// @param data Extra calldata information passed along to this strategy.
@@ -65,11 +66,13 @@ contract StrategyAddBaseTokenOnly is ReentrancyGuardUpgradeable, IStrategy {
     uint256 rIn = lpToken.token0() == baseToken ? r0 : r1;
     // find how many baseToken need to be converted to farmingToken
     // Constants come from
-    // 4(1-f) = 4*998*1000 = 3992000, where f = 0.002 and 1,000 is a way to avoid floating point
-    // 1998^2 = 3992004
+    // 2-f = 2-0.0025 = 19975
+    // 4(1-f) = 4*9975*10000 = 399000000, where f = 0.0025 and 10,000 is a way to avoid floating point
+    // 19975^2 = 399000625
+    // 9975*2 = 19950
     uint256 aIn = CustomMath
-      .sqrt(rIn.mul(balance.mul(3992000).add(rIn.mul(3992004))))
-      .sub(rIn.mul(1998)) / 1996;
+      .sqrt(rIn.mul(balance.mul(399000000).add(rIn.mul(399000625))))
+      .sub(rIn.mul(19975)) / 19950;
     // 4. Convert that portion of baseToken to farmingToken.
     address[] memory path = new address[](2);
     path[0] = baseToken;
@@ -94,11 +97,11 @@ contract StrategyAddBaseTokenOnly is ReentrancyGuardUpgradeable, IStrategy {
     );
     require(
       moreLPAmount >= minLPAmount,
-      "StrategyAddBaseTokenOnly::execute:: insufficient LP tokens received"
+      "PancakeswapV2StrategyAddBaseTokenOnly::execute:: insufficient LP tokens received"
     );
     require(
       lpToken.transfer(msg.sender, lpToken.balanceOf(address(this))),
-      "StrategyAddBaseTokenOnly::execute:: failed to transfer LP token to msg.sender"
+      "PancakeswapV2StrategyAddBaseTokenOnly::execute:: failed to transfer LP token to msg.sender"
     );
     // 6. Reset approval for safety reason
     baseToken.safeApprove(address(router), 0);

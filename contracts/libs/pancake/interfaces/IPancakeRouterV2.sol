@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.3;
+pragma solidity >=0.5.0;
 
-interface IPancakeRouter {
+interface IPancakeRouterV2 {
   function factory() external view returns (address);
 
   function WETH() external view returns (address);

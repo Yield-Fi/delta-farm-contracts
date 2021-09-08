@@ -1,16 +1,17 @@
+// SPDX-License-Identifier: UNLICENSED
+
 pragma solidity 0.8.3;
 
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
-
-import "../../interfaces/IWETH.sol";
-import "../../apis/pancake/IPancakeRouter02.sol";
+import "../../interfaces/IWBNB.sol";
+import "./interfaces/IPancakeFactory.sol";
+import "./interfaces/IPancakeRouterV2.sol";
 import "./PancakeLibraryV2.sol";
 import "../../utils/SafeToken.sol";
 
-contract PancakeRouterV2 is IPancakeRouter02 {
+contract PancakeRouterV2 is IPancakeRouterV2 {
   using SafeMathUpgradeable for uint256;
 
   address public immutable override factory;
@@ -21,7 +22,7 @@ contract PancakeRouterV2 is IPancakeRouter02 {
     _;
   }
 
-  constructor(address _factory, address _WETH) public {
+  constructor(address _factory, address _WETH) {
     factory = _factory;
     WETH = _WETH;
   }
@@ -141,8 +142,8 @@ contract PancakeRouterV2 is IPancakeRouter02 {
     );
     address pair = PancakeLibraryV2.pairFor(factory, token, WETH);
     SafeToken.safeTransferFrom(token, msg.sender, pair, amountToken);
-    IWETH(WETH).deposit{ value: amountETH }();
-    assert(IWETH(WETH).transfer(pair, amountETH));
+    IWBNB(WETH).deposit{ value: amountETH }();
+    assert(IWBNB(WETH).transfer(pair, amountETH));
     liquidity = IPancakePair(pair).mint(to);
     // refund dust eth, if any
     if (msg.value > amountETH)
@@ -200,7 +201,7 @@ contract PancakeRouterV2 is IPancakeRouter02 {
       deadline
     );
     SafeToken.safeTransfer(token, to, amountToken);
-    IWETH(WETH).withdraw(amountETH);
+    IWBNB(WETH).withdraw(amountETH);
     SafeToken.safeTransferETH(to, amountETH);
   }
 
@@ -295,7 +296,7 @@ contract PancakeRouterV2 is IPancakeRouter02 {
       to,
       IERC20Upgradeable(token).balanceOf(address(this))
     );
-    IWETH(WETH).withdraw(amountETH);
+    IWBNB(WETH).withdraw(amountETH);
     SafeToken.safeTransferETH(to, amountETH);
   }
 
@@ -428,9 +429,9 @@ contract PancakeRouterV2 is IPancakeRouter02 {
       amounts[amounts.length - 1] >= amountOutMin,
       "PancakeRouter: INSUFFICIENT_OUTPUT_AMOUNT"
     );
-    IWETH(WETH).deposit{ value: amounts[0] }();
+    IWBNB(WETH).deposit{ value: amounts[0] }();
     assert(
-      IWETH(WETH).transfer(
+      IWBNB(WETH).transfer(
         PancakeLibraryV2.pairFor(factory, path[0], path[1]),
         amounts[0]
       )
@@ -461,7 +462,7 @@ contract PancakeRouterV2 is IPancakeRouter02 {
       amounts[0]
     );
     _swap(amounts, path, address(this));
-    IWETH(WETH).withdraw(amounts[amounts.length - 1]);
+    IWBNB(WETH).withdraw(amounts[amounts.length - 1]);
     SafeToken.safeTransferETH(to, amounts[amounts.length - 1]);
   }
 
@@ -491,7 +492,7 @@ contract PancakeRouterV2 is IPancakeRouter02 {
       amounts[0]
     );
     _swap(amounts, path, address(this));
-    IWETH(WETH).withdraw(amounts[amounts.length - 1]);
+    IWBNB(WETH).withdraw(amounts[amounts.length - 1]);
     SafeToken.safeTransferETH(to, amounts[amounts.length - 1]);
   }
 
@@ -511,9 +512,9 @@ contract PancakeRouterV2 is IPancakeRouter02 {
     require(path[0] == WETH, "PancakeRouter: INVALID_PATH");
     amounts = PancakeLibraryV2.getAmountsIn(factory, amountOut, path);
     require(amounts[0] <= msg.value, "PancakeRouter: EXCESSIVE_INPUT_AMOUNT");
-    IWETH(WETH).deposit{ value: amounts[0] }();
+    IWBNB(WETH).deposit{ value: amounts[0] }();
     assert(
-      IWETH(WETH).transfer(
+      IWBNB(WETH).transfer(
         PancakeLibraryV2.pairFor(factory, path[0], path[1]),
         amounts[0]
       )
@@ -596,9 +597,9 @@ contract PancakeRouterV2 is IPancakeRouter02 {
   ) external payable virtual override ensure(deadline) {
     require(path[0] == WETH, "PancakeRouter: INVALID_PATH");
     uint256 amountIn = msg.value;
-    IWETH(WETH).deposit{ value: amountIn }();
+    IWBNB(WETH).deposit{ value: amountIn }();
     assert(
-      IWETH(WETH).transfer(
+      IWBNB(WETH).transfer(
         PancakeLibraryV2.pairFor(factory, path[0], path[1]),
         amountIn
       )
@@ -635,7 +636,7 @@ contract PancakeRouterV2 is IPancakeRouter02 {
       amountOut >= amountOutMin,
       "PancakeRouter: INSUFFICIENT_OUTPUT_AMOUNT"
     );
-    IWETH(WETH).withdraw(amountOut);
+    IWBNB(WETH).withdraw(amountOut);
     SafeToken.safeTransferETH(to, amountOut);
   }
 
