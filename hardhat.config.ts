@@ -27,10 +27,6 @@ export default {
       allowUnlimitedContractSize: true,
       timeout: 1800000,
     },
-    testnet: {
-      url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-      accounts: [process.env.TESTNET_PRIVATE_KEY],
-    },
   },
   solidity: {
     compilers: [
