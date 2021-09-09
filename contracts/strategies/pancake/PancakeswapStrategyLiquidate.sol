@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 
-import "../../libs/pancake/interfaces/IPancakeRouter02.sol";
+import "../../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../libs/pancake/interfaces/IPancakePair.sol";
 import "../../libs/pancake/interfaces/IPancakeFactory.sol";
 import "../../interfaces/IStrategy.sol";
@@ -16,11 +16,11 @@ contract PancakeswapStrategyLiquidate is ReentrancyGuardUpgradeable, IStrategy {
   using SafeToken for address;
 
   IPancakeFactory public factory;
-  IPancakeRouter02 public router;
+  IPancakeRouterV2 public router;
 
   /// @dev Create a new liquidate strategy instance.
   /// @param _router The PancakeSwap Router smart contract.
-  function initialize(IPancakeRouter02 _router) external initializer {
+  function initialize(IPancakeRouterV2 _router) external initializer {
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
 
     factory = IPancakeFactory(_router.factory());

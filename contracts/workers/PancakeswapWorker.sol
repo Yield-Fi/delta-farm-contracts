@@ -103,7 +103,7 @@ contract PancakeswapWorker is
   uint256 public fee;
   uint256 public feeDenom;
 
-  /// @notice Upgraded State Variables for PancakeswapV2Worker02
+  /// @notice Upgraded State Variables for PancakeswapWorker
   uint256 public reinvestThreshold;
   address[] public reinvestPath;
   address public treasuryAccount;
@@ -156,12 +156,12 @@ contract PancakeswapWorker is
     // 6. Check if critical parameters are config properly
     require(
       baseToken != cake,
-      "PancakeswapV2Worker02::initialize:: base token cannot be a reward token"
+      "PancakeswapWorker::initialize:: base token cannot be a reward token"
     );
     require(
       (farmingToken == lpToken.token0() || farmingToken == lpToken.token1()) &&
         (baseToken == lpToken.token0() || baseToken == lpToken.token1()),
-      "PancakeswapV2Worker02::initialize:: LP underlying not match with farm & base token"
+      "PancakeswapWorker::initialize:: LP underlying not match with farm & base token"
     );
   }
 
@@ -169,10 +169,7 @@ contract PancakeswapWorker is
 
   /// @dev Require that the caller must be an EOA account to avoid flash loans.
   modifier onlyEOA() {
-    require(
-      msg.sender == tx.origin,
-      "PancakeswapV2Worker02::onlyEOA:: not eoa"
-    );
+    require(msg.sender == tx.origin, "PancakeswapWorker::onlyEOA:: not eoa");
     _;
   }
 
@@ -180,7 +177,7 @@ contract PancakeswapWorker is
   modifier onlyOperator() {
     require(
       msg.sender == operator,
-      "PancakeswapV2Worker02::onlyOperator:: not operator"
+      "PancakeswapWorker::onlyOperator:: not operator"
     );
     _;
   }
@@ -189,7 +186,7 @@ contract PancakeswapWorker is
   modifier onlyReinvestor() {
     require(
       okReinvestors[msg.sender],
-      "PancakeswapV2Worker02::onlyReinvestor:: not reinvestor"
+      "PancakeswapWorker::onlyReinvestor:: not reinvestor"
     );
     _;
   }
@@ -230,19 +227,20 @@ contract PancakeswapWorker is
 
     require(
       reinvestBountyBps <= maxReinvestBountyBps,
-      "PancakeswapV2Worker02::initialize:: reinvestBountyBps exceeded maxReinvestBountyBps"
+      "PancakeswapWorker::initialize:: reinvestBountyBps exceeded maxReinvestBountyBps"
     );
     require(
       reinvestPath[0] == cake &&
         reinvestPath[reinvestPath.length - 1] == baseToken,
-      "PancakeswapV2Worker02::initialize:: reinvestPath must start with CAKE, end with BTOKEN"
+      "PancakeswapWorker::initialize:: reinvestPath must start with CAKE, end with BTOKEN"
     );
   }
 
   /// @dev Re-invest whatever this worker has earned back to staked LP tokens.
   function reinvest() external override onlyEOA onlyReinvestor nonReentrant {
     _reinvest(msg.sender, reinvestBountyBps, 0, 0);
-    // in case of beneficial vault equals to operator vault, call buyback to transfer some buyback amount back to the vault
+    // in case of beneficial vault equals to operator vault,
+    // call buyback to transfer some buyback amount back to the vault
     // This can't be called within the _reinvest statement since _reinvest is called within the `work` as well
     _buyback();
   }
@@ -260,7 +258,7 @@ contract PancakeswapWorker is
   ) internal {
     require(
       _treasuryAccount != address(0),
-      "PancakeswapV2Worker02::_reinvest:: bad treasury account"
+      "PancakeswapWorker::_reinvest:: bad treasury account"
     );
     // 1. Withdraw all the rewards. Return if reward <= _reinvestThreshold.
     masterChef.withdraw(pid, 0);
@@ -332,11 +330,11 @@ contract PancakeswapWorker is
     (address strat, bytes memory ext) = abi.decode(data, (address, bytes));
     require(
       okStrats[strat],
-      "PancakeswapV2Worker02::work:: unapproved work strategy"
+      "PancakeswapWorker::work:: unapproved work strategy"
     );
     require(
       lpToken.transfer(strat, lpToken.balanceOf(address(this))),
-      "PancakeswapV2Worker02::work:: unable to transfer lp to strat"
+      "PancakeswapWorker::work:: unable to transfer lp to strat"
     );
     baseToken.safeTransfer(strat, actualBaseTokenBalance());
     IStrategy(strat).execute(user, debt, ext);
@@ -358,7 +356,7 @@ contract PancakeswapWorker is
     if (aIn == 0) return 0;
     require(
       rIn > 0 && rOut > 0,
-      "PancakeswapV2Worker02::getMktSellAmount:: bad reserve values"
+      "PancakeswapWorker::getMktSellAmount:: bad reserve values"
     );
     uint256 aInWithFee = aIn.mul(fee);
     uint256 numerator = aInWithFee.mul(rOut);
@@ -420,9 +418,11 @@ contract PancakeswapWorker is
       address(this),
       block.timestamp
     );
-    /// 3. if beneficialvault token not equal to baseToken regardless of a caller balance, can directly transfer to beneficial vault
+    /// 3. if beneficialvault token not equal to baseToken regardless of a caller balance,
+    /// can directly transfer to beneficial vault
     /// otherwise, need to keep it as a buybackAmount,
-    /// since beneficial vault is the same as the calling vault, it will think of this reward as a `back` amount to paydebt/ sending back to a position owner
+    /// since beneficial vault is the same as the calling vault,
+    /// it will think of this reward as a `back` amount to paydebt/ sending back to a position owner
     if (beneficialVaultToken != baseToken) {
       buybackAmount = 0;
       beneficialVaultToken.safeTransfer(
@@ -456,8 +456,10 @@ contract PancakeswapWorker is
     );
   }
 
-  /// @dev since buybackAmount variable has been created to collect a buyback balance when during the reinvest within the work method,
-  /// thus the actualBaseTokenBalance exists to differentiate an actual base token balance balance without taking buy back amount into account
+  /// @dev since buybackAmount variable has been created to collect a buyback
+  /// balance when during the reinvest within the work method,
+  /// thus the actualBaseTokenBalance exists to differentiate an actual base token
+  /// balance balance without taking buy back amount into account
   function actualBaseTokenBalance() internal view returns (uint256) {
     return baseToken.myBalance().sub(buybackAmount);
   }
@@ -542,16 +544,16 @@ contract PancakeswapWorker is
   ) external onlyOwner {
     require(
       _reinvestBountyBps <= maxReinvestBountyBps,
-      "PancakeswapV2Worker02::setReinvestConfig:: _reinvestBountyBps exceeded maxReinvestBountyBps"
+      "PancakeswapWorker::setReinvestConfig:: _reinvestBountyBps exceeded maxReinvestBountyBps"
     );
     require(
       _reinvestPath.length >= 2,
-      "PancakeswapV2Worker02::setReinvestConfig:: _reinvestPath length must >= 2"
+      "PancakeswapWorker::setReinvestConfig:: _reinvestPath length must >= 2"
     );
     require(
       _reinvestPath[0] == cake &&
         _reinvestPath[_reinvestPath.length - 1] == baseToken,
-      "PancakeswapV2Worker02::setReinvestConfig:: _reinvestPath must start with CAKE, end with BTOKEN"
+      "PancakeswapWorker::setReinvestConfig:: _reinvestPath must start with CAKE, end with BTOKEN"
     );
 
     reinvestBountyBps = _reinvestBountyBps;
@@ -574,11 +576,11 @@ contract PancakeswapWorker is
   {
     require(
       _maxReinvestBountyBps >= reinvestBountyBps,
-      "PancakeswapV2Worker02::setMaxReinvestBountyBps:: _maxReinvestBountyBps lower than reinvestBountyBps"
+      "PancakeswapWorker::setMaxReinvestBountyBps:: _maxReinvestBountyBps lower than reinvestBountyBps"
     );
     require(
       _maxReinvestBountyBps <= 3000,
-      "PancakeswapV2Worker02::setMaxReinvestBountyBps:: _maxReinvestBountyBps exceeded 30%"
+      "PancakeswapWorker::setMaxReinvestBountyBps:: _maxReinvestBountyBps exceeded 30%"
     );
 
     maxReinvestBountyBps = _maxReinvestBountyBps;
@@ -623,12 +625,12 @@ contract PancakeswapWorker is
   function setRewardPath(address[] calldata _rewardPath) external onlyOwner {
     require(
       rewardPath.length >= 2,
-      "PancakeswapV2Worker02::setRewardPath:: rewardPath length must be >= 2"
+      "PancakeswapWorker::setRewardPath:: rewardPath length must be >= 2"
     );
     require(
       rewardPath[0] == cake &&
         rewardPath[rewardPath.length - 1] == beneficialVault.token(),
-      "PancakeswapV2Worker02::setRewardPath:: rewardPath must start with CAKE and end with beneficialVault token"
+      "PancakeswapWorker::setRewardPath:: rewardPath must start with CAKE and end with beneficialVault token"
     );
 
     rewardPath = _rewardPath;
@@ -658,7 +660,7 @@ contract PancakeswapWorker is
   ) external onlyOwner {
     require(
       _treasuryBountyBps <= maxReinvestBountyBps,
-      "PancakeswapV2Worker02::setTreasuryConfig:: _treasuryBountyBps exceeded maxReinvestBountyBps"
+      "PancakeswapWorker::setTreasuryConfig:: _treasuryBountyBps exceeded maxReinvestBountyBps"
     );
 
     treasuryAccount = _treasuryAccount;
@@ -678,16 +680,16 @@ contract PancakeswapWorker is
   ) external onlyOwner {
     require(
       _beneficialVaultBountyBps <= 10000,
-      "PancakeswapV2Worker02::setBeneficialVaultConfig:: _beneficialVaultBountyBps exceeds 100%"
+      "PancakeswapWorker::setBeneficialVaultConfig:: _beneficialVaultBountyBps exceeds 100%"
     );
     require(
       _rewardPath.length >= 2,
-      "PancakeswapV2Worker02::setBeneficialVaultConfig:: rewardPath length must >= 2"
+      "PancakeswapWorker::setBeneficialVaultConfig:: rewardPath length must >= 2"
     );
     require(
       _rewardPath[0] == cake &&
         _rewardPath[_rewardPath.length - 1] == _beneficialVault.token(),
-      "PancakeswapV2Worker02::setBeneficialVaultConfig:: rewardPath must start with CAKE, end with beneficialVault token"
+      "PancakeswapWorker::setBeneficialVaultConfig:: rewardPath must start with CAKE, end with beneficialVault token"
     );
 
     _buyback();
