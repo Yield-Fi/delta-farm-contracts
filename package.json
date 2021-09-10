@@ -15,7 +15,8 @@
     "flatten": "hardhat flatten > flatten.sol",
     "deploy:testnet:pancake:strategies": "hardhat --network testnet deploy --no-compile --reset --tags PancakeStrategies",
     "deploy:hardhat:vault": "hardhat --network hardhat deploy --no-compile --reset --tags Vault",
-    "deploy:localhost:vault": "hardhat --network localhost deploy --no-compile --reset --tags Vault"
+    "deploy:localhost:vault": "hardhat --network localhost deploy --no-compile --reset --tags Vault",
+    "upgrade:hardhat:vault": "hardhat --network hardhat deploy --no-compile --reset --tags VaultUpgrade"
   },
   "repository": {
     "type": "git",

@@ -638,7 +638,7 @@
     {
       "name": "Deficentral BUSD",
       "symbol": "defiBUSD",
-      "address": "0xf9d32C5E10Dd51511894b360e6bD39D7573450F9",
+      "address": "0x9fE46736679d2D9a65F0992F2272dE9f3c7fa6e0",
       "deployedBlock": 7313516,
       "baseToken": "0xDfb1211E2694193df5765d54350e1145FD2404A1",
       "debtToken": "0x2E0384Bc38E250639291D6710EDC3d5034e95996",
