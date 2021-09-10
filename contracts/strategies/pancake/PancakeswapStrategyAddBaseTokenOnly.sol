@@ -45,8 +45,6 @@ contract PancakeswapStrategyAddBaseTokenOnly is
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
   /// @param data Extra calldata information passed along to this strategy.
   function execute(
-    address, /* user */
-    uint256, /* debt */
     bytes calldata data
   ) external override nonReentrant {
     // 1. Find out what farming token we are dealing with and min additional LP tokens.

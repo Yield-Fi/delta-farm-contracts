@@ -30,8 +30,6 @@ contract PancakeswapStrategyLiquidate is ReentrancyGuardUpgradeable, IStrategy {
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
   /// @param data Extra calldata information passed along to this strategy.
   function execute(
-    address, /* user */
-    uint256, /* debt */
     bytes calldata data
   ) external override nonReentrant {
     // 1. Find out what farming token we are dealing with.

@@ -293,7 +293,7 @@ contract PancakeswapWorker is
       address(addStrat),
       actualBaseTokenBalance().sub(_callerBalance)
     );
-    addStrat.execute(address(0), 0, abi.encode(0));
+    addStrat.execute(abi.encode(0));
 
     // 6. Stake LPs for more rewards
     masterChef.deposit(pid, lpToken.balanceOf(address(this)));
@@ -307,13 +307,9 @@ contract PancakeswapWorker is
 
   /// @dev Work on the given position. Must be called by the operator.
   /// @param id The position ID to work on.
-  /// @param user The original user that is interacting with the operator.
-  /// @param debt The amount of user debt to help the strategy make decisions.
   /// @param data The encoded data, consisting of strategy address and calldata.
   function work(
     uint256 id,
-    address user,
-    uint256 debt,
     bytes calldata data
   ) external override onlyOperator nonReentrant {
     // 1. If a treasury configs are not ready. Not reinvest.
@@ -337,7 +333,7 @@ contract PancakeswapWorker is
       "PancakeswapWorker::work:: unable to transfer lp to strat"
     );
     baseToken.safeTransfer(strat, actualBaseTokenBalance());
-    IStrategy(strat).execute(user, debt, ext);
+    IStrategy(strat).execute(ext);
     // 4. Add LP tokens back to the farming pool.
     _addShare(id);
     // 5. Return any remaining BaseToken back to the operator.
@@ -394,7 +390,7 @@ contract PancakeswapWorker is
     // 1. Convert the position back to LP tokens and use liquidate strategy.
     _removeShare(id);
     lpToken.transfer(address(liqStrat), lpToken.balanceOf(address(this)));
-    liqStrat.execute(address(0), 0, abi.encode(0));
+    liqStrat.execute(abi.encode(0));
     // 2. Return all available BaseToken back to the operator.
     uint256 liquidatedAmount = actualBaseTokenBalance();
     baseToken.safeTransfer(msg.sender, liquidatedAmount);

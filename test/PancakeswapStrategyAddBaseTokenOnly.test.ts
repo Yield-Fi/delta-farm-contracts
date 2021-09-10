@@ -155,8 +155,7 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
 
   it("should revert on bad calldata", async () => {
     // Bob passes some bad calldata that can't be decoded
-    await expect(stratAsBob.execute(await bob.getAddress(), "0", "0x1234")).to
-      .be.reverted;
+    await expect(stratAsBob.execute("0x1234")).to.be.reverted;
   });
 
   it("should convert all BTOKEN to LP tokens at best rate", async () => {
@@ -189,8 +188,6 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     );
     // Bob uses AddBaseTokenOnly strategy to add 0.1 WBTC
     await stratAsBob.execute(
-      await bob.getAddress(),
-      "0",
       ethers.utils.defaultAbiCoder.encode(
         ["address", "address", "uint256"],
         [baseToken.address, farmingToken.address, "0"]
@@ -217,8 +214,6 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
       ethers.utils.parseEther("0.015415396042372718")
     );
     await stratAsBob.execute(
-      await bob.getAddress(),
-      "0",
       ethers.utils.defaultAbiCoder.encode(
         ["address", "address", "uint256"],
         [
@@ -249,8 +244,6 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     );
     await expect(
       stratAsBob.execute(
-        await bob.getAddress(),
-        "0",
         ethers.utils.defaultAbiCoder.encode(
           ["address", "address", "uint256"],
           [

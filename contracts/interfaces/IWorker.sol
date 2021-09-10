@@ -7,8 +7,6 @@ import "../libs/pancake/interfaces/IPancakePair.sol";
 interface IWorker {
   /// @dev Work on a (potentially new) position. Optionally send token back to Vault.
   function work(
-    uint256 id,
-    address user,
     uint256 debt,
     bytes calldata data
   ) external;

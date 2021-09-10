@@ -1,6 +1,6 @@
 import "@openzeppelin/test-helpers";
 
-import { BigNumberish, Signer, Wallet, utils } from "ethers";
+import { Signer } from "ethers";
 import {
   MockToken,
   MockToken__factory,
@@ -207,8 +207,6 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     );
     await expect(
       strat.execute(
-        await bob.getAddress(),
-        "0",
         ethers.utils.defaultAbiCoder.encode(
           ["address", "address", "uint256"],
           [
@@ -222,8 +220,6 @@ describe("Pancakeswap - StrategyLiquidate", () => {
 
     // Bob uses liquidate strategy to turn all LPs back to BTOKEN with a same minimum value
     await strat.execute(
-      await bob.getAddress(),
-      "0",
       ethers.utils.defaultAbiCoder.encode(
         ["address", "address", "uint256"],
         [baseToken.address, farmingToken.address, ethers.utils.parseEther("1")]

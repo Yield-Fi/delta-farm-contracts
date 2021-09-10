@@ -11,7 +11,6 @@ import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
 
-import "./interfaces/IDebtToken.sol";
 import "./interfaces/IWorker.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultConfig.sol";
@@ -40,9 +39,7 @@ contract Vault is
     address indexed killer,
     address owner,
     uint256 posVal,
-    uint256 debt,
-    uint256 prize,
-    uint256 left
+    uint256 prize
   );
   event AddCollateral(
     uint256 indexed id,
@@ -64,12 +61,7 @@ contract Vault is
 
   /// @dev Attributes for Vault
   /// token - address of the token to be deposited in this pool
-  /// name - name of the ibERC20
-  /// symbol - symbol of ibERC20
-  /// decimals - decimals of ibERC20, this depends on the decimal of the token
-  /// debtToken - just a simple ERC20 token for staking with FairLaunch
   address public override token;
-  address public debtToken;
 
   struct Position {
     address worker;
@@ -84,7 +76,6 @@ contract Vault is
 
   uint256 public vaultDebtShare;
   uint256 public vaultDebtVal;
-  uint256 public lastAccrueTime;
   uint256 public reservePool;
 
   /// @dev Require that the caller must be an EOA account if not whitelisted.
@@ -129,24 +120,11 @@ contract Vault is
     _IN_EXEC_LOCK = _NOT_ENTERED;
   }
 
-  /// @dev Add more debt to the bank debt pool.
-  modifier accrue(uint256 value) {
-    if (block.timestamp > lastAccrueTime) {
-      uint256 interest = pendingInterest(value);
-      uint256 toReserve = interest.mul(config.getReservePoolBps()).div(10000);
-      reservePool = reservePool.add(toReserve);
-      vaultDebtVal = vaultDebtVal.add(interest);
-      lastAccrueTime = block.timestamp;
-    }
-    _;
-  }
-
   function initialize(
     IVaultConfig _config,
     address _token,
     string calldata _name,
-    string calldata _symbol,
-    address _debtToken
+    string calldata _symbol
   ) external initializer {
     __Ownable_init();
     __UUPSUpgradeable_init();
@@ -154,18 +132,7 @@ contract Vault is
 
     nextPositionID = 1;
     config = _config;
-    lastAccrueTime = block.timestamp;
     token = _token;
-
-    fairLaunchPoolId = type(uint256).max;
-
-    debtToken = _debtToken;
-
-    SafeToken.safeApprove(
-      debtToken,
-      config.getFairLaunchAddr(),
-      type(uint256).max
-    );
 
     // free-up execution scope
     _IN_EXEC_LOCK = _NOT_ENTERED;
@@ -175,20 +142,7 @@ contract Vault is
 
   function _authorizeUpgrade(address) internal override onlyOwner {}
 
-  /// @dev Return the pending interest that will be accrued in the next call.
-  /// @param value Balance value to subtract off address(this).balance when called from payable functions.
-  function pendingInterest(uint256 value) public view returns (uint256) {
-    if (block.timestamp > lastAccrueTime) {
-      uint256 timePast = block.timestamp.sub(lastAccrueTime);
-      uint256 balance = SafeToken.myBalance(token).sub(value);
-      uint256 ratePerSec = config.getInterestRate(vaultDebtVal, balance);
-      return ratePerSec.mul(vaultDebtVal).mul(timePast).div(1e18);
-    } else {
-      return 0;
-    }
-  }
-
-  /// @dev Return the Token debt value given the debt share. Be careful of unaccrued interests.
+   /// @dev Return the Token debt value given the debt share. Be careful of unaccrued interests.
   /// @param debtShare The debt share to be converted.
   function debtShareToVal(uint256 debtShare) public view returns (uint256) {
     if (vaultDebtShare == 0) return debtShare; // When there's no share, 1 share = 1 val.
@@ -202,7 +156,7 @@ contract Vault is
     return debtVal.mul(vaultDebtShare).div(vaultDebtVal);
   }
 
-  /// @dev Return Token value and debt of the given position. Be careful of unaccrued interests.
+  /// @dev Return Token value and debt of the given position.
   /// @param id The position ID to query.
   function positionInfo(uint256 id) external view returns (uint256, uint256) {
     Position storage pos = positions[id];
@@ -212,35 +166,6 @@ contract Vault is
   /// @dev Return the total token entitled to the token holders. Be careful of unaccrued interests.
   function totalToken() public view override returns (uint256) {
     return SafeToken.myBalance(token).add(vaultDebtVal).sub(reservePool);
-  }
-
-  /// @dev Add more token to the lending pool. Hope to get some good returns.
-  function deposit(uint256 amountToken)
-    external
-    payable
-    override
-    transferTokenToVault(amountToken)
-    accrue(amountToken)
-    nonReentrant
-  {
-    _deposit(amountToken);
-  }
-
-  function _deposit(uint256 amountToken) internal {
-    uint256 total = totalToken().sub(amountToken);
-    uint256 share = total == 0
-      ? amountToken
-      : amountToken.mul(totalSupply()).div(total);
-    _mint(msg.sender, share);
-    require(totalSupply() > 1e17, "no tiny shares");
-  }
-
-  /// @dev Withdraw token from the lending and burning ibToken.
-  function withdraw(uint256 share) external override accrue(0) nonReentrant {
-    uint256 amount = share.mul(totalToken()).div(totalSupply());
-    _burn(msg.sender, share);
-    _safeUnwrap(msg.sender, amount);
-    require(totalSupply() > 1e17, "no tiny shares");
   }
 
   /// @dev Request Funds from user through Vault
@@ -255,39 +180,6 @@ contract Vault is
       msg.sender,
       amount
     );
-  }
-
-  /// @dev Mint & deposit debtToken on behalf of farmers
-  /// @param id The ID of the position
-  /// @param amount The amount of debt that the position holds
-  function _fairLaunchDeposit(uint256 id, uint256 amount) internal {
-    if (amount > 0) {
-      IDebtToken(debtToken).mint(address(this), amount);
-      // IFairLaunch(config.getFairLaunchAddr()).deposit(
-      //   positions[id].owner,
-      //   fairLaunchPoolId,
-      //   amount
-      // );
-    }
-  }
-
-  /// @dev Withdraw & burn debtToken on behalf of farmers
-  /// @param id The ID of the position
-  function _fairLaunchWithdraw(uint256 id) internal {
-    if (positions[id].debtShare > 0) {
-      // Note: Do this way because we don't want to fail open, close, or kill position
-      // if cannot withdraw from FairLaunch somehow. 0xb5c5f672 is a signature of withdraw(address,uint256,uint256)
-      (bool success, ) = config.getFairLaunchAddr().call(
-        abi.encodeWithSelector(
-          0xb5c5f672,
-          positions[id].owner,
-          fairLaunchPoolId,
-          positions[id].debtShare
-        )
-      );
-      if (success)
-        IDebtToken(debtToken).burn(address(this), positions[id].debtShare);
-    }
   }
 
   /// @dev Transfer to "to". Automatically unwrap if BTOKEN is WBNB
@@ -318,10 +210,8 @@ contract Vault is
     payable
     onlyEOAorWhitelisted
     transferTokenToVault(amount)
-    accrue(amount)
     nonReentrant
   {
-    require(fairLaunchPoolId != type(uint256).max, "poolId not set");
     require(id != 0, "no id 0");
 
     // 1. Load position from state & sanity check
@@ -339,12 +229,10 @@ contract Vault is
     if (!goRogue) require(config.isWorkerStable(worker), "worker !stable");
     else
       require(config.isWorkerReserveConsistent(worker), "reserve !consistent");
-    // 4. Getting required info.
-    uint256 debt = debtShareToVal(pos.debtShare);
     // 5. Perform add collateral according to the strategy.
     uint256 beforeBEP20 = SafeToken.myBalance(token).sub(amount);
     SafeToken.safeTransfer(token, worker, amount);
-    IWorker(worker).work(id, msg.sender, debt, data);
+    IWorker(worker).work(id, data);
     uint256 healthAfter = IWorker(worker).health(id);
     uint256 back = SafeToken.myBalance(token).sub(beforeBEP20);
     // 6. Sanity check states after perform add collaterals
@@ -357,11 +245,11 @@ contract Vault is
       require(config.isWorkerReserveConsistent(worker), "reserve !consistent");
     require(back == 0, "back !0");
     require(healthAfter > healthBefore, "health !increase");
-    uint256 killFactor = config.rawKillFactor(pos.worker, debt);
-    require(
-      debt.mul(10000) <= healthAfter.mul(killFactor.sub(100)),
-      "debtRatio > killFactor margin"
-    );
+    // uint256 killFactor = config.rawKillFactor(pos.worker, debt);
+    // require(
+    //   debt.mul(10000) <= healthAfter.mul(killFactor.sub(100)),
+    //   "debtRatio > killFactor margin"
+    // );
     // 7. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;
@@ -374,24 +262,20 @@ contract Vault is
   /// @param worker The address of the authorized worker to work for this position.
   /// @param principalAmount The anout of Token to supply by user.
   /// @param borrowAmount The amount of Token to borrow from the pool.
-  /// @param maxReturn The max amount of Token to return to the pool.
   /// @param data The calldata to pass along to the worker for more working context.
   function work(
     uint256 id,
     address worker,
     uint256 principalAmount,
     uint256 borrowAmount,
-    uint256 maxReturn,
     bytes calldata data
   )
     external
     payable
     onlyEOAorWhitelisted
     transferTokenToVault(principalAmount)
-    accrue(principalAmount)
     nonReentrant
   {
-    require(fairLaunchPoolId != type(uint256).max, "poolId not set");
     // 1. Sanity check the input position, or add a new position of ID is 0.
     Position storage pos;
     if (id == 0) {
@@ -404,7 +288,6 @@ contract Vault is
       require(id < nextPositionID, "bad position id");
       require(pos.worker == worker, "bad position worker");
       require(pos.owner == msg.sender, "not position owner");
-      _fairLaunchWithdraw(id);
     }
     emit Work(id, borrowAmount);
     // Update execution scope variables
@@ -416,7 +299,6 @@ contract Vault is
       borrowAmount == 0 || config.acceptDebt(worker),
       "worker not accept more debt"
     );
-    uint256 debt = _removeDebt(id).add(borrowAmount);
     // 3. Perform the actual work, using a new scope to avoid stack-too-deep errors.
     uint256 back;
     {
@@ -427,30 +309,12 @@ contract Vault is
       );
       uint256 beforeBEP20 = SafeToken.myBalance(token).sub(sendBEP20);
       SafeToken.safeTransfer(token, worker, sendBEP20);
-      IWorker(worker).work(id, msg.sender, debt, data);
+      IWorker(worker).work(id, data);
       back = SafeToken.myBalance(token).sub(beforeBEP20);
-    }
-    // 4. Check and update position debt.
-    uint256 lessDebt = MathUpgradeable.min(
-      debt,
-      MathUpgradeable.min(back, maxReturn)
-    );
-    debt = debt.sub(lessDebt);
-    if (debt > 0) {
-      require(debt >= config.minDebtSize(), "too small debt size");
-      uint256 health = IWorker(worker).health(id);
-      uint256 workFactor = config.workFactor(worker, debt);
-      require(health.mul(workFactor) >= debt.mul(10000), "bad work factor");
-      _addDebt(id, debt);
-      _fairLaunchDeposit(id, pos.debtShare);
     }
     // 5. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;
-    // 6. Return excess token back.
-    if (back > lessDebt) {
-      _safeUnwrap(msg.sender, back.sub(lessDebt));
-    }
   }
 
   /// @dev Kill the given to the position. Liquidate it immediately if killFactor condition is met.
@@ -458,19 +322,9 @@ contract Vault is
   function kill(uint256 id)
     external
     onlyWhitelistedLiqudators
-    accrue(0)
     nonReentrant
   {
-    require(fairLaunchPoolId != type(uint256).max, "poolId not set");
-    // 1. Verify that the position is eligible for liquidation.
     Position storage pos = positions[id];
-    require(pos.debtShare > 0, "no debt");
-    // 2. Distribute ALPACAs in FairLaunch to owner
-    _fairLaunchWithdraw(id);
-    uint256 debt = _removeDebt(id);
-    uint256 health = IWorker(pos.worker).health(id);
-    uint256 killFactor = config.killFactor(pos.worker, debt);
-    require(health.mul(killFactor) < debt.mul(10000), "can't liquidate");
     // 3. Perform liquidation and compute the amount of token received.
     uint256 beforeToken = SafeToken.myBalance(token);
     IWorker(pos.worker).liquidate(id);
@@ -479,7 +333,6 @@ contract Vault is
     uint256 liquidatorPrize = back.mul(config.getKillBps()).div(10000);
     uint256 tresauryFees = back.mul(config.getKillTreasuryBps()).div(10000);
     uint256 prize = liquidatorPrize.add(tresauryFees);
-    uint256 rest = back.sub(prize);
     // 4. Clear position debt and return funds to liquidator and position owner.
     if (liquidatorPrize > 0) {
       _safeUnwrap(msg.sender, liquidatorPrize);
@@ -489,53 +342,15 @@ contract Vault is
       _safeUnwrap(config.getTreasuryAddr(), tresauryFees);
     }
 
-    uint256 left = rest > debt ? rest - debt : 0;
-    if (left > 0) {
-      _safeUnwrap(pos.owner, left);
-    }
+    uint256 health = IWorker(pos.worker).health(id);
 
-    emit Kill(id, msg.sender, pos.owner, health, debt, prize, left);
-  }
-
-  /// @dev Internal function to add the given debt value to the given position.
-  function _addDebt(uint256 id, uint256 debtVal) internal {
-    Position storage pos = positions[id];
-    uint256 debtShare = debtValToShare(debtVal);
-    pos.debtShare = pos.debtShare.add(debtShare);
-    vaultDebtShare = vaultDebtShare.add(debtShare);
-    vaultDebtVal = vaultDebtVal.add(debtVal);
-    emit AddDebt(id, debtShare);
-  }
-
-  /// @dev Internal function to clear the debt of the given position. Return the debt value.
-  function _removeDebt(uint256 id) internal returns (uint256) {
-    Position storage pos = positions[id];
-    uint256 debtShare = pos.debtShare;
-    if (debtShare > 0) {
-      uint256 debtVal = debtShareToVal(debtShare);
-      pos.debtShare = 0;
-      vaultDebtShare = vaultDebtShare.sub(debtShare);
-      vaultDebtVal = vaultDebtVal.sub(debtVal);
-      emit RemoveDebt(id, debtShare);
-      return debtVal;
-    } else {
-      return 0;
-    }
+    emit Kill(id, msg.sender, pos.owner, health, prize);
   }
 
   /// @dev Update bank configuration to a new address. Must only be called by owner.
   /// @param _config The new configurator address.
   function updateConfig(IVaultConfig _config) external onlyOwner {
     config = _config;
-  }
-
-  function setFairLaunchPoolId(uint256 _poolId) external onlyOwner {
-    SafeToken.safeApprove(
-      debtToken,
-      config.getFairLaunchAddr(),
-      type(uint256).max
-    );
-    fairLaunchPoolId = _poolId;
   }
 
   /// @dev Withdraw BaseToken reserve for underwater positions to the given address.
