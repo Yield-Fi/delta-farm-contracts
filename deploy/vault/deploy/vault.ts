@@ -49,6 +49,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await vault.deployed();
   console.log(`>> Deployed at ${vault.address}`);
 
+  console.log(`>> Transferring ownership of Vault to Proxy Admin`);
+  await vault.transferOwnership(config.ProxyAdmin);
+  console.log("✅ Done");
+
   const wNativeRelayer = WNativeRelayer__factory.connect(
     config.SharedConfig.WNativeRelayer,
     (await ethers.getSigners())[0]
