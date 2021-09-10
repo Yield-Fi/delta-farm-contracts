@@ -13,7 +13,9 @@
     "lint:fix": "eslint \"**/*.ts\" --fix",
     "solhint": "solhint 'contracts/**/*.sol'",
     "flatten": "hardhat flatten > flatten.sol",
-    "deploy:testnet:pancake:strategies": "hardhat --network testnet deploy --no-compile --reset --tags PancakeStrategies"
+    "deploy:testnet:pancake:strategies": "hardhat --network testnet deploy --no-compile --reset --tags PancakeStrategies",
+    "deploy:hardhat:vault": "hardhat --network hardhat deploy --no-compile --reset --tags Vault",
+    "deploy:localhost:vault": "hardhat --network localhost deploy --no-compile --reset --tags Vault"
   },
   "repository": {
     "type": "git",

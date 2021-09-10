@@ -20,6 +20,17 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 
 export default {
   networks: {
+    localhost: {
+      url: "HTTP://127.0.0.1:7545",
+      allowUnlimitedContractSize: true,
+      timeout: 1800000,
+      gas: 12000000,
+      blockGasLimit: 0x1fffffffffffff,
+      chainId: 1337,
+      accounts: [
+        "09504ce5eb4b49ab8b64cac8372ae6a581fcd81e8ab5487a1dba715b57ab0c1d",
+      ],
+    },
     hardhat: {
       chainId: 31337,
       gas: 12000000,
