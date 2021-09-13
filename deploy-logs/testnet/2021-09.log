@@ -1,0 +1,9 @@
+2021-09-13 09:05:49 ||| ---> Deploying VNativeRelayer... <---
+2021-09-13 09:06:15 ||| - WNativeRelayer deployed at 0x49D5cCd9f978712b53d3F7f1B54bEb5F0C60fF7D
+2021-09-13 09:07:27 ||| ---> Deploying vaults... <---
+2021-09-13 09:07:27 ||| -> BUSD Vault
+2021-09-13 09:07:50 |||   - Vault Config deployed at 0x44F7018deE64221FA9D8a06B8024e6319c1e94FB
+2021-09-13 09:08:11 |||   - Vault deployed at 0x990AcD6aA0A36afCCD55acCCC1273cE80c8e3253
+2021-09-13 09:08:50 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2021-09-13 09:09:15 ||| - AddBaseTokenOnlyStrategy deployed at 0x73d6950d37Cf17f6d38da5291FC2783EE7d2431b
+2021-09-13 09:09:34 ||| - LiquidateStrategy deployed at 0x85ff4165f2ce8dbB342461279277B3acD71BE713

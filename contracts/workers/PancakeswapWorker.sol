@@ -308,10 +308,12 @@ contract PancakeswapWorker is
   /// @dev Work on the given position. Must be called by the operator.
   /// @param id The position ID to work on.
   /// @param data The encoded data, consisting of strategy address and calldata.
-  function work(
-    uint256 id,
-    bytes calldata data
-  ) external override onlyOperator nonReentrant {
+  function work(uint256 id, bytes calldata data)
+    external
+    override
+    onlyOperator
+    nonReentrant
+  {
     // 1. If a treasury configs are not ready. Not reinvest.
     if (treasuryAccount != address(0) && treasuryBountyBps != 0)
       _reinvest(

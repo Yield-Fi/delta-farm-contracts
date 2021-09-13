@@ -18,19 +18,31 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
   }
 });
 
+const testnet = (() => {
+  switch (process.env.TESTNET) {
+    case "bsc-test":
+      return {
+        url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+        accounts: [process.env.TESTNET_PRIVATE_KEY],
+      };
+    case "localhost":
+      return {
+        url: "HTTP://127.0.0.1:7545",
+        allowUnlimitedContractSize: true,
+        timeout: 1800000,
+        gas: 12000000,
+        blockGasLimit: 0x1fffffffffffff,
+        chainId: 1337,
+        accounts: [process.env.TESTNET_PRIVATE_KEY],
+      };
+    default:
+      return undefined;
+  }
+})();
+
 export default {
   networks: {
-    localhost: {
-      url: "HTTP://127.0.0.1:7545",
-      allowUnlimitedContractSize: true,
-      timeout: 1800000,
-      gas: 12000000,
-      blockGasLimit: 0x1fffffffffffff,
-      chainId: 1337,
-      accounts: [
-        "09504ce5eb4b49ab8b64cac8372ae6a581fcd81e8ab5487a1dba715b57ab0c1d",
-      ],
-    },
+    testnet,
     hardhat: {
       chainId: 31337,
       gas: 12000000,
@@ -48,6 +60,12 @@ export default {
         version: "0.6.6",
       },
     ],
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1,
+      },
+    },
   },
   typechain: {
     outDir: "./typechain",

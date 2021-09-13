@@ -2,9 +2,10 @@
 
 pragma solidity 0.8.3;
 
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 
 import "../../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../libs/pancake/interfaces/IPancakePair.sol";
@@ -12,7 +13,13 @@ import "../../libs/pancake/interfaces/IPancakeFactory.sol";
 import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
 
-contract PancakeswapStrategyLiquidate is ReentrancyGuardUpgradeable, IStrategy {
+contract PancakeswapStrategyLiquidate is
+  Initializable,
+  OwnableUpgradeable,
+  UUPSUpgradeable,
+  ReentrancyGuardUpgradeable,
+  IStrategy
+ {
   using SafeToken for address;
 
   IPancakeFactory public factory;
@@ -22,10 +29,15 @@ contract PancakeswapStrategyLiquidate is ReentrancyGuardUpgradeable, IStrategy {
   /// @param _router The PancakeSwap Router smart contract.
   function initialize(IPancakeRouterV2 _router) external initializer {
     ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
+    __Ownable_init();
+    __UUPSUpgradeable_init();
 
     factory = IPancakeFactory(_router.factory());
     router = _router;
   }
+
+  function _authorizeUpgrade(address) internal override onlyOwner {}
+
 
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
   /// @param data Extra calldata information passed along to this strategy.

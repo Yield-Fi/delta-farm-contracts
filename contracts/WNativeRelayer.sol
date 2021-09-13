@@ -18,15 +18,6 @@ contract WNativeRelayer is
   IWNativeRelayer
 {
   address wnative;
-  mapping(address => bool) okCallers;
-
-  modifier onlyWhitelistedCaller() {
-    require(
-      okCallers[msg.sender] == true,
-      "WNativeRelayer::onlyWhitelistedCaller:: !okCaller"
-    );
-    _;
-  }
 
   function initialize(address _wnative) external initializer {
     __Ownable_init();
@@ -36,22 +27,7 @@ contract WNativeRelayer is
 
   function _authorizeUpgrade(address) internal override onlyOwner {}
 
-  function setCallerOk(address[] calldata whitelistedCallers, bool isOk)
-    external
-    onlyOwner
-  {
-    uint256 len = whitelistedCallers.length;
-    for (uint256 idx = 0; idx < len; idx++) {
-      okCallers[whitelistedCallers[idx]] = isOk;
-    }
-  }
-
-  function withdraw(uint256 _amount)
-    external
-    override
-    onlyWhitelistedCaller
-    nonReentrant
-  {
+  function withdraw(uint256 _amount) external override nonReentrant {
     IWBNB(wnative).withdraw(_amount);
     (bool success, ) = msg.sender.call{ value: _amount }("");
     require(success, "WNativeRelayer::onlyWhitelistedCaller:: can't withdraw");

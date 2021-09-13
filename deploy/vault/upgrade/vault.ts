@@ -1,44 +1,46 @@
 import { ethers, upgrades } from "hardhat";
-
 import { DeployFunction } from "hardhat-deploy/types";
-import { HardhatRuntimeEnvironment } from "hardhat/types";
-import TestnetConfig from "../../../.testnet.json";
-import { Vault__factory } from "../../../typechain";
+import { getConfig, VaultConfigType } from "../../utils/config";
+import { logger } from "../../utils/logger";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const TARGETED_VAULTS = ["defiBUSD"];
+const upgradeFunc: DeployFunction = async () => {
+  // The array of vaults' names to upgrade. To upgrade all vaults pass an empty array.
+  const vaultsToDeploy: VaultConfigType["name"][] = [];
 
-  const config = TestnetConfig;
+  const vaultsFilter = (vault: VaultConfigType) =>
+    vaultsToDeploy.includes(vault.name) || vaultsToDeploy.length === 0;
 
-  const toBeUpgradedVaults = TARGETED_VAULTS.map((tv) => {
-    const vault = config.Vaults.find((v) => tv == v.symbol);
-    if (vault === undefined) {
-      throw `error: not found vault with ${tv} symbol`;
-    }
-    if (vault.config === "") {
-      throw `error: not found config address`;
-    }
+  const [deployer] = await ethers.getSigners();
+  const config = getConfig();
 
-    return vault;
-  });
-
-  for (const vault of toBeUpgradedVaults) {
-    console.log(`============`);
-    console.log(
-      `>> Upgrading Vault at ${vault.symbol} through direct contract call as owner.`
+  logger("---> Upgrading implementation of vaults... <---");
+  config.vaults.filter(vaultsFilter).forEach(async (vault, index) => {
+    logger(`${index + 1}. ${vault.name}`);
+    const VaultConfigFactory = await ethers.getContractFactory(
+      "VaultConfig",
+      deployer
     );
-    console.log(">> Upgrade & deploy if needed a new IMPL automatically.");
-    const NewVaultFactory = (await ethers.getContractFactory(
-      "Vault"
-    )) as Vault__factory;
 
-    const _vault = await upgrades.upgradeProxy(vault.address, NewVaultFactory);
+    const VaultConfig = await upgrades.upgradeProxy(
+      vault.config,
+      VaultConfigFactory
+    );
 
-    console.log(`>> Implementation address: ${_vault.address}`);
-    console.log("✅ Done");
-  }
+    await VaultConfig.deployed();
+
+    logger(
+      `  - New implementation of Vault Config deployed at ${VaultConfig.address}`
+    );
+
+    const VaultFactory = await ethers.getContractFactory("Vault", deployer);
+
+    const Vault = await upgrades.upgradeProxy(vault.address, VaultFactory);
+
+    await Vault.deployed();
+
+    logger(`  - New implementation of Vault deployed at ${Vault.address}`);
+  });
 };
 
-export default func;
-func.tags = ["VaultUpgrade"];
+export default upgradeFunc;
+upgradeFunc.tags = ["VaultUpgrade"];

@@ -13,10 +13,20 @@
     "lint:fix": "eslint \"**/*.ts\" --fix",
     "solhint": "solhint 'contracts/**/*.sol'",
     "flatten": "hardhat flatten > flatten.sol",
-    "deploy:testnet:pancake:strategies": "hardhat --network testnet deploy --no-compile --reset --tags PancakeStrategies",
-    "deploy:hardhat:vault": "hardhat --network hardhat deploy --no-compile --reset --tags Vault",
-    "deploy:localhost:vault": "hardhat --network localhost deploy --no-compile --reset --tags Vault",
-    "upgrade:hardhat:vault": "hardhat --network hardhat deploy --no-compile --reset --tags VaultUpgrade"
+    "deploy:testnet:nativeRelayer": "hardhat --network testnet deploy --reset --tags WNativeRelayer",
+    "deploy:mainet:nativeRelayer": "hardhat --network mainet deploy --reset --tags WNativeRelayer",
+    "deploy:testnet:vaults": "hardhat --network testnet deploy --reset --tags Vault",
+    "upgrade:testnet:vaults": "hardhat --network testnet deploy --reset --tags VaultUpgrade",
+    "deploy:mainnet:vaults": "hardhat --network mainnet deploy --reset --tags Vault",
+    "upgrade:mainnet:vaults": "hardhat --network mainnet deploy --reset --tags VaultUpgrade",
+    "deploy:testnet:strategies:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapStrategies",
+    "upgrade:testnet:strategies:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapStrategiesUpgrade",
+    "deploy:mainnet:strategies:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapStrategies",
+    "upgrade:mainnet:strategies:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapStrategiesUpgrade",
+    "deploy:testnet:workers:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapWorkers",
+    "upgrade:testnet:workers:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapWorkersUpgrade",
+    "deploy:mainnet:workers:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapWorkers",
+    "upgrade:mainnet:workers:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapWorkersUpgrade"
   },
   "repository": {
     "type": "git",
@@ -62,6 +72,7 @@
   "dependencies": {
     "@pancakeswap-libs/pancake-swap-core": "^0.1.0",
     "bn.js": "^5.2.0",
-    "chai-bn": "^0.3.0"
+    "chai-bn": "^0.3.0",
+    "moment": "^2.29.1"
   }
 }
