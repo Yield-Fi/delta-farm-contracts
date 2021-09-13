@@ -51,7 +51,7 @@ export const testnetConfig: ProjectConfigType = {
   WNativeRelayer: "0x49D5cCd9f978712b53d3F7f1B54bEb5F0C60fF7D",
   treasuryAccount: "0x94FC2d635D65e6f657b7617843915a41c87B7852",
   tokens,
-  clients: {
+  dex: {
     pancakeswap: {
       FactoryV2: "0xda8EE87e2172d997a7fe05a83FC5c472B40FacCE",
       RouterV2: "0x367633909278A3C91f4cB130D8e56382F00D1071",

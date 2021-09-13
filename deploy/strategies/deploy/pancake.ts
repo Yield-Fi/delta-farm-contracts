@@ -17,7 +17,7 @@ const deployFunc: DeployFunction = async () => {
 
   const AddBaseTokenOnlyStrategy = (await upgrades.deployProxy(
     AddBaseTokenOnlyStrategyFactory,
-    [config.clients.pancakeswap.RouterV2],
+    [config.dex.pancakeswap.RouterV2],
     { kind: "uups" }
   )) as PancakeswapStrategyAddBaseTokenOnly;
 
@@ -33,7 +33,7 @@ const deployFunc: DeployFunction = async () => {
 
   const LiquidateStrategy = await upgrades.deployProxy(
     LiquidateStrategyFactory,
-    [config.clients.pancakeswap.RouterV2],
+    [config.dex.pancakeswap.RouterV2],
     { kind: "uups" }
   );
 

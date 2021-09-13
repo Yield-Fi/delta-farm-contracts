@@ -29,8 +29,8 @@ const deployFunc: DeployFunction = async () => {
         [
           vault.address,
           vault.baseToken,
-          config.clients.pancakeswap.MasterChef,
-          config.clients.pancakeswap.RouterV2,
+          config.dex.pancakeswap.MasterChef,
+          config.dex.pancakeswap.RouterV2,
           worker.positionId,
           config.strategies.pancakeswap.AddBaseToken,
           config.strategies.pancakeswap.Liquidate,
