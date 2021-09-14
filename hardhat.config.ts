@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-waffle";
 import "@openzeppelin/hardhat-upgrades";
 import "hardhat-deploy";
 import "solidity-coverage";
+import "hardhat-contract-sizer";
 
 import { config as dotEnvConfig } from "dotenv";
 import { task } from "hardhat/config";
