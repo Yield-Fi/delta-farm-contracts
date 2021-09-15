@@ -1,6 +1,5 @@
 import "@openzeppelin/test-helpers";
 
-import { Signer } from "ethers";
 import {
   MockToken,
   MockToken__factory,
@@ -9,6 +8,7 @@ import {
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
+  PancakeRouterV2__factory,
   PancakeswapStrategyAddBaseTokenOnly,
   PancakeswapStrategyAddBaseTokenOnly__factory,
   WBNB,
@@ -16,7 +16,7 @@ import {
 } from "../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
-import { PancakeRouterV2__factory } from "../typechain/factories/PancakeRouterV2__factory";
+import { Signer } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 

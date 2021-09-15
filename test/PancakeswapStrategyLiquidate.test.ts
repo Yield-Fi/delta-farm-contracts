@@ -1,6 +1,5 @@
 import "@openzeppelin/test-helpers";
 
-import { Signer } from "ethers";
 import {
   MockToken,
   MockToken__factory,
@@ -17,6 +16,7 @@ import {
 } from "../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
+import { Signer } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 
