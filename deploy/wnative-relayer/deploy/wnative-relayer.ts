@@ -9,16 +9,11 @@ const deployFun: DeployFunction = async function () {
 
   logger("---> Deploying VNativeRelayer... <---");
 
-  const WNativeRelayerFactory = await ethers.getContractFactory(
-    "WNativeRelayer",
-    deployer
-  );
+  const WNativeRelayerFactory = await ethers.getContractFactory("WNativeRelayer", deployer);
 
-  const WNativeRelayer = await upgrades.deployProxy(
-    WNativeRelayerFactory,
-    [config.tokens.WBNB],
-    { kind: "uups" }
-  );
+  const WNativeRelayer = await upgrades.deployProxy(WNativeRelayerFactory, [config.tokens.WBNB], {
+    kind: "uups",
+  });
 
   await WNativeRelayer.deployed();
 

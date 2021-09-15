@@ -22,9 +22,7 @@ const deployFunc: DeployFunction = async () => {
   )) as PancakeswapStrategyAddBaseTokenOnly;
 
   await AddBaseTokenOnlyStrategy.deployed();
-  logger(
-    `- AddBaseTokenOnlyStrategy deployed at ${AddBaseTokenOnlyStrategy.address}`
-  );
+  logger(`- AddBaseTokenOnlyStrategy deployed at ${AddBaseTokenOnlyStrategy.address}`);
 
   const LiquidateStrategyFactory = await ethers.getContractFactory(
     "PancakeswapStrategyLiquidate",
@@ -34,7 +32,9 @@ const deployFunc: DeployFunction = async () => {
   const LiquidateStrategy = await upgrades.deployProxy(
     LiquidateStrategyFactory,
     [config.dex.pancakeswap.RouterV2],
-    { kind: "uups" }
+    {
+      kind: "uups",
+    }
   );
 
   await LiquidateStrategy.deployed();

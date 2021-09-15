@@ -17,7 +17,13 @@ import "./interfaces/IWBNB.sol";
 import "./interfaces/IWNativeRelayer.sol";
 import "./utils/SafeToken.sol";
 
-contract Vault is IVault, Initializable, OwnableUpgradeSafe, ERC20UpgradeSafe, ReentrancyGuardUpgradeSafe {
+contract Vault is
+  IVault,
+  Initializable,
+  OwnableUpgradeSafe,
+  ERC20UpgradeSafe,
+  ReentrancyGuardUpgradeSafe
+{
   /// @notice Libraries
   using SafeToken for address;
   using SafeMath for uint256;

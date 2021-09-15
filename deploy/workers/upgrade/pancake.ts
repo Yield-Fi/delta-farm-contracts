@@ -25,9 +25,7 @@ const upgradeFunc: DeployFunction = async () => {
 
       await PancakeswapWorker.deployed();
 
-      logger(
-        `  New implementation of ${worker.name} deployed at ${PancakeswapWorker.address}`
-      );
+      logger(`  New implementation of ${worker.name} deployed at ${PancakeswapWorker.address}`);
     });
   });
 };

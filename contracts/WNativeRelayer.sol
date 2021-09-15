@@ -11,7 +11,12 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "./interfaces/IWBNB.sol";
 import "./interfaces/IWNativeRelayer.sol";
 
-contract WNativeRelayer is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWNativeRelayer {
+contract WNativeRelayer is
+  Initializable,
+  OwnableUpgradeSafe,
+  ReentrancyGuardUpgradeSafe,
+  IWNativeRelayer
+{
   address wnative;
 
   function initialize(address _wnative) external initializer {

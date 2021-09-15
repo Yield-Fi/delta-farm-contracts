@@ -13,7 +13,12 @@ import "../../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
 
-contract PancakeswapStrategyLiquidate is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IStrategy {
+contract PancakeswapStrategyLiquidate is
+  Initializable,
+  OwnableUpgradeSafe,
+  ReentrancyGuardUpgradeSafe,
+  IStrategy
+{
   using SafeToken for address;
 
   IPancakeFactory public factory;
@@ -33,7 +38,10 @@ contract PancakeswapStrategyLiquidate is Initializable, OwnableUpgradeSafe, Reen
   /// @param data Extra calldata information passed along to this strategy.
   function execute(bytes calldata data) external override nonReentrant {
     // 1. Find out what farming token we are dealing with.
-    (address baseToken, address farmingToken, uint256 minBaseToken) = abi.decode(data, (address, address, uint256));
+    (address baseToken, address farmingToken, uint256 minBaseToken) = abi.decode(
+      data,
+      (address, address, uint256)
+    );
     IPancakePair lpToken = IPancakePair(factory.getPair(farmingToken, baseToken));
     // 2. Approve router to do their stuffs
     require(
@@ -55,10 +63,19 @@ contract PancakeswapStrategyLiquidate is Initializable, OwnableUpgradeSafe, Reen
     address[] memory path = new address[](2);
     path[0] = farmingToken;
     path[1] = baseToken;
-    router.swapExactTokensForTokens(farmingToken.myBalance(), 0, path, address(this), block.timestamp);
+    router.swapExactTokensForTokens(
+      farmingToken.myBalance(),
+      0,
+      path,
+      address(this),
+      block.timestamp
+    );
     // 5. Return all baseToken back to the original caller.
     uint256 balance = baseToken.myBalance();
-    require(balance >= minBaseToken, "PancakeswapV2StrategyLiquidate::execute:: insufficient baseToken received");
+    require(
+      balance >= minBaseToken,
+      "PancakeswapV2StrategyLiquidate::execute:: insufficient baseToken received"
+    );
     SafeToken.safeTransfer(baseToken, msg.sender, balance);
     // 6. Reset approve for safety reason
     require(

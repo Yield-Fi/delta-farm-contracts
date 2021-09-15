@@ -67,10 +67,7 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     factoryV2 = await PancakeFactory.deploy(await deployer.getAddress());
     await factoryV2.deployed();
 
-    const WBNB = (await ethers.getContractFactory(
-      "WBNB",
-      deployer
-    )) as WBNB__factory;
+    const WBNB = (await ethers.getContractFactory("WBNB", deployer)) as WBNB__factory;
     wbnb = await WBNB.deploy();
     await factoryV2.deployed();
 
@@ -86,32 +83,14 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
       "MockToken",
       deployer
     )) as MockToken__factory;
-    baseToken = (await upgrades.deployProxy(MockToken, [
-      "BTOKEN",
-      "BTOKEN",
-    ])) as MockToken;
+    baseToken = (await upgrades.deployProxy(MockToken, ["BTOKEN", "BTOKEN"])) as MockToken;
     await baseToken.deployed();
-    await baseToken.mint(
-      await alice.getAddress(),
-      ethers.utils.parseEther("100")
-    );
-    await baseToken.mint(
-      await bob.getAddress(),
-      ethers.utils.parseEther("100")
-    );
-    farmingToken = (await upgrades.deployProxy(MockToken, [
-      "FTOKEN",
-      "FTOKEN",
-    ])) as MockToken;
+    await baseToken.mint(await alice.getAddress(), ethers.utils.parseEther("100"));
+    await baseToken.mint(await bob.getAddress(), ethers.utils.parseEther("100"));
+    farmingToken = (await upgrades.deployProxy(MockToken, ["FTOKEN", "FTOKEN"])) as MockToken;
     await farmingToken.deployed();
-    await farmingToken.mint(
-      await alice.getAddress(),
-      ethers.utils.parseEther("10")
-    );
-    await farmingToken.mint(
-      await bob.getAddress(),
-      ethers.utils.parseEther("10")
-    );
+    await farmingToken.mint(await alice.getAddress(), ethers.utils.parseEther("10"));
+    await farmingToken.mint(await bob.getAddress(), ethers.utils.parseEther("10"));
 
     await factoryV2.createPair(baseToken.address, farmingToken.address);
 
@@ -120,11 +99,10 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
       deployer
     );
 
-    const PancakeswapStrategyAddBaseTokenOnly =
-      (await ethers.getContractFactory(
-        "PancakeswapStrategyAddBaseTokenOnly",
-        deployer
-      )) as PancakeswapStrategyAddBaseTokenOnly__factory;
+    const PancakeswapStrategyAddBaseTokenOnly = (await ethers.getContractFactory(
+      "PancakeswapStrategyAddBaseTokenOnly",
+      deployer
+    )) as PancakeswapStrategyAddBaseTokenOnly__factory;
     strat = (await upgrades.deployProxy(PancakeswapStrategyAddBaseTokenOnly, [
       routerV2.address,
     ])) as PancakeswapStrategyAddBaseTokenOnly;
@@ -134,19 +112,13 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     baseTokenAsAlice = MockToken__factory.connect(baseToken.address, alice);
     baseTokenAsBob = MockToken__factory.connect(baseToken.address, bob);
 
-    farmingTokenAsAlice = MockToken__factory.connect(
-      farmingToken.address,
-      alice
-    );
+    farmingTokenAsAlice = MockToken__factory.connect(farmingToken.address, alice);
 
     routerV2AsAlice = PancakeRouterV2__factory.connect(routerV2.address, alice);
 
     lpAsBob = PancakePair__factory.connect(lpV2.address, bob);
 
-    stratAsBob = PancakeswapStrategyAddBaseTokenOnly__factory.connect(
-      strat.address,
-      bob
-    );
+    stratAsBob = PancakeswapStrategyAddBaseTokenOnly__factory.connect(strat.address, bob);
   }
 
   beforeEach(async () => {
@@ -160,14 +132,8 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
 
   it("should convert all BTOKEN to LP tokens at best rate", async () => {
     // Alice adds 0.1 FTOKEN + 1 WBTC
-    await farmingTokenAsAlice.approve(
-      routerV2.address,
-      ethers.utils.parseEther("0.1")
-    );
-    await baseTokenAsAlice.approve(
-      routerV2.address,
-      ethers.utils.parseEther("1")
-    );
+    await farmingTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("0.1"));
+    await baseTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("1"));
 
     // Add liquidity to the WBTC-FTOKEN pool on Pancakeswap
     await routerV2AsAlice.addLiquidity(
@@ -182,10 +148,7 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     );
 
     // Bob transfer 0.1 WBTC to StrategyAddBaseTokenOnly first
-    await baseTokenAsBob.transfer(
-      strat.address,
-      ethers.utils.parseEther("0.1")
-    );
+    await baseTokenAsBob.transfer(strat.address, ethers.utils.parseEther("0.1"));
     // Bob uses AddBaseTokenOnly strategy to add 0.1 WBTC
     await stratAsBob.execute(
       ethers.utils.defaultAbiCoder.encode(
@@ -197,39 +160,25 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     expect(await lpV2.balanceOf(await bob.getAddress())).to.be.bignumber.eq(
       ethers.utils.parseEther("0.015415396042372718")
     );
-    expect(await lpV2.balanceOf(strat.address)).to.be.bignumber.eq(
-      ethers.utils.parseEther("0")
-    );
+    expect(await lpV2.balanceOf(strat.address)).to.be.bignumber.eq(ethers.utils.parseEther("0"));
     expect(await farmingToken.balanceOf(strat.address)).to.be.bignumber.eq(
       ethers.utils.parseEther("0")
     );
 
     // Bob uses AddBaseTokenOnly strategy to add another 0.1 WBTC
-    await baseTokenAsBob.transfer(
-      strat.address,
-      ethers.utils.parseEther("0.1")
-    );
-    await lpAsBob.transfer(
-      strat.address,
-      ethers.utils.parseEther("0.015415396042372718")
-    );
+    await baseTokenAsBob.transfer(strat.address, ethers.utils.parseEther("0.1"));
+    await lpAsBob.transfer(strat.address, ethers.utils.parseEther("0.015415396042372718"));
     await stratAsBob.execute(
       ethers.utils.defaultAbiCoder.encode(
         ["address", "address", "uint256"],
-        [
-          baseToken.address,
-          farmingToken.address,
-          ethers.utils.parseEther("0.01"),
-        ]
+        [baseToken.address, farmingToken.address, ethers.utils.parseEther("0.01")]
       )
     );
 
     expect(await lpV2.balanceOf(await bob.getAddress())).to.be.bignumber.eq(
       ethers.utils.parseEther("0.030143763464109982")
     );
-    expect(await lpV2.balanceOf(strat.address)).to.be.bignumber.eq(
-      ethers.utils.parseEther("0")
-    );
+    expect(await lpV2.balanceOf(strat.address)).to.be.bignumber.eq(ethers.utils.parseEther("0"));
     expect(await farmingToken.balanceOf(strat.address)).to.be.bignumber.eq(
       ethers.utils.parseEther("0")
     );
@@ -238,19 +187,12 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     );
 
     // Bob uses AddBaseTokenOnly strategy yet again, but now with an unreasonable min LP request
-    await baseTokenAsBob.transfer(
-      strat.address,
-      ethers.utils.parseEther("0.1")
-    );
+    await baseTokenAsBob.transfer(strat.address, ethers.utils.parseEther("0.1"));
     await expect(
       stratAsBob.execute(
         ethers.utils.defaultAbiCoder.encode(
           ["address", "address", "uint256"],
-          [
-            baseToken.address,
-            farmingToken.address,
-            ethers.utils.parseEther("0.05"),
-          ]
+          [baseToken.address, farmingToken.address, ethers.utils.parseEther("0.05")]
         )
       )
     ).to.be.revertedWith("insufficient LP tokens received");

@@ -48,14 +48,22 @@ contract SimplePriceOracle is Initializable, OwnableUpgradeSafe, IPriceOracle {
       address token0 = token0s[idx];
       address token1 = token1s[idx];
       uint256 price = prices[idx];
-      store[token0][token1] = PriceData({ price: uint192(price), lastUpdate: uint64(block.timestamp) });
+      store[token0][token1] = PriceData({
+        price: uint192(price),
+        lastUpdate: uint64(block.timestamp)
+      });
       emit PriceUpdate(token0, token1, price);
     }
   }
 
   /// @dev Return the wad price of token0/token1, multiplied by 1e18
   /// NOTE: (if you have 1 token0 how much you can sell it for token1)
-  function getPrice(address token0, address token1) external view override returns (uint256 price, uint256 lastUpdate) {
+  function getPrice(address token0, address token1)
+    external
+    view
+    override
+    returns (uint256 price, uint256 lastUpdate)
+  {
     // PriceData memory data = store[token0][token1];
     // price = uint256(data.price);
     // lastUpdate = uint256(data.lastUpdate);

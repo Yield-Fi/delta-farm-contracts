@@ -16,21 +16,13 @@ const upgradeFunc: DeployFunction = async () => {
   logger("---> Upgrading implementation of vaults... <---");
   for (const vault of config.vaults.filter(vaultsFilter)) {
     logger(`-> ${vault.name}`);
-    const VaultConfigFactory = await ethers.getContractFactory(
-      "VaultConfig",
-      deployer
-    );
+    const VaultConfigFactory = await ethers.getContractFactory("VaultConfig", deployer);
 
-    const VaultConfig = await upgrades.upgradeProxy(
-      vault.config,
-      VaultConfigFactory
-    );
+    const VaultConfig = await upgrades.upgradeProxy(vault.config, VaultConfigFactory);
 
     await VaultConfig.deployed();
 
-    logger(
-      `  - New implementation of Vault Config deployed at ${VaultConfig.address}`
-    );
+    logger(`  - New implementation of Vault Config deployed at ${VaultConfig.address}`);
 
     const VaultFactory = await ethers.getContractFactory("Vault", deployer);
 

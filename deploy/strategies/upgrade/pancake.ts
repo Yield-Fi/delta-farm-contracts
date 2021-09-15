@@ -7,17 +7,12 @@ const upgradeFunc: DeployFunction = async () => {
   const config = getConfig();
   const [deployer] = await ethers.getSigners();
 
-  logger(
-    "---> Upgrading strategies implementation for the pancakeswap workers... <---"
-  );
+  logger("---> Upgrading strategies implementation for the pancakeswap workers... <---");
 
-  const addBaseTokenOnlyStrategyProxyAddress =
-    config.strategies.pancakeswap.AddBaseToken;
+  const addBaseTokenOnlyStrategyProxyAddress = config.strategies.pancakeswap.AddBaseToken;
 
   if (!addBaseTokenOnlyStrategyProxyAddress) {
-    throw new Error(
-      "Address for PancakeswapStrategyAddBaseTokenOnly not found"
-    );
+    throw new Error("Address for PancakeswapStrategyAddBaseTokenOnly not found");
   }
 
   const AddBaseTokenOnlyStrategyFactory = await ethers.getContractFactory(
@@ -48,9 +43,7 @@ const upgradeFunc: DeployFunction = async () => {
   );
 
   await LiquidateStrategy.deployed();
-  logger(
-    `- new implementation of LiquidateStrategy deployed at ${LiquidateStrategy.address}`
-  );
+  logger(`- new implementation of LiquidateStrategy deployed at ${LiquidateStrategy.address}`);
 };
 
 export default upgradeFunc;

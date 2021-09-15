@@ -13,7 +13,12 @@ import "./interfaces/InterestModel.sol";
 contract VaultConfig is Initializable, OwnableUpgradeSafe, IVaultConfig {
   /// @notice Events
   event SetWhitelistedCaller(address indexed caller, address indexed addr, bool ok);
-  event SetParams(address indexed caller, address wrappedNative, address wNativeRelayer, address treasury);
+  event SetParams(
+    address indexed caller,
+    address wrappedNative,
+    address wNativeRelayer,
+    address treasury
+  );
   event SetWorkers(address indexed caller, address worker, address workerConfig);
   event SetMaxKillBps(address indexed caller, uint256 maxKillBps);
   event SetWhitelistedLiquidator(address indexed caller, address indexed addr, bool ok);
@@ -59,8 +64,14 @@ contract VaultConfig is Initializable, OwnableUpgradeSafe, IVaultConfig {
   }
 
   /// @dev Set the configuration for the given workers. Must only be called by the owner.
-  function setWorkers(address[] calldata addrs, IWorkerConfig[] calldata configs) external onlyOwner {
-    require(addrs.length == configs.length, "ConfigurableInterestVaultConfig::setWorkers:: bad length");
+  function setWorkers(address[] calldata addrs, IWorkerConfig[] calldata configs)
+    external
+    onlyOwner
+  {
+    require(
+      addrs.length == configs.length,
+      "ConfigurableInterestVaultConfig::setWorkers:: bad length"
+    );
     for (uint256 idx = 0; idx < addrs.length; idx++) {
       workers[addrs[idx]] = configs[idx];
       emit SetWorkers(_msgSender(), addrs[idx], address(configs[idx]));

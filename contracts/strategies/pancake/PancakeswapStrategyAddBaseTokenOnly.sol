@@ -41,7 +41,10 @@ contract PancakeswapStrategyAddBaseTokenOnly is
   /// @param data Extra calldata information passed along to this strategy.
   function execute(bytes calldata data) external override nonReentrant {
     // 1. Find out what farming token we are dealing with and min additional LP tokens.
-    (address baseToken, address farmingToken, uint256 minLPAmount) = abi.decode(data, (address, address, uint256));
+    (address baseToken, address farmingToken, uint256 minLPAmount) = abi.decode(
+      data,
+      (address, address, uint256)
+    );
     IPancakePair lpToken = IPancakePair(factory.getPair(farmingToken, baseToken));
     // 2. Approve router to do their stuffs
     farmingToken.safeApprove(address(router), uint256(-1));
@@ -56,7 +59,9 @@ contract PancakeswapStrategyAddBaseTokenOnly is
     // 4(1-f) = 4*9975*10000 = 399000000, where f = 0.0025 and 10,000 is a way to avoid floating point
     // 19975^2 = 399000625
     // 9975*2 = 19950
-    uint256 aIn = CustomMath.sqrt(rIn.mul(balance.mul(399000000).add(rIn.mul(399000625)))).sub(rIn.mul(19975)) / 19950;
+    uint256 aIn = CustomMath.sqrt(rIn.mul(balance.mul(399000000).add(rIn.mul(399000625)))).sub(
+      rIn.mul(19975)
+    ) / 19950;
     // 4. Convert that portion of baseToken to farmingToken.
     address[] memory path = new address[](2);
     path[0] = baseToken;

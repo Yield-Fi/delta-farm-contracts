@@ -16,10 +16,7 @@ const deployFunc: DeployFunction = async () => {
   logger("---> Deploying vaults... <---");
   for (const vault of config.vaults.filter(vaultsFilter)) {
     logger(`-> ${vault.name}`);
-    const VaultConfigFactory = await ethers.getContractFactory(
-      "VaultConfig",
-      deployer
-    );
+    const VaultConfigFactory = await ethers.getContractFactory("VaultConfig", deployer);
 
     const VaultConfig = await upgrades.deployProxy(
       VaultConfigFactory,
@@ -37,12 +34,7 @@ const deployFunc: DeployFunction = async () => {
 
     const Vault = await upgrades.deployProxy(
       VaultFactory,
-      [
-        VaultConfig.address,
-        vault.baseToken,
-        vault.tokenName,
-        vault.tokenSymbol,
-      ],
+      [VaultConfig.address, vault.baseToken, vault.tokenName, vault.tokenSymbol],
       { kind: "uups" }
     );
 

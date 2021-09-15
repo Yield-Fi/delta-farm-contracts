@@ -16,6 +16,7 @@
     "solhint": "solhint 'contracts/**/*.sol'",
     "flatten": "hardhat flatten > flatten.sol",
     "docs": "solidity-docgen --solc-module solc-0.8.3",
+    "prettier:fix": "prettier --write contracts/ && prettier --write test && prettier --write deploy && prettier --write scripts",
     "deploy:testnet:nativeRelayer": "hardhat --network testnet deploy --reset --tags WNativeRelayer",
     "deploy:mainnet:nativeRelayer": "hardhat --network mainnet deploy --reset --tags WNativeRelayer",
     "deploy:testnet:vaults": "hardhat --network testnet deploy --reset --tags Vault",
