@@ -6,7 +6,9 @@
   "scripts": {
     "test": "hardhat test",
     "compile": "hardhat compile",
+    "compile:clean": "npm run clean && hardhat compile",
     "coverage": "hardhat coverage",
+    "clean": "rmdir artifacts\\ cache\\ typechain\\ /s /q",
     "solium": "solium --dir contracts/",
     "solium:fix": "solium --dir contracts/ --fix",
     "lint": "eslint \"**/*.ts\"",
@@ -15,7 +17,7 @@
     "flatten": "hardhat flatten > flatten.sol",
     "docs": "solidity-docgen --solc-module solc-0.8.3",
     "deploy:testnet:nativeRelayer": "hardhat --network testnet deploy --reset --tags WNativeRelayer",
-    "deploy:mainet:nativeRelayer": "hardhat --network mainet deploy --reset --tags WNativeRelayer",
+    "deploy:mainnet:nativeRelayer": "hardhat --network mainnet deploy --reset --tags WNativeRelayer",
     "deploy:testnet:vaults": "hardhat --network testnet deploy --reset --tags Vault",
     "upgrade:testnet:vaults": "hardhat --network testnet deploy --reset --tags VaultUpgrade",
     "deploy:mainnet:vaults": "hardhat --network mainnet deploy --reset --tags Vault",
