@@ -55,9 +55,6 @@ export default {
   solidity: {
     compilers: [
       {
-        version: "0.8.3",
-      },
-      {
         version: "0.6.6",
       },
     ],
@@ -72,5 +69,14 @@ export default {
     outDir: "./typechain",
     target: "ethers-v5",
     alwaysGenerateOverloads: false,
+  },
+  paths: {
+    sources: "./contracts",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
+  mocha: {
+    timeout: 50000,
   },
 };
