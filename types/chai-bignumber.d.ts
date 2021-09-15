@@ -10,10 +10,7 @@ declare module "chai-bignumber" {
 
 declare namespace Chai {
   // For BDD API
-  interface Assertion
-    extends LanguageChains,
-      NumericComparison,
-      TypeComparison {
+  interface Assertion extends LanguageChains, NumericComparison, TypeComparison {
     bignumber: Assertion;
   }
 }
