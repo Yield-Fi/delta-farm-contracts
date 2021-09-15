@@ -7,8 +7,8 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
-import "../../libs/pancake/interfaces/IPancakeFactory.sol";
-import "../../libs/pancake/interfaces/IPancakePair.sol";
+import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
+import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
 import "../../../contracts/libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../interfaces/IStrategy.sol";
@@ -39,17 +39,10 @@ contract PancakeswapStrategyAddBaseTokenOnly is
 
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
   /// @param data Extra calldata information passed along to this strategy.
-  function execute(
-    bytes calldata data
-  ) external override nonReentrant {
+  function execute(bytes calldata data) external override nonReentrant {
     // 1. Find out what farming token we are dealing with and min additional LP tokens.
-    (address baseToken, address farmingToken, uint256 minLPAmount) = abi.decode(
-      data,
-      (address, address, uint256)
-    );
-    IPancakePair lpToken = IPancakePair(
-      factory.getPair(farmingToken, baseToken)
-    );
+    (address baseToken, address farmingToken, uint256 minLPAmount) = abi.decode(data, (address, address, uint256));
+    IPancakePair lpToken = IPancakePair(factory.getPair(farmingToken, baseToken));
     // 2. Approve router to do their stuffs
     farmingToken.safeApprove(address(router), uint256(-1));
     baseToken.safeApprove(address(router), uint256(-1));
@@ -63,20 +56,12 @@ contract PancakeswapStrategyAddBaseTokenOnly is
     // 4(1-f) = 4*9975*10000 = 399000000, where f = 0.0025 and 10,000 is a way to avoid floating point
     // 19975^2 = 399000625
     // 9975*2 = 19950
-    uint256 aIn = CustomMath
-      .sqrt(rIn.mul(balance.mul(399000000).add(rIn.mul(399000625))))
-      .sub(rIn.mul(19975)) / 19950;
+    uint256 aIn = CustomMath.sqrt(rIn.mul(balance.mul(399000000).add(rIn.mul(399000625)))).sub(rIn.mul(19975)) / 19950;
     // 4. Convert that portion of baseToken to farmingToken.
     address[] memory path = new address[](2);
     path[0] = baseToken;
     path[1] = farmingToken;
-    router.swapExactTokensForTokens(
-      aIn,
-      0,
-      path,
-      address(this),
-      block.timestamp
-    );
+    router.swapExactTokensForTokens(aIn, 0, path, address(this), block.timestamp);
     // 5. Mint more LP tokens and return all LP tokens to the sender.
     (, , uint256 moreLPAmount) = router.addLiquidity(
       baseToken,

@@ -11,20 +11,13 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IWorker.sol";
-import "./interfaces/IWorker2.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWBNB.sol";
 import "./interfaces/IWNativeRelayer.sol";
 import "./utils/SafeToken.sol";
 
-contract Vault is
-  IVault,
-  Initializable,
-  OwnableUpgradeSafe,
-  ERC20UpgradeSafe,
-  ReentrancyGuardUpgradeSafe
-{
+contract Vault is IVault, Initializable, OwnableUpgradeSafe, ERC20UpgradeSafe, ReentrancyGuardUpgradeSafe {
   /// @notice Libraries
   using SafeToken for address;
   using SafeMath for uint256;
@@ -67,10 +60,7 @@ contract Vault is
   /// @dev Get token from msg.sender
   modifier transferTokenToVault(uint256 value) {
     if (msg.value != 0) {
-      require(
-        token == config.wNativeRelayer(),
-        "baseToken is not wNative"
-      );
+      require(token == config.wNativeRelayer(), "baseToken is not wNative");
       require(value == msg.value, "value != msg.value");
       IWBNB(config.nativeTokenAddr()).deposit{ value: msg.value }();
     } else {
@@ -122,17 +112,8 @@ contract Vault is
   }
 
   /// @dev Request Funds from user through Vault
-  function requestFunds(address targetedToken, uint256 amount)
-    external
-    override
-    inExec
-  {
-    SafeToken.safeTransferFrom(
-      targetedToken,
-      positions[POSITION_ID].owner,
-      msg.sender,
-      amount
-    );
+  function requestFunds(address targetedToken, uint256 amount) external override inExec {
+    SafeToken.safeTransferFrom(targetedToken, positions[POSITION_ID].owner, msg.sender, amount);
   }
 
   /// @dev Transfer to "to". Automatically unwrap if BTOKEN is WBNB
@@ -158,13 +139,7 @@ contract Vault is
     address worker,
     uint256 amount,
     bytes calldata data
-  )
-    external
-    payable
-    onlyEOAorWhitelisted
-    transferTokenToVault(amount)
-    nonReentrant
-  {
+  ) external payable onlyEOAorWhitelisted transferTokenToVault(amount) nonReentrant {
     // 1. Sanity check the input position, or add a new position of ID is 0.
     Position storage pos;
     if (id == 0) {
@@ -181,15 +156,12 @@ contract Vault is
     emit Work(id, amount);
     // Update execution scope variables
     POSITION_ID = id;
-    (address strat, bytes memory params) = abi.decode(data, (address, bytes));
-    STRATEGY = strat;
+    (STRATEGY, ) = abi.decode(data, (address, bytes));
+    require(config.isWorker(worker), "not a worker");
 
-    require(
-      amount <= SafeToken.myBalance(token),
-     "insufficient funds in the vault"
-    );
+    require(amount <= SafeToken.myBalance(token), "insufficient funds in the vault");
     SafeToken.safeTransfer(token, worker, amount);
-    IWorker2(worker).executeStrategy(POSITION_ID, STRATEGY, params);
+    IWorker(worker).work(id, data);
     // 5. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;
@@ -204,11 +176,7 @@ contract Vault is
   /// @dev Withdraw BaseToken reserve for underwater positions to the given address.
   /// @param to The address to transfer BaseToken to.
   /// @param value The number of BaseToken tokens to withdraw. Must not exceed `reservePool`.
-  function withdrawReserve(address to, uint256 value)
-    external
-    onlyOwner
-    nonReentrant
-  {
+  function withdrawReserve(address to, uint256 value) external onlyOwner nonReentrant {
     SafeToken.safeTransfer(token, to, value);
   }
 

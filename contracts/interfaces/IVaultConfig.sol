@@ -28,8 +28,5 @@ interface IVaultConfig {
   function isWorkerStable(address worker) external view returns (bool);
 
   /// @dev Return if reserve that worker is working with is consistent
-  function isWorkerReserveConsistent(address worker)
-    external
-    view
-    returns (bool);
+  function isWorkerReserveConsistent(address worker) external view returns (bool);
 }

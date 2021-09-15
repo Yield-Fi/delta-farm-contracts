@@ -43,17 +43,14 @@ library CustomMath {
       result <<= 1;
     }
 
-    // The operations can never overflow because the result is max 2^127 when it enters this block.
-    {
-      result = (result + x / result) >> 1;
-      result = (result + x / result) >> 1;
-      result = (result + x / result) >> 1;
-      result = (result + x / result) >> 1;
-      result = (result + x / result) >> 1;
-      result = (result + x / result) >> 1;
-      result = (result + x / result) >> 1; // Seven iterations should be enough
-      uint256 roundedDownResult = x / result;
-      return result >= roundedDownResult ? roundedDownResult : result;
-    }
+    result = (result + x / result) >> 1;
+    result = (result + x / result) >> 1;
+    result = (result + x / result) >> 1;
+    result = (result + x / result) >> 1;
+    result = (result + x / result) >> 1;
+    result = (result + x / result) >> 1;
+    result = (result + x / result) >> 1; // Seven iterations should be enough
+    uint256 roundedDownResult = x / result;
+    return result >= roundedDownResult ? roundedDownResult : result;
   }
 }

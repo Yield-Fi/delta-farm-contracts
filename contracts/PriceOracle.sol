@@ -26,7 +26,7 @@ contract SimplePriceOracle is Initializable, OwnableUpgradeSafe, IPriceOracle {
   }
 
   function initialize(address _feeder) external initializer {
-     __Ownable_init();
+    __Ownable_init();
 
     feeder = _feeder;
   }
@@ -61,6 +61,6 @@ contract SimplePriceOracle is Initializable, OwnableUpgradeSafe, IPriceOracle {
     // lastUpdate = uint256(data.lastUpdate);
     // require(price != 0 && lastUpdate != 0, "SimplePriceOracle::getPrice:: bad price data");
     // return (price, lastUpdate);
-  return (1, block.timestamp - 1 hours);
+    return (1, block.timestamp - 1 hours);
   }
 }

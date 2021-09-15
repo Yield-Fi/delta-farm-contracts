@@ -10,39 +10,14 @@ import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWorkerConfig.sol";
 import "./interfaces/InterestModel.sol";
 
-contract VaultConfig is
-  Initializable,
-  OwnableUpgradeSafe,
-  IVaultConfig
-{
+contract VaultConfig is Initializable, OwnableUpgradeSafe, IVaultConfig {
   /// @notice Events
-  event SetWhitelistedCaller(
-    address indexed caller,
-    address indexed addr,
-    bool ok
-  );
-  event SetParams(
-    address indexed caller,
-    address wrappedNative,
-    address wNativeRelayer,
-    address treasury
-  );
-  event SetWorkers(
-    address indexed caller,
-    address worker,
-    address workerConfig
-  );
+  event SetWhitelistedCaller(address indexed caller, address indexed addr, bool ok);
+  event SetParams(address indexed caller, address wrappedNative, address wNativeRelayer, address treasury);
+  event SetWorkers(address indexed caller, address worker, address workerConfig);
   event SetMaxKillBps(address indexed caller, uint256 maxKillBps);
-  event SetWhitelistedLiquidator(
-    address indexed caller,
-    address indexed addr,
-    bool ok
-  );
-  event SetApprovedAddStrategy(
-    address indexed caller,
-    address addStrat,
-    bool ok
-  );
+  event SetWhitelistedLiquidator(address indexed caller, address indexed addr, bool ok);
+  event SetApprovedAddStrategy(address indexed caller, address addStrat, bool ok);
 
   /// Mapping for worker address to its configuration.
   mapping(address => IWorkerConfig) public workers;
@@ -84,14 +59,8 @@ contract VaultConfig is
   }
 
   /// @dev Set the configuration for the given workers. Must only be called by the owner.
-  function setWorkers(
-    address[] calldata addrs,
-    IWorkerConfig[] calldata configs
-  ) external onlyOwner {
-    require(
-      addrs.length == configs.length,
-      "ConfigurableInterestVaultConfig::setWorkers:: bad length"
-    );
+  function setWorkers(address[] calldata addrs, IWorkerConfig[] calldata configs) external onlyOwner {
+    require(addrs.length == configs.length, "ConfigurableInterestVaultConfig::setWorkers:: bad length");
     for (uint256 idx = 0; idx < addrs.length; idx++) {
       workers[addrs[idx]] = configs[idx];
       emit SetWorkers(_msgSender(), addrs[idx], address(configs[idx]));
@@ -99,10 +68,7 @@ contract VaultConfig is
   }
 
   /// @dev Set whitelisted callers. Must only be called by the owner.
-  function setWhitelistedCallers(address[] calldata callers, bool ok)
-    external
-    onlyOwner
-  {
+  function setWhitelistedCallers(address[] calldata callers, bool ok) external onlyOwner {
     for (uint256 idx = 0; idx < callers.length; idx++) {
       whitelistedCallers[callers[idx]] = ok;
       emit SetWhitelistedCaller(_msgSender(), callers[idx], ok);
@@ -110,10 +76,7 @@ contract VaultConfig is
   }
 
   /// @dev Set approved add strategies. Must only be called by the owner.
-  function setApprovedAddStrategy(address[] calldata addStrats, bool ok)
-    external
-    onlyOwner
-  {
+  function setApprovedAddStrategy(address[] calldata addStrats, bool ok) external onlyOwner {
     for (uint256 idx = 0; idx < addStrats.length; idx++) {
       approvedAddStrategies[addStrats[idx]] = ok;
       emit SetApprovedAddStrategy(_msgSender(), addStrats[idx], ok);
@@ -121,10 +84,7 @@ contract VaultConfig is
   }
 
   /// @dev Set whitelisted liquidators. Must only be called by the owner.
-  function setWhitelistedLiquidators(address[] calldata callers, bool ok)
-    external
-    onlyOwner
-  {
+  function setWhitelistedLiquidators(address[] calldata callers, bool ok) external onlyOwner {
     for (uint256 idx = 0; idx < callers.length; idx++) {
       whitelistedLiquidators[callers[idx]] = ok;
       emit SetWhitelistedLiquidator(_msgSender(), callers[idx], ok);
@@ -137,22 +97,12 @@ contract VaultConfig is
   }
 
   /// @dev Return if worker is stable.
-  function isWorkerStable(address worker)
-    external
-    view
-    override
-    returns (bool)
-  {
+  function isWorkerStable(address worker) external view override returns (bool) {
     return workers[worker].isStable(worker);
   }
 
   /// @dev Return if pools is consistent
-  function isWorkerReserveConsistent(address worker)
-    external
-    view
-    override
-    returns (bool)
-  {
+  function isWorkerReserveConsistent(address worker) external view override returns (bool) {
     return workers[worker].isReserveConsistent(worker);
   }
 
