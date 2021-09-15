@@ -1,6 +1,7 @@
+import { VaultConfigType, getConfig } from "../../utils/config";
 import { ethers, upgrades } from "hardhat";
+
 import { DeployFunction } from "hardhat-deploy/types";
-import { getConfig, VaultConfigType } from "../../utils/config";
 import { logger } from "../../utils/logger";
 
 const deployFunc: DeployFunction = async () => {
@@ -18,13 +19,11 @@ const deployFunc: DeployFunction = async () => {
     logger(`-> ${vault.name}`);
     const VaultConfigFactory = await ethers.getContractFactory("VaultConfig", deployer);
 
-    const VaultConfig = await upgrades.deployProxy(
-      VaultConfigFactory,
-      [config.tokens.WBNB, config.WNativeRelayer, config.treasuryAccount],
-      {
-        kind: "uups",
-      }
-    );
+    const VaultConfig = await upgrades.deployProxy(VaultConfigFactory, [
+      config.tokens.WBNB,
+      config.WNativeRelayer,
+      config.treasuryAccount,
+    ]);
 
     await VaultConfig.deployed();
 
@@ -32,11 +31,12 @@ const deployFunc: DeployFunction = async () => {
 
     const VaultFactory = await ethers.getContractFactory("Vault", deployer);
 
-    const Vault = await upgrades.deployProxy(
-      VaultFactory,
-      [VaultConfig.address, vault.baseToken, vault.tokenName, vault.tokenSymbol],
-      { kind: "uups" }
-    );
+    const Vault = await upgrades.deployProxy(VaultFactory, [
+      VaultConfig.address,
+      vault.baseToken,
+      vault.tokenName,
+      vault.tokenSymbol,
+    ]);
 
     await Vault.deployed();
 

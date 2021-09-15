@@ -1,4 +1,5 @@
 import { ethers, upgrades } from "hardhat";
+
 import { DeployFunction } from "hardhat-deploy/types";
 import { PancakeswapStrategyAddBaseTokenOnly } from "../../../typechain";
 import { getConfig } from "../../utils/config";
@@ -15,11 +16,9 @@ const deployFunc: DeployFunction = async () => {
     deployer
   );
 
-  const AddBaseTokenOnlyStrategy = (await upgrades.deployProxy(
-    AddBaseTokenOnlyStrategyFactory,
-    [config.dex.pancakeswap.RouterV2],
-    { kind: "uups" }
-  )) as PancakeswapStrategyAddBaseTokenOnly;
+  const AddBaseTokenOnlyStrategy = (await upgrades.deployProxy(AddBaseTokenOnlyStrategyFactory, [
+    config.dex.pancakeswap.RouterV2,
+  ])) as PancakeswapStrategyAddBaseTokenOnly;
 
   await AddBaseTokenOnlyStrategy.deployed();
   logger(`- AddBaseTokenOnlyStrategy deployed at ${AddBaseTokenOnlyStrategy.address}`);
@@ -29,13 +28,9 @@ const deployFunc: DeployFunction = async () => {
     deployer
   );
 
-  const LiquidateStrategy = await upgrades.deployProxy(
-    LiquidateStrategyFactory,
-    [config.dex.pancakeswap.RouterV2],
-    {
-      kind: "uups",
-    }
-  );
+  const LiquidateStrategy = await upgrades.deployProxy(LiquidateStrategyFactory, [
+    config.dex.pancakeswap.RouterV2,
+  ]);
 
   await LiquidateStrategy.deployed();
   logger(`- LiquidateStrategy deployed at ${LiquidateStrategy.address}`);

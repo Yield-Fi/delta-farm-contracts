@@ -1,5 +1,6 @@
-import { DeployFunction } from "hardhat-deploy/types";
 import { ethers, upgrades } from "hardhat";
+
+import { DeployFunction } from "hardhat-deploy/types";
 import { getConfig } from "../../utils/config";
 import { logger } from "../../utils/logger";
 
@@ -11,9 +12,7 @@ const deployFun: DeployFunction = async function () {
 
   const WNativeRelayerFactory = await ethers.getContractFactory("WNativeRelayer", deployer);
 
-  const WNativeRelayer = await upgrades.deployProxy(WNativeRelayerFactory, [config.tokens.WBNB], {
-    kind: "uups",
-  });
+  const WNativeRelayer = await upgrades.deployProxy(WNativeRelayerFactory, [config.tokens.WBNB]);
 
   await WNativeRelayer.deployed();
 

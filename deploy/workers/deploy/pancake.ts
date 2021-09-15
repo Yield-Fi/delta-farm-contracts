@@ -1,7 +1,8 @@
+import { WorkerConfigType, getConfig } from "../../utils/config";
 import { ethers, upgrades } from "hardhat";
+
 import { DeployFunction } from "hardhat-deploy/types";
-import { PancakeswapWorker2 } from "../../../typechain";
-import { getConfig, WorkerConfigType } from "../../utils/config";
+import { PancakeswapWorker } from "../../../typechain";
 import { logger } from "../../utils/logger";
 
 const deployFunc: DeployFunction = async () => {
@@ -24,28 +25,15 @@ const deployFunc: DeployFunction = async () => {
         deployer
       );
 
-      const PancakeswapWorker = (await upgrades.deployProxy(
-        PancakeswapWorkerFactory,
-        [
-          vault.address,
-          vault.baseToken,
-          config.dex.pancakeswap.MasterChef,
-          config.dex.pancakeswap.RouterV2,
-          worker.positionId,
-        ],
-        { kind: "uups" }
-      )) as PancakeswapWorker2;
+      const PancakeswapWorker = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
+        vault.address,
+        vault.baseToken,
+        config.dex.pancakeswap.MasterChef,
+        config.dex.pancakeswap.RouterV2,
+        worker.positionId,
+      ])) as PancakeswapWorker;
 
       await PancakeswapWorker.deployed();
-
-      PancakeswapWorker.setReinvestConfig(
-        config.treasuryAccount,
-        1000,
-        config.treasuryAccount,
-        500,
-        config.strategies.pancakeswap.AddBaseToken,
-        1
-      );
 
       logger(`  - ${worker.name} deployed at ${PancakeswapWorker.address}`);
     }

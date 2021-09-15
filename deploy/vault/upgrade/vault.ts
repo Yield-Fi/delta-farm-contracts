@@ -1,6 +1,7 @@
+import { VaultConfigType, getConfig } from "../../utils/config";
 import { ethers, upgrades } from "hardhat";
+
 import { DeployFunction } from "hardhat-deploy/types";
-import { getConfig, VaultConfigType } from "../../utils/config";
 import { logger } from "../../utils/logger";
 
 const upgradeFunc: DeployFunction = async () => {
