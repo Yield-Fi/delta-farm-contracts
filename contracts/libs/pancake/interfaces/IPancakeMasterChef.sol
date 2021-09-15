@@ -2,7 +2,6 @@
 
 pragma solidity 0.6.6;
 
-import "./IPancakePair.sol";
 
 // Making the original MasterChef as an interface leads to compilation fail.
 // Use Contract instead of Interface here
