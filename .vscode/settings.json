@@ -1,3 +1,5 @@
 {
-  "editor.tabSize": 2
+  "editor.tabSize": 2,
+  "solidity.compileUsingLocalVersion": "c:\\Users\\Patryk Mróz\\Desktop\\praca\\deficentral-blockchain\\soljson-v0.6.6+commit.6c089d02.js",
+  "solidity.compileUsingRemoteVersion": "v0.6.6+commit.6c089d02"
 }

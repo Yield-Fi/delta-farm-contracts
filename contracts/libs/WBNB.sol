@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
 contract WBNB {
   string public name = "Wrapped BNB";
@@ -51,7 +51,7 @@ contract WBNB {
   ) public returns (bool) {
     require(balanceOf[src] >= wad);
 
-    if (src != msg.sender && allowance[src][msg.sender] != type(uint256).max) {
+    if (src != msg.sender && allowance[src][msg.sender] != uint256(-1)) {
       require(allowance[src][msg.sender] >= wad);
       allowance[src][msg.sender] -= wad;
     }

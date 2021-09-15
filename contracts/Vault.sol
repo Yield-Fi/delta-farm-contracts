@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20Upgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/MathUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/interfaces/IERC20Upgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/Math.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IWorker.sol";
+import "./interfaces/IWorker2.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWBNB.sol";
@@ -21,14 +21,13 @@ import "./utils/SafeToken.sol";
 contract Vault is
   IVault,
   Initializable,
-  UUPSUpgradeable,
-  OwnableUpgradeable,
-  ERC20Upgradeable,
-  ReentrancyGuardUpgradeable
+  OwnableUpgradeSafe,
+  ERC20UpgradeSafe,
+  ReentrancyGuardUpgradeSafe
 {
   /// @notice Libraries
   using SafeToken for address;
-  using SafeMathUpgradeable for uint256;
+  using SafeMath for uint256;
 
   /// @notice Events
   event Work(uint256 indexed id, uint256 loan);
@@ -36,7 +35,7 @@ contract Vault is
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;
   uint256 private constant _ENTERED = 2;
-  uint256 private constant _NO_ID = type(uint256).max;
+  uint256 private constant _NO_ID = uint256(-1);
   address private constant _NO_ADDRESS = address(1);
 
   /// @dev Temporay variables to manage execution scope
@@ -97,7 +96,7 @@ contract Vault is
     string calldata _symbol
   ) external initializer {
     __Ownable_init();
-    __UUPSUpgradeable_init();
+    __ReentrancyGuard_init();
     __ERC20_init(_name, _symbol);
 
     nextPositionID = 1;
@@ -109,8 +108,6 @@ contract Vault is
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;
   }
-
-  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   /// @dev Return Token value of the given position.
   /// @param id The position ID to query.
@@ -184,15 +181,15 @@ contract Vault is
     emit Work(id, amount);
     // Update execution scope variables
     POSITION_ID = id;
-    (STRATEGY, ) = abi.decode(data, (address, bytes));
-    require(config.isWorker(worker), "not a worker");
+    (address strat, bytes memory params) = abi.decode(data, (address, bytes));
+    STRATEGY = strat;
 
     require(
       amount <= SafeToken.myBalance(token),
      "insufficient funds in the vault"
     );
     SafeToken.safeTransfer(token, worker, amount);
-    IWorker(worker).work(id, data);
+    IWorker2(worker).executeStrategy(POSITION_ID, STRATEGY, params);
     // 5. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;

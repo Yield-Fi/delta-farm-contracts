@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "../libs/pancake/interfaces/IPancakeFactory.sol";
-import "../libs/pancake/interfaces/IPancakePair.sol";
+import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
+import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
+
 import "../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../libs/pancake/interfaces/IPancakeMasterChef.sol";
 import "../interfaces/IStrategy.sol";
@@ -20,14 +21,13 @@ import "../utils/SafeToken.sol";
 
 contract PancakeswapWorker is
   Initializable,
-  OwnableUpgradeable,
-  UUPSUpgradeable,
-  ReentrancyGuardUpgradeable,
+  OwnableUpgradeSafe,
+  ReentrancyGuardUpgradeSafe,
   IWorker
 {
   /// @notice Libraries
   using SafeToken for address;
-  using SafeMathUpgradeable for uint256;
+  using SafeMath for uint256;
 
   /// @notice Events
   event Reinvest(address indexed caller, uint256 reward, uint256 bounty);
@@ -124,7 +124,7 @@ contract PancakeswapWorker is
   ) external initializer {
     // 1. Initialized imported library
     __Ownable_init();
-    __UUPSUpgradeable_init();
+    __ReentrancyGuard_init();
 
     // 2. Assign dependency contracts
     operator = _operator;
@@ -164,8 +164,6 @@ contract PancakeswapWorker is
       "PancakeswapWorker::initialize:: LP underlying not match with farm & base token"
     );
   }
-
-  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   /// @dev Require that the caller must be an EOA account to avoid flash loans.
   modifier onlyEOA() {
@@ -266,8 +264,8 @@ contract PancakeswapWorker is
     if (reward <= _reinvestThreshold) return;
 
     // 2. Approve tokens
-    cake.safeApprove(address(router), type(uint256).max);
-    address(lpToken).safeApprove(address(masterChef), type(uint256).max);
+    cake.safeApprove(address(router), uint256(-1));
+    address(lpToken).safeApprove(address(masterChef), uint256(-1));
 
     // 3. Send the reward bounty to the _treasuryAccount.
     uint256 bounty = reward.mul(_treasuryBountyBps) / 10000;
@@ -467,7 +465,7 @@ contract PancakeswapWorker is
     uint256 balance = lpToken.balanceOf(address(this));
     if (balance > 0) {
       // 1. Approve token to be spend by masterChef
-      address(lpToken).safeApprove(address(masterChef), type(uint256).max);
+      address(lpToken).safeApprove(address(masterChef), uint256(-1));
       // 2. Convert balance to share
       uint256 share = balanceToShare(balance);
       // 3. Deposit balance to PancakeMasterChef

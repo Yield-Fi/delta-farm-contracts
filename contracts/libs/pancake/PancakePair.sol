@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
 import "./interfaces/IPancakePair.sol";
 import "./PancakeERC20.sol";
@@ -85,7 +85,7 @@ contract PancakePair is PancakeERC20 {
   );
   event Sync(uint112 reserve0, uint112 reserve1);
 
-  constructor() {
+  constructor() public {
     factory = msg.sender;
   }
 
@@ -104,7 +104,7 @@ contract PancakePair is PancakeERC20 {
     uint112 _reserve1
   ) private {
     require(
-      balance0 <= type(uint112).max && balance1 <= type(uint112).max,
+      balance0 <= uint112(-1) && balance1 <= uint112(-1),
       "Pancake: OVERFLOW"
     );
     uint32 blockTimestamp = uint32(block.timestamp % 2**32);

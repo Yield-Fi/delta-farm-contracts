@@ -1,14 +1,13 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IPriceOracle.sol";
 
-contract SimplePriceOracle is Initializable, UUPSUpgradeable, OwnableUpgradeable, IPriceOracle {
+contract SimplePriceOracle is Initializable, OwnableUpgradeSafe, IPriceOracle {
   event PriceUpdate(address indexed token0, address indexed token1, uint256 price);
 
   address feeder;
@@ -28,12 +27,9 @@ contract SimplePriceOracle is Initializable, UUPSUpgradeable, OwnableUpgradeable
 
   function initialize(address _feeder) external initializer {
      __Ownable_init();
-    __UUPSUpgradeable_init();
 
     feeder = _feeder;
   }
-
-  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   function setFeeder(address _feeder) public onlyOwner {
     feeder = _feeder;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
 interface IPriceOracle {
   /// @dev Return the wad price of token0/token1, multiplied by 1e18

@@ -1,22 +1,19 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWorkerConfig.sol";
 import "./interfaces/InterestModel.sol";
 
 contract VaultConfig is
-  IVaultConfig,
   Initializable,
-  UUPSUpgradeable,
-  OwnableUpgradeable,
-  ReentrancyGuardUpgradeable
+  OwnableUpgradeSafe,
+  IVaultConfig
 {
   /// @notice Events
   event SetWhitelistedCaller(
@@ -68,12 +65,9 @@ contract VaultConfig is
     address _treasury
   ) external initializer {
     __Ownable_init();
-    __UUPSUpgradeable_init();
 
     setParams(_getWrappedNativeAddr, _getWNativeRelayer, _treasury);
   }
-
-  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   /// @dev Set all the basic parameters. Must only be called by the owner.
   /// @param _treasury address of treasury account

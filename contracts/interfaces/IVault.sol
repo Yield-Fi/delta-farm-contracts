@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
 interface IVault {
   /// @dev Return the total ERC20 entitled to the token holders. Be careful of unaccrued interests.

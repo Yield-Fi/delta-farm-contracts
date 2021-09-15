@@ -2,13 +2,13 @@
 
 pragma solidity >=0.5.0;
 
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 
 import "./interfaces/IPancakePair.sol";
 import "./interfaces/IPancakeFactory.sol";
 
 library PancakeLibraryV2 {
-  using SafeMathUpgradeable for uint256;
+  using SafeMath for uint256;
 
   // returns sorted token addresses, used to handle return values from pairs sorted in this order
   function sortTokens(address tokenA, address tokenB)

@@ -392,7 +392,7 @@ export const testnetConfig: ProjectConfigType = {
       workers: [
         {
           name: "BUSD-USDT PancakeswapWorker",
-          address: "",
+          address: "0xF0098232a9a9caA599F1664b9090eDBaf11d4357",
           positionId: "24",
           token0: tokens.BUSD,
           token1: tokens.USDT,

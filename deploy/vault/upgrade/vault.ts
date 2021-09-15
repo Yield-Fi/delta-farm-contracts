@@ -14,8 +14,8 @@ const upgradeFunc: DeployFunction = async () => {
   const config = getConfig();
 
   logger("---> Upgrading implementation of vaults... <---");
-  config.vaults.filter(vaultsFilter).forEach(async (vault, index) => {
-    logger(`${index + 1}. ${vault.name}`);
+  for (const vault of config.vaults.filter(vaultsFilter)) {
+    logger(`-> ${vault.name}`);
     const VaultConfigFactory = await ethers.getContractFactory(
       "VaultConfig",
       deployer
@@ -39,7 +39,7 @@ const upgradeFunc: DeployFunction = async () => {
     await Vault.deployed();
 
     logger(`  - New implementation of Vault deployed at ${Vault.address}`);
-  });
+  }
 };
 
 export default upgradeFunc;

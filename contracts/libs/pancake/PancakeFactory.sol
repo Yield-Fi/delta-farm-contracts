@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.3;
+pragma solidity 0.6.6;
 
 import "./interfaces/IPancakeFactory.sol";
 import "./PancakePair.sol";
@@ -22,7 +22,7 @@ contract PancakeFactory {
     uint256
   );
 
-  constructor(address _feeToSetter) {
+  constructor(address _feeToSetter) public {
     feeToSetter = _feeToSetter;
   }
 

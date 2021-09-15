@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.3;
+pragma solidity 0.6.6;
 
 library CustomMath {
   /// @notice Calculates the square root of x, rounding down.
@@ -44,7 +44,7 @@ library CustomMath {
     }
 
     // The operations can never overflow because the result is max 2^127 when it enters this block.
-    unchecked {
+    {
       result = (result + x / result) >> 1;
       result = (result + x / result) >> 1;
       result = (result + x / result) >> 1;

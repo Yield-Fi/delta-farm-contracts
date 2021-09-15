@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
 interface InterestModel {
   /// @dev Return the interest rate per second, using 1e18 as denom.

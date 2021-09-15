@@ -1,6 +1,6 @@
 import { ethers, upgrades } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
-import { PancakeswapWorker } from "../../../typechain";
+import { PancakeswapWorker2 } from "../../../typechain";
 import { getConfig, WorkerConfigType } from "../../utils/config";
 import { logger } from "../../utils/logger";
 
@@ -32,13 +32,20 @@ const deployFunc: DeployFunction = async () => {
           config.dex.pancakeswap.MasterChef,
           config.dex.pancakeswap.RouterV2,
           worker.positionId,
-          config.strategies.pancakeswap.AddBaseToken,
-          config.strategies.pancakeswap.Liquidate,
         ],
         { kind: "uups" }
-      )) as PancakeswapWorker;
+      )) as PancakeswapWorker2;
 
       await PancakeswapWorker.deployed();
+
+      PancakeswapWorker.setReinvestConfig(
+        config.treasuryAccount,
+        1000,
+        config.treasuryAccount,
+        500,
+        config.strategies.pancakeswap.AddBaseToken,
+        1
+      );
 
       logger(`  - ${worker.name} deployed at ${PancakeswapWorker.address}`);
     }

@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/utils/math/SafeMathUpgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
 import "../../libs/pancake/interfaces/IPancakeFactory.sol";
 import "../../libs/pancake/interfaces/IPancakePair.sol";
@@ -18,13 +17,12 @@ import "../../utils/CustomMath.sol";
 
 contract PancakeswapStrategyAddBaseTokenOnly is
   Initializable,
-  OwnableUpgradeable,
-  UUPSUpgradeable,
-  ReentrancyGuardUpgradeable,
+  OwnableUpgradeSafe,
+  ReentrancyGuardUpgradeSafe,
   IStrategy
 {
   using SafeToken for address;
-  using SafeMathUpgradeable for uint256;
+  using SafeMath for uint256;
 
   IPancakeFactory public factory;
   IPancakeRouterV2 public router;
@@ -32,15 +30,12 @@ contract PancakeswapStrategyAddBaseTokenOnly is
   /// @dev Create a new add Token only strategy instance.
   /// @param _router The PancakeSwap Router smart contract.
   function initialize(IPancakeRouterV2 _router) external initializer {
-    ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
     __Ownable_init();
-    __UUPSUpgradeable_init();
+    __ReentrancyGuard_init();
 
     factory = IPancakeFactory(_router.factory());
     router = _router;
   }
-
-  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
   /// @param data Extra calldata information passed along to this strategy.
@@ -56,8 +51,8 @@ contract PancakeswapStrategyAddBaseTokenOnly is
       factory.getPair(farmingToken, baseToken)
     );
     // 2. Approve router to do their stuffs
-    farmingToken.safeApprove(address(router), type(uint256).max);
-    baseToken.safeApprove(address(router), type(uint256).max);
+    farmingToken.safeApprove(address(router), uint256(-1));
+    baseToken.safeApprove(address(router), uint256(-1));
     // 3. Compute the optimal amount of baseToken to be converted to farmingToken.
     uint256 balance = baseToken.myBalance();
     (uint256 r0, uint256 r1, ) = lpToken.getReserves();

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: Unlicensed
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
 import "../../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../libs/pancake/interfaces/IPancakePair.sol";
@@ -15,9 +15,8 @@ import "../../utils/SafeToken.sol";
 
 contract PancakeswapStrategyLiquidate is
   Initializable,
-  OwnableUpgradeable,
-  UUPSUpgradeable,
-  ReentrancyGuardUpgradeable,
+  OwnableUpgradeSafe,
+  ReentrancyGuardUpgradeSafe,
   IStrategy
  {
   using SafeToken for address;
@@ -28,16 +27,12 @@ contract PancakeswapStrategyLiquidate is
   /// @dev Create a new liquidate strategy instance.
   /// @param _router The PancakeSwap Router smart contract.
   function initialize(IPancakeRouterV2 _router) external initializer {
-    ReentrancyGuardUpgradeable.__ReentrancyGuard_init();
     __Ownable_init();
-    __UUPSUpgradeable_init();
+    __ReentrancyGuard_init();
 
     factory = IPancakeFactory(_router.factory());
     router = _router;
   }
-
-  function _authorizeUpgrade(address) internal override onlyOwner {}
-
 
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
   /// @param data Extra calldata information passed along to this strategy.
@@ -52,10 +47,10 @@ contract PancakeswapStrategyLiquidate is
     );
     // 2. Approve router to do their stuffs
     require(
-      lpToken.approve(address(router), type(uint256).max),
+      lpToken.approve(address(router), uint256(-1)),
       "PancakeswapV2StrategyLiquidate::execute:: unable to approve LP token"
     );
-    farmingToken.safeApprove(address(router), type(uint256).max);
+    farmingToken.safeApprove(address(router), uint256(-1));
     // 3. Remove all liquidity back to BaseToken and farming tokens.
     router.removeLiquidity(
       baseToken,

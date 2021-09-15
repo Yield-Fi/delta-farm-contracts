@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.3;
+pragma solidity 0.6.6;
 
 import "./interfaces/IPancakeERC20.sol";
 import "./libraries/SafeMath.sol";
@@ -24,7 +24,7 @@ contract PancakeERC20 {
   event Approval(address indexed owner, address indexed spender, uint256 value);
   event Transfer(address indexed from, address indexed to, uint256 value);
 
-  constructor() {
+  constructor() public {
     uint256 chainId;
     assembly {
       chainId := chainid()
@@ -88,7 +88,7 @@ contract PancakeERC20 {
     address to,
     uint256 value
   ) external returns (bool) {
-    if (allowance[from][msg.sender] != type(uint256).max) {
+    if (allowance[from][msg.sender] != uint256(-1)) {
       allowance[from][msg.sender] = allowance[from][msg.sender].sub(value);
     }
     _transfer(from, to, value);

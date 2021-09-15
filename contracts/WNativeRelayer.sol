@@ -1,31 +1,29 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity 0.8.3;
+pragma solidity 0.6.6;
 
-import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IWBNB.sol";
 import "./interfaces/IWNativeRelayer.sol";
 
 contract WNativeRelayer is
   Initializable,
-  UUPSUpgradeable,
-  ReentrancyGuardUpgradeable,
-  OwnableUpgradeable,
+  OwnableUpgradeSafe,
+  ReentrancyGuardUpgradeSafe,
   IWNativeRelayer
 {
   address wnative;
 
   function initialize(address _wnative) external initializer {
     __Ownable_init();
-    __UUPSUpgradeable_init();
+    __ReentrancyGuard_init();
     wnative = _wnative;
   }
-
-  function _authorizeUpgrade(address) internal override onlyOwner {}
 
   function withdraw(uint256 _amount) external override nonReentrant {
     IWBNB(wnative).withdraw(_amount);
