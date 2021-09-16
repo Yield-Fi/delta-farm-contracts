@@ -15,9 +15,9 @@ const deployFunc: DeployFunction = async () => {
   const workersFilter = (worker: WorkerConfigType) =>
     workersToDeploy.includes(worker.name) || workersToDeploy.length === 0;
 
-  logger("---> Upgrading implementation of pancakeswap workers... <---");
+  logger("---> Deploying pancakeswap workers... <---");
   for (const vault of config.vaults) {
-    logger(`-> Upgrading workers for ${vault.name}`);
+    logger(`-> Deploying workers for ${vault.name}`);
     for (const worker of vault.workers.filter(workersFilter)) {
       logger(`  - Deploying ${worker.name}...`);
       const PancakeswapWorkerFactory = await ethers.getContractFactory(
@@ -31,6 +31,12 @@ const deployFunc: DeployFunction = async () => {
         config.dex.pancakeswap.MasterChef,
         config.dex.pancakeswap.RouterV2,
         worker.positionId,
+        config.strategies.pancakeswap.AddBaseToken,
+        config.strategies.pancakeswap.Liquidate,
+        "100",
+        config.treasuryAccount,
+        [config.tokens.CAKE, vault.baseToken],
+        "100",
       ])) as PancakeswapWorker;
 
       await PancakeswapWorker.deployed();
