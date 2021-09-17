@@ -1,12 +1,13 @@
-import { Signer } from "@ethersproject/abstract-signer";
-import { BigNumber } from "@ethersproject/bignumber";
-import { ethers } from "hardhat";
 import { PancakeFactory, PancakeRouterV2 } from "../../typechain";
+
+import { BigNumber } from "@ethersproject/bignumber";
 import { CakeToken } from "../../typechain/CakeToken";
 import { MockWBNB } from "../../typechain/MockWBNB";
 import { PancakeMasterChef } from "../../typechain/PancakeMasterChef";
+import { Signer } from "@ethersproject/abstract-signer";
 import { SyrupBar } from "../../typechain/SyrupBar";
 import { deployContract } from "./deployContract";
+import { ethers } from "hardhat";
 
 interface IHolder {
   address: string;

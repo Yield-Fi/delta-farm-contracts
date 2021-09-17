@@ -160,6 +160,7 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
     expect(await lpV2.balanceOf(await bob.getAddress())).to.be.bignumber.eq(
       ethers.utils.parseEther("0.015415396042372718")
     );
+
     expect(await lpV2.balanceOf(strat.address)).to.be.bignumber.eq(ethers.utils.parseEther("0"));
     expect(await farmingToken.balanceOf(strat.address)).to.be.bignumber.eq(
       ethers.utils.parseEther("0")

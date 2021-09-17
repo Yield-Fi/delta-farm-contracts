@@ -1,7 +1,8 @@
-import { Signer } from "@ethersproject/abstract-signer";
-import { BigNumber } from "@ethersproject/bignumber";
+import { MockToken, MockWBNB, MockWBNB__factory } from "../../typechain";
 import { ethers, upgrades } from "hardhat";
-import { MockToken } from "../../typechain";
+
+import { BigNumber } from "@ethersproject/bignumber";
+import { Signer } from "@ethersproject/abstract-signer";
 
 export interface IHolder {
   address: string;
@@ -36,4 +37,11 @@ export const deployToken = async (token: IMockTokenConfig, deployer: Signer) => 
   }
 
   return MockToken;
+};
+
+export const deployWBNB = async (deployer: Signer): Promise<MockWBNB> => {
+  const WBNB = (await ethers.getContractFactory("MockWBNB", deployer)) as MockWBNB__factory;
+  const wbnb = await WBNB.deploy();
+  await wbnb.deployed();
+  return wbnb;
 };
