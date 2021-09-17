@@ -6,7 +6,6 @@ import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
 import "../libs/pancake/interfaces/IPancakeRouterV2.sol";
@@ -57,14 +56,14 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @notice Configuration variables
   IPancakeMasterChef public masterChef;
-  IPancakeFactory public factory;
   IPancakeRouterV2 public router;
   IPancakePair public override lpToken;
   address public wNative;
   address public override baseToken;
-  address public override farmingToken;
+  address public override token0;
+  address public override token1;
   address public cake;
-  address public operator;
+  address public operatingVault;
   uint256 public pid;
 
   /// @notice Mutable state variables
@@ -92,7 +91,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   uint256 public buybackAmount;
 
   function initialize(
-    address _operator,
+    address _operatingVault,
     address _baseToken,
     IPancakeMasterChef _masterChef,
     IPancakeRouterV2 _router,
@@ -109,20 +108,18 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     ReentrancyGuardUpgradeSafe.__ReentrancyGuard_init();
 
     // 2. Assign dependency contracts
-    operator = _operator;
+    operatingVault = _operatingVault;
     wNative = _router.WETH();
     masterChef = _masterChef;
     router = _router;
-    factory = IPancakeFactory(_router.factory());
 
     // 3. Assign tokens state variables
     baseToken = _baseToken;
     pid = _pid;
     (IERC20 _lpToken, , , ) = masterChef.poolInfo(_pid);
     lpToken = IPancakePair(address(_lpToken));
-    address token0 = lpToken.token0();
-    address token1 = lpToken.token1();
-    farmingToken = token0 == baseToken ? token1 : token0;
+    token0 = lpToken.token0();
+    token1 = lpToken.token1();
     cake = address(masterChef.cake());
 
     // 4. Assign critical strategy contracts
@@ -153,11 +150,6 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
       "PancakeswapWorker::initialize:: reinvestBountyBps exceeded maxReinvestBountyBps"
     );
     require(
-      (farmingToken == lpToken.token0() || farmingToken == lpToken.token1()) &&
-        (baseToken == lpToken.token0() || baseToken == lpToken.token1()),
-      "PancakeswapWorker::initialize:: LP underlying not match with farm & base token"
-    );
-    require(
       reinvestPath[0] == cake && reinvestPath[reinvestPath.length - 1] == baseToken,
       "PancakeswapWorker::initialize:: reinvestPath must start with CAKE, end with BTOKEN"
     );
@@ -169,9 +161,9 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     _;
   }
 
-  /// @dev Require that the caller must be the operator.
+  /// @dev Require that the caller must be the operatingVault.
   modifier onlyOperator() {
-    require(msg.sender == operator, "PancakeswapWorker::onlyOperator:: not operator");
+    require(msg.sender == operatingVault, "PancakeswapWorker::onlyOperator:: not operatingVault");
     _;
   }
 
@@ -200,7 +192,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   /// @dev Re-invest whatever this worker has earned back to staked LP tokens.
   function reinvest() external override onlyEOA onlyReinvestor nonReentrant {
     _reinvest(msg.sender, reinvestBountyBps, 0, 0);
-    // in case of beneficial vault equals to operator vault,
+    // in case of beneficial vault equals to operatingVault vault,
     // call buyback to transfer some buyback amount back to the vault
     // This can't be called within the _reinvest statement since _reinvest is called within the `work` as well
     _buyback();
@@ -259,7 +251,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     emit Reinvest(_treasuryAccount, reward, bounty);
   }
 
-  /// @dev Work on the given position. Must be called by the operator.
+  /// @dev Work on the given position. Must be called by the operatingVault.
   /// @param id The position ID to work on.
   /// @param data The encoded data, consisting of strategy address and calldata.
   function work(uint256 id, bytes calldata data) external override onlyOperator nonReentrant {
@@ -279,7 +271,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     IStrategy(strat).execute(ext);
     // 4. Add LP tokens back to the farming pool.
     _addShare(id);
-    // 5. Return any remaining BaseToken back to the operator.
+    // 5. Return any remaining BaseToken back to the operatingVault.
     baseToken.safeTransfer(msg.sender, actualBaseTokenBalance());
   }
 
@@ -330,7 +322,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     _removeShare(id);
     lpToken.transfer(address(liqStrat), lpToken.balanceOf(address(this)));
     liqStrat.execute(abi.encode(0));
-    // 2. Return all available BaseToken back to the operator.
+    // 2. Return all available BaseToken back to the operatingVault.
     uint256 liquidatedAmount = actualBaseTokenBalance();
     baseToken.safeTransfer(msg.sender, liquidatedAmount);
     emit Liquidate(id, liquidatedAmount);
@@ -419,14 +411,14 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   function getPath() external view override returns (address[] memory) {
     address[] memory path = new address[](2);
     path[0] = baseToken;
-    path[1] = farmingToken;
+    path[1] = token1;
     return path;
   }
 
   /// @dev Return the inverse path.
   function getReversedPath() external view override returns (address[] memory) {
     address[] memory reversePath = new address[](2);
-    reversePath[0] = farmingToken;
+    reversePath[0] = token1;
     reversePath[1] = baseToken;
     return reversePath;
   }

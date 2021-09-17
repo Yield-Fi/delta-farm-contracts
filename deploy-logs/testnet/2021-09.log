@@ -7,3 +7,7 @@
 2021-09-13 09:08:50 ||| ---> Deploying strategies for the pancakeswap workers... <---
 2021-09-13 09:09:15 ||| - AddBaseTokenOnlyStrategy deployed at 0x73d6950d37Cf17f6d38da5291FC2783EE7d2431b
 2021-09-13 09:09:34 ||| - LiquidateStrategy deployed at 0x85ff4165f2ce8dbB342461279277B3acD71BE713
+2021-09-16 13:14:01 ||| ---> Upgrading implementation of pancakeswap workers... <---
+2021-09-16 13:14:01 ||| -> Upgrading workers for BUSD Vault
+2021-09-16 13:14:01 |||   - Deploying BUSD-USDT PancakeswapWorker...
+2021-09-16 13:14:53 |||   - BUSD-USDT PancakeswapWorker deployed at 0x023ba0C241B4BA5a8aDCAb3614C6b28666038085

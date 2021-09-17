@@ -20,7 +20,7 @@ export const deployTokens = async (tokens: IMockTokenConfig[], deployer: Signer)
     promises.push(deployToken(token, deployer));
   }
 
-  return promises;
+  return Promise.all(promises);
 };
 
 export const deployToken = async (token: IMockTokenConfig, deployer: Signer) => {

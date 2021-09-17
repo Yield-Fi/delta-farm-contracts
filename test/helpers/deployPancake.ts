@@ -1,5 +1,6 @@
 import { Signer } from "@ethersproject/abstract-signer";
 import { BigNumber } from "@ethersproject/bignumber";
+import { ethers } from "hardhat";
 import { PancakeFactory, PancakeRouterV2 } from "../../typechain";
 import { CakeToken } from "../../typechain/CakeToken";
 import { MockWBNB } from "../../typechain/MockWBNB";
@@ -18,7 +19,13 @@ export const deployPancakeV2 = async (
   cakeHolders: IHolder[],
   deployer: Signer
 ): Promise<[PancakeFactory, PancakeRouterV2, CakeToken, SyrupBar, PancakeMasterChef]> => {
-  const PancakeFactory = (await deployContract("PancakeFactory", [], deployer)) as PancakeFactory;
+  const _feeToAddress = ethers.constants.AddressZero;
+
+  const PancakeFactory = (await deployContract(
+    "PancakeFactory",
+    [_feeToAddress],
+    deployer
+  )) as PancakeFactory;
 
   const PancakeRouterV2 = (await deployContract(
     "PancakeRouterV2",

@@ -26,11 +26,14 @@ interface IWorker {
   /// @dev LP token holds by worker
   function lpToken() external view returns (IPancakePair);
 
-  /// @dev Base Token that worker is working on
+  /// @dev Token that is swapped for tokens from pool
   function baseToken() external view returns (address);
 
-  /// @dev Farming Token that worker is working on
-  function farmingToken() external view returns (address);
+  /// @dev Token 0 from the pool that worker is working on
+  function token0() external view returns (address);
+
+  /// @dev Token 1 from the pool that worker is working on
+  function token1() external view returns (address);
 
   /// @dev Return the trading path that worker is using for convert BTOKEN->...->FTOKEN
   function getPath() external view returns (address[] memory);
