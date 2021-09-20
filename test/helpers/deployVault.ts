@@ -17,7 +17,7 @@ export const deployVault = async (
   treasuryAccountAddress: string,
   baseToken: MockToken,
   deployer: Signer
-): Promise<[Vault, WNativeRelayer]> => {
+): Promise<[Vault, VaultConfig, WNativeRelayer]> => {
   const WNativeRelayer = (await ethers.getContractFactory(
     "WNativeRelayer",
     deployer
@@ -49,5 +49,5 @@ export const deployVault = async (
   // TODO: Contract restrictions
   // await wNativeRelayer.setCallerOk([vault.address], true);
 
-  return [vault, wNativeRelayer as WNativeRelayer];
+  return [vault, vaultConfig, wNativeRelayer as WNativeRelayer];
 };
