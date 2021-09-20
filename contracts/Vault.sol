@@ -144,6 +144,8 @@ contract Vault is
     uint256 id,
     address worker,
     uint256 amount,
+    address client,
+    uint256 clientBps,
     bytes calldata data
   ) external payable onlyEOAorWhitelisted transferTokenToVault(amount) nonReentrant {
     // 1. Sanity check the input position, or add a new position of ID is 0.
@@ -167,7 +169,7 @@ contract Vault is
 
     require(amount <= SafeToken.myBalance(token), "insufficient funds in the vault");
     SafeToken.safeTransfer(token, worker, amount);
-    IWorker(worker).work(id, data);
+    IWorker(worker).work(id, client, clientBps, data);
     // 5. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;

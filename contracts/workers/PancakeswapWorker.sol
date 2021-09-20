@@ -32,7 +32,11 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     IVault indexed beneficialVault,
     uint256 indexed buyback
   );
-  event SetApprovedStrategy(address indexed caller, address indexed strategy, bool indexed isApproved);
+  event SetApprovedStrategy(
+    address indexed caller,
+    address indexed strategy,
+    bool indexed isApproved
+  );
   event SetReinvestorOK(address indexed caller, address indexed reinvestor, bool indexed isOk);
   event SetCriticalStrategy(
     address indexed caller,
@@ -254,7 +258,12 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   /// @dev Work on the given position. Must be called by the operatingVault.
   /// @param id The position ID to work on.
   /// @param data The encoded data, consisting of strategy address and calldata.
-  function work(uint256 id, bytes calldata data) external override onlyOperator nonReentrant {
+  function work(
+    uint256 id,
+    address client,
+    uint256 clientBps,
+    bytes calldata data
+  ) external override onlyOperator nonReentrant {
     // 1. If a treasury configs are not ready. Not reinvest.
     if (treasuryAccount != address(0) && treasuryBountyBps != 0)
       _reinvest(treasuryAccount, treasuryBountyBps, actualBaseTokenBalance(), reinvestThreshold);
@@ -494,7 +503,11 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   /// @dev Set the given strategies' approval status.
   /// @param strats - The strategy addresses.
   /// @param isApproved - Whether to approve or unapprove the given strategies.
-  function setApprovedStrategies(address[] calldata strats, bool isApproved) external override onlyOwner {
+  function setApprovedStrategies(address[] calldata strats, bool isApproved)
+    external
+    override
+    onlyOwner
+  {
     uint256 len = strats.length;
     for (uint256 idx = 0; idx < len; idx++) {
       approvedStrategies[strats[idx]] = isApproved;
@@ -535,7 +548,10 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   /// @dev Update critical strategy smart contracts. EMERGENCY ONLY. Bad strategies can steal funds.
   /// @param _reinvestStrategy - The new add strategy contract.
   /// @param _liqStrat - The new liquidate strategy contract.
-  function setCriticalStrategies(IStrategy _reinvestStrategy, IStrategy _liqStrat) external onlyOwner {
+  function setCriticalStrategies(IStrategy _reinvestStrategy, IStrategy _liqStrat)
+    external
+    onlyOwner
+  {
     reinvestStrategy = _reinvestStrategy;
     liqStrat = _liqStrat;
 
