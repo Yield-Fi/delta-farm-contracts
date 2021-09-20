@@ -18,7 +18,7 @@ interface IWorker {
   function liquidate(uint256 id) external;
 
   /// @dev SetStretegy that be able to executed by the worker.
-  function setStrategyOk(address[] calldata strats, bool isOk) external;
+  function setApprovedStrategies(address[] calldata strats, bool isOk) external;
 
   /// @dev Set address that can be reinvest
   function setReinvestorOk(address[] calldata reinvestor, bool isOk) external;

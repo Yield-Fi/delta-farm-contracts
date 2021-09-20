@@ -32,11 +32,11 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     IVault indexed beneficialVault,
     uint256 indexed buyback
   );
-  event SetStrategyOK(address indexed caller, address indexed strategy, bool indexed isOk);
+  event SetApprovedStrategy(address indexed caller, address indexed strategy, bool indexed isApproved);
   event SetReinvestorOK(address indexed caller, address indexed reinvestor, bool indexed isOk);
   event SetCriticalStrategy(
     address indexed caller,
-    IStrategy indexed addStrat,
+    IStrategy indexed reinvestStrategy,
     IStrategy indexed liqStrat
   );
   event SetMaxReinvestBountyBps(address indexed caller, uint256 indexed maxReinvestBountyBps);
@@ -68,9 +68,9 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @notice Mutable state variables
   mapping(uint256 => uint256) public shares;
-  mapping(address => bool) public okStrats;
+  mapping(address => bool) public approvedStrategies;
   uint256 public totalShare;
-  IStrategy public addStrat;
+  IStrategy public reinvestStrategy;
   IStrategy public liqStrat;
   uint256 public reinvestBountyBps;
   uint256 public maxReinvestBountyBps;
@@ -96,7 +96,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     IPancakeMasterChef _masterChef,
     IPancakeRouterV2 _router,
     uint256 _pid,
-    IStrategy _addStrat,
+    IStrategy _reinvestStrategy,
     IStrategy _liqStrat,
     uint256 _reinvestBountyBps,
     address _treasuryAccount,
@@ -123,10 +123,10 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     cake = address(masterChef.cake());
 
     // 4. Assign critical strategy contracts
-    addStrat = _addStrat;
+    reinvestStrategy = _reinvestStrategy;
     liqStrat = _liqStrat;
-    okStrats[address(addStrat)] = true;
-    okStrats[address(liqStrat)] = true;
+    approvedStrategies[address(reinvestStrategy)] = true;
+    approvedStrategies[address(liqStrat)] = true;
 
     // 5. Assign Re-invest parameters
     reinvestBountyBps = _reinvestBountyBps;
@@ -238,8 +238,8 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     );
 
     // 5. Use add Token strategy to convert all BaseToken without both caller balance and buyback amount to LP tokens.
-    baseToken.safeTransfer(address(addStrat), actualBaseTokenBalance().sub(_callerBalance));
-    addStrat.execute(abi.encode(0));
+    baseToken.safeTransfer(address(reinvestStrategy), actualBaseTokenBalance().sub(_callerBalance));
+    reinvestStrategy.execute(abi.encode(0));
 
     // 6. Stake LPs for more rewards
     masterChef.deposit(pid, lpToken.balanceOf(address(this)));
@@ -262,7 +262,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     _removeShare(id);
     // 3. Perform the worker strategy; sending LP tokens + BaseToken; expecting LP tokens + BaseToken.
     (address strat, bytes memory ext) = abi.decode(data, (address, bytes));
-    require(okStrats[strat], "PancakeswapWorker::work:: unapproved work strategy");
+    require(approvedStrategies[strat], "PancakeswapWorker::work:: unapproved work strategy");
     require(
       lpToken.transfer(strat, lpToken.balanceOf(address(this))),
       "PancakeswapWorker::work:: unable to transfer lp to strat"
@@ -493,13 +493,13 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Set the given strategies' approval status.
   /// @param strats - The strategy addresses.
-  /// @param isOk - Whether to approve or unapprove the given strategies.
-  function setStrategyOk(address[] calldata strats, bool isOk) external override onlyOwner {
+  /// @param isApproved - Whether to approve or unapprove the given strategies.
+  function setApprovedStrategies(address[] calldata strats, bool isApproved) external override onlyOwner {
     uint256 len = strats.length;
     for (uint256 idx = 0; idx < len; idx++) {
-      okStrats[strats[idx]] = isOk;
+      approvedStrategies[strats[idx]] = isApproved;
 
-      emit SetStrategyOK(msg.sender, strats[idx], isOk);
+      emit SetApprovedStrategy(msg.sender, strats[idx], isApproved);
     }
   }
 
@@ -533,13 +533,13 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   }
 
   /// @dev Update critical strategy smart contracts. EMERGENCY ONLY. Bad strategies can steal funds.
-  /// @param _addStrat - The new add strategy contract.
+  /// @param _reinvestStrategy - The new add strategy contract.
   /// @param _liqStrat - The new liquidate strategy contract.
-  function setCriticalStrategies(IStrategy _addStrat, IStrategy _liqStrat) external onlyOwner {
-    addStrat = _addStrat;
+  function setCriticalStrategies(IStrategy _reinvestStrategy, IStrategy _liqStrat) external onlyOwner {
+    reinvestStrategy = _reinvestStrategy;
     liqStrat = _liqStrat;
 
-    emit SetCriticalStrategy(msg.sender, addStrat, liqStrat);
+    emit SetCriticalStrategy(msg.sender, reinvestStrategy, liqStrat);
   }
 
   /// @dev Set treasury configurations.
