@@ -2,6 +2,7 @@ import { BigNumber, Signer } from "ethers";
 import {
   CakeToken,
   MockToken,
+  MockToken__factory,
   PancakeFactory,
   PancakeMasterChef,
   PancakeMasterChef__factory,
@@ -11,6 +12,7 @@ import {
   PancakeswapStrategyAddBaseTokenOnly,
   PancakeswapStrategyLiquidate,
   PancakeswapWorker,
+  PancakeswapWorker__factory,
   SyrupBar,
 } from "../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
@@ -22,6 +24,7 @@ import { parseEther } from "@ethersproject/units";
 import { SwapHelper } from "./helpers/swap";
 import { MockWBNB } from "../typechain";
 import { parse } from "path/posix";
+import { assertAlmostEqual } from "./helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -55,6 +58,7 @@ describe("PancakeswapWorker", () => {
   let LiquidateStrategy: PancakeswapStrategyLiquidate;
 
   let BaseToken: MockToken;
+  let BaseToken__account1: MockToken;
   let Token0: MockToken;
   let Token1: MockToken;
   let lpBUSD_TOK0__deployer: PancakePair;
@@ -249,6 +253,8 @@ describe("PancakeswapWorker", () => {
       PancakeMasterChef.address,
       account2
     );
+
+    BaseToken__account1 = MockToken__factory.connect(BaseToken.address, account1);
   }
 
   beforeEach(async () => {
@@ -263,6 +269,39 @@ describe("PancakeswapWorker", () => {
       ];
       expect(result).to.include(BaseToken.address.toLowerCase());
       expect(result).to.include(Token0.address.toLowerCase());
+    });
+
+    it("Should add liquidity via add base token only strategy", async () => {
+      const worker__operator = PancakeswapWorker__factory.connect(
+        WorkerBUSD_TOK0.address,
+        vaultOperator
+      );
+
+      await BaseToken__account1.transfer(worker__operator.address, parseEther("1"));
+
+      expect((await worker__operator.health(1)).toString()).to.eq(parseEther("0"));
+
+      await worker__operator.work(
+        1,
+        account2Address,
+        "500",
+        ethers.utils.defaultAbiCoder.encode(
+          ["address", "bytes"],
+          [
+            AddBaseTokenOnlyStrategy.address,
+            ethers.utils.defaultAbiCoder.encode(
+              ["address", "address", "uint256"],
+              [BaseToken.address, Token0.address, "0"]
+            ),
+          ]
+        )
+      );
+
+      /// expected 1 Base Token - fee for pancakeswap
+      assertAlmostEqual(
+        (await worker__operator.health(1)).toString(),
+        parseEther("0.99853").toString()
+      );
     });
   });
 
@@ -295,9 +334,10 @@ describe("PancakeswapWorker", () => {
     );
   });
 
-  it("should successfully set a treasury account", async () => {
+  it("should successfully set a treasury config", async () => {
     await WorkerTOK0_TOK1.setTreasuryConfig(account2Address, REINVEST_FEE_BPS);
     expect(await WorkerTOK0_TOK1.treasuryAccount()).to.eq(account2Address);
+    expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq(REINVEST_FEE_BPS);
   });
 
   it("should approve reinvest and liquidate strategies", async () => {
