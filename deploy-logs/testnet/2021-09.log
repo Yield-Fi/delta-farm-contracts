@@ -11,3 +11,5 @@
 2021-09-16 13:14:01 ||| -> Upgrading workers for BUSD Vault
 2021-09-16 13:14:01 |||   - Deploying BUSD-USDT PancakeswapWorker...
 2021-09-16 13:14:53 |||   - BUSD-USDT PancakeswapWorker deployed at 0x023ba0C241B4BA5a8aDCAb3614C6b28666038085
+2021-09-21 16:22:28 ||| ---> Deploying bounty collector... <---
+2021-09-21 16:23:19 ||| - BountyCollector deployed at 0x4051E70f3Fe8969eA7BeCAA58bADf655742659a3

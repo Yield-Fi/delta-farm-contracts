@@ -31,15 +31,15 @@ import {
 import { parseEther } from "@ethersproject/units";
 import { SwapHelper } from "./helpers/swap";
 import { MockWBNB } from "../typechain";
-import { parse } from "path/posix";
 import { assertAlmostEqual } from "./helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;
 
 describe("PancakeswapWorker", () => {
-  const CAKE_PER_BLOCK = parseEther("0.076");
-  const REINVEST_FEE_BPS = "100";
+  const CAKE_PER_BLOCK = parseEther("1");
+  const DEFI_FEE_BPS = "100";
+  const CLIENT_FEE_BPS = "100";
 
   let deployer: Signer;
   let deployerAddress: string;
@@ -83,13 +83,7 @@ describe("PancakeswapWorker", () => {
 
   async function fixture() {
     [deployer, account1, account2, vaultOperator, treasuryAccount] = await ethers.getSigners();
-    [
-      deployerAddress,
-      account1Address,
-      account2Address,
-      vaultOperatorAddress,
-      treasuryAccountAddress,
-    ] = await Promise.all([
+    [deployerAddress, account1Address, account2Address, vaultOperatorAddress] = await Promise.all([
       deployer.getAddress(),
       account1.getAddress(),
       account2.getAddress(),
@@ -113,7 +107,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("100"),
+              amount: parseEther("2300"),
             },
           ],
         },
@@ -131,7 +125,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("100"),
+              amount: parseEther("2000"),
             },
           ],
         },
@@ -149,7 +143,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("100"),
+              amount: parseEther("2000"),
             },
           ],
         },
@@ -163,7 +157,7 @@ describe("PancakeswapWorker", () => {
       await deployPancakeV2(
         MockWBNB,
         CAKE_PER_BLOCK,
-        [{ address: deployerAddress, amount: parseEther("100") }],
+        [{ address: deployerAddress, amount: parseEther("200") }],
         deployer
       );
 
@@ -198,11 +192,11 @@ describe("PancakeswapWorker", () => {
       PancakeRouterV2.address,
       1,
       AddBaseTokenOnlyStrategy.address,
-      LiquidateStrategy.address,
-      REINVEST_FEE_BPS,
-      BountyCollector.address,
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
+      BountyCollector.address,
+      DEFI_FEE_BPS,
+      [CakeToken.address, MockWBNB.address, BaseToken.address],
     ])) as PancakeswapWorker;
 
     await WorkerBUSD_TOK0.deployed();
@@ -214,11 +208,11 @@ describe("PancakeswapWorker", () => {
       PancakeRouterV2.address,
       2,
       AddBaseTokenOnlyStrategy.address,
-      LiquidateStrategy.address,
-      REINVEST_FEE_BPS,
-      BountyCollector.address,
-      [CakeToken.address, MockWBNB.address, BaseToken.address],
+      [CakeToken.address, MockWBNB.address, Token0.address],
       0,
+      BountyCollector.address,
+      DEFI_FEE_BPS,
+      [CakeToken.address, MockWBNB.address, BaseToken.address],
     ])) as PancakeswapWorker;
 
     await WorkerTOK0_TOK1.deployed();
@@ -236,26 +230,26 @@ describe("PancakeswapWorker", () => {
       {
         token0: BaseToken,
         token1: Token0,
-        amount0desired: ethers.utils.parseEther("10"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("100"),
       },
       {
         token0: CakeToken,
         token1: MockWBNB,
-        amount0desired: ethers.utils.parseEther("1"),
-        amount1desired: ethers.utils.parseEther("10"),
+        amount0desired: ethers.utils.parseEther("100"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: BaseToken,
         token1: MockWBNB,
-        amount0desired: ethers.utils.parseEther("10"),
-        amount1desired: ethers.utils.parseEther("10"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: Token0,
         token1: MockWBNB,
-        amount0desired: ethers.utils.parseEther("10"),
-        amount1desired: ethers.utils.parseEther("10"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
     ]);
 
@@ -300,17 +294,19 @@ describe("PancakeswapWorker", () => {
         deployer
       );
       await worker__deployer.setReinvestorOk([vaultOperatorAddress], true);
+      await worker__deployer.setApprovedStrategies([LiquidateStrategy.address], true);
 
       /// send 0.1 base token to the worker
       await BaseToken__account1.transfer(worker__operator.address, parseEther("0.1"));
 
+      /// Initially the amount of tokens to receive from a given position should equal 0
       expect((await worker__operator.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
 
       /// add liquidity to the pool via add base token only strategy
       await worker__operator.work(
         1,
         account2Address,
-        "500",
+        CLIENT_FEE_BPS,
         ethers.utils.defaultAbiCoder.encode(
           ["address", "bytes"],
           [
@@ -323,7 +319,7 @@ describe("PancakeswapWorker", () => {
         )
       );
 
-      /// expected ~0.1 Base Token (minus some trading fee)
+      /// expected ~ 0.1 Base Token (minus some trading fee) ~ 0.099 BASE TOKEN
       assertAlmostEqual(
         (await worker__operator.tokensToReceive(1)).toString(),
         parseEther("0.0997518").toString()
@@ -331,13 +327,21 @@ describe("PancakeswapWorker", () => {
 
       const latestBlock = await time.latestBlockNumber();
 
-      await time.advanceBlockTo(latestBlock.add(1).toNumber());
+      await time.advanceBlockTo(latestBlock.add(1).toNumber()); /// + 1 BLOCK
 
-      await worker__operator.reinvest();
+      await worker__operator.reinvest(); /// + 1 BLOCK
+
+      /*
+      There are two positions in pancakeMasterChef with the same alloc points, so 0.5 CAKE per block is generated for the given position.
+      2 BLOCK = 2 * 0.5 CAKE = 1 CAKE
+      1 CAKE ~ 10 BASE TOKEN (without trading fee)
+      10 BASE TOKEN + 0.099 BASE TOKEN = 10.099 BASE TOKEN
+      10.099 BASE TOKEN - some trading fees ~ 9.83 BASE TOKEN
+      */
 
       assertAlmostEqual(
         (await worker__operator.tokensToReceive(1)).toString(),
-        parseEther("0.75495747").toString()
+        parseEther("9.831220357231100569").toString()
       );
 
       await worker__operator.work(
@@ -356,9 +360,16 @@ describe("PancakeswapWorker", () => {
         )
       );
 
+      /*
+      + 0.5 CAKE - 2% fee (100 defi fee bps + 100 client fee bps) = 0.49 CAKE for reinvest before remove liquidity
+      0.49 CAKE ~ 4.9 BASE TOKEN
+      9.83 BASE TOKEN + 4.9 BASE TOKEN = 14.73 BASE TOKEN
+      14.73 BASE TOKEN (minus some trading fees) ~ 14.27 BASE TOKEN
+      */
+
       assertAlmostEqual(
         (await BaseToken.balanceOf(vaultOperatorAddress)).toString(),
-        parseEther("1.006781296427353867").toString()
+        parseEther("14.269543707892675787").toString()
       );
     });
   });
@@ -392,20 +403,19 @@ describe("PancakeswapWorker", () => {
   });
 
   it("should successfully set a treasury config", async () => {
-    await WorkerTOK0_TOK1.setTreasuryConfig(account2Address, REINVEST_FEE_BPS);
+    await WorkerTOK0_TOK1.setTreasuryConfig(account2Address, "500");
     expect(await WorkerTOK0_TOK1.bountyCollector()).to.eq(account2Address);
-    expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq(REINVEST_FEE_BPS);
+    expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq("500");
   });
 
-  it("should approve reinvest and liquidate strategies", async () => {
+  it("should approve reinvest strategy", async () => {
     expect(await WorkerTOK0_TOK1.approvedStrategies(AddBaseTokenOnlyStrategy.address)).to.be.eq(
       true
     );
-    expect(await WorkerTOK0_TOK1.approvedStrategies(LiquidateStrategy.address)).to.be.eq(true);
   });
 
-  it("should add supported strategy", async () => {
-    await WorkerTOK0_TOK1.setApprovedStrategies([account2Address], true);
-    expect(await WorkerTOK0_TOK1.approvedStrategies(account2Address)).to.be.eq(true);
+  it("should approve new strategy", async () => {
+    await WorkerTOK0_TOK1.setApprovedStrategies([LiquidateStrategy.address], true);
+    expect(await WorkerTOK0_TOK1.approvedStrategies(LiquidateStrategy.address)).to.be.eq(true);
   });
 });

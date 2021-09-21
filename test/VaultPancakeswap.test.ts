@@ -189,11 +189,11 @@ describe("Vault - interactions", async () => {
       router,
       POOL_ID,
       addStrat,
-      liqStrat,
-      REINVEST_BOUNTY_BPS,
-      eveAddress,
       [cake.address, mockWBNB.address, baseToken.address],
-      REINVEST_THRESHOLD,
+      0,
+      eveAddress,
+      REINVEST_BOUNTY_BPS,
+      [cake.address, mockWBNB.address, baseToken.address],
       deployer
     );
 
@@ -204,11 +204,11 @@ describe("Vault - interactions", async () => {
       router,
       POOL_ID,
       addStrat,
-      liqStrat,
-      REINVEST_BOUNTY_BPS,
-      eveAddress,
       [cake.address, mockWBNB.address, baseToken.address],
-      REINVEST_THRESHOLD,
+      0,
+      eveAddress,
+      REINVEST_BOUNTY_BPS,
+      [cake.address, mockWBNB.address, baseToken.address],
       deployer
     );
 

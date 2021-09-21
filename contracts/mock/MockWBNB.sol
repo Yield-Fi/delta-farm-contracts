@@ -36,12 +36,12 @@ contract MockWBNB is IWBNB {
     deposit();
   }
 
-  function deposit() override public payable {
+  function deposit() public payable override {
     balanceOf[msg.sender] += msg.value;
     emit Deposit(msg.sender, msg.value);
   }
 
-  function withdraw(uint256 wad) override public {
+  function withdraw(uint256 wad) public override {
     require(balanceOf[msg.sender] >= wad);
     balanceOf[msg.sender] -= wad;
     msg.sender.transfer(wad);
@@ -63,7 +63,7 @@ contract MockWBNB is IWBNB {
     return true;
   }
 
-  function transfer(address dst, uint256 wad) override public returns (bool) {
+  function transfer(address dst, uint256 wad) public override returns (bool) {
     return transferFrom(msg.sender, dst, wad);
   }
 

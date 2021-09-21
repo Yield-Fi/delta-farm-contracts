@@ -19,6 +19,7 @@ import { ethers, upgrades, waffle } from "hardhat";
 import { Signer } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
+import { parseEther } from "@ethersproject/units";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -154,14 +155,14 @@ describe("Pancakeswap - StrategyLiquidate", () => {
       FOREVER
     );
 
-    expect(await baseToken.balanceOf(await bob.getAddress())).to.be.bignumber.eq(
-      ethers.utils.parseEther("99")
+    expect((await baseToken.balanceOf(await bob.getAddress())).toString()).to.eq(
+      parseEther("99").toString()
     );
-    expect(await farmingToken.balanceOf(await bob.getAddress())).to.be.bignumber.eq(
-      ethers.utils.parseEther("9.9")
+    expect((await farmingToken.balanceOf(await bob.getAddress())).toString()).to.eq(
+      parseEther("9.9").toString()
     );
-    expect(await lp.balanceOf(await bob.getAddress())).to.be.bignumber.eq(
-      ethers.utils.parseEther("0.316227766016837933")
+    expect((await lp.balanceOf(await bob.getAddress())).toString()).to.eq(
+      parseEther("0.316227766016837933").toString()
     );
 
     // Bob uses liquidate strategy to turn all LPs back to BTOKEN but with an unreasonable expectation
@@ -183,15 +184,15 @@ describe("Pancakeswap - StrategyLiquidate", () => {
       )
     );
 
-    expect(await lp.balanceOf(strat.address)).to.be.bignumber.eq(ethers.utils.parseEther("0"));
-    expect(await lp.balanceOf(await bob.getAddress())).to.be.bignumber.eq(
-      ethers.utils.parseEther("0")
+    expect((await lp.balanceOf(strat.address)).toString()).to.eq(ethers.utils.parseEther("0"));
+    expect((await lp.balanceOf(await bob.getAddress())).toString()).to.eq(
+      parseEther("0").toString()
     );
-    expect(await baseToken.balanceOf(lp.address)).to.be.bignumber.eq(
-      ethers.utils.parseEther("0.500625782227784731")
+    expect((await baseToken.balanceOf(lp.address)).toString()).to.eq(
+      parseEther("0.500625782227784731").toString()
     );
-    expect(await farmingToken.balanceOf(lp.address)).to.be.bignumber.eq(
-      ethers.utils.parseEther("0.2")
+    expect((await farmingToken.balanceOf(lp.address)).toString()).to.eq(
+      parseEther("0.2").toString()
     );
   });
 });

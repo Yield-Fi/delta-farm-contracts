@@ -2,7 +2,7 @@ import { WorkerConfigType, getConfig } from "../../utils/config";
 import { ethers, upgrades } from "hardhat";
 
 import { DeployFunction } from "hardhat-deploy/types";
-import { PancakeswapWorker } from "../../../typechain";
+import { BountyCollector__factory, PancakeswapWorker } from "../../../typechain";
 import { logger } from "../../utils/logger";
 
 const deployFunc: DeployFunction = async () => {
@@ -14,6 +14,8 @@ const deployFunc: DeployFunction = async () => {
 
   const workersFilter = (worker: WorkerConfigType) =>
     workersToDeploy.includes(worker.name) || workersToDeploy.length === 0;
+
+  const deployedWorkers = [];
 
   logger("---> Deploying pancakeswap workers... <---");
   for (const vault of config.vaults) {
@@ -27,23 +29,28 @@ const deployFunc: DeployFunction = async () => {
 
       const PancakeswapWorker = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
         vault.address,
-        vault.baseToken,
+        config.baseToken,
         config.dex.pancakeswap.MasterChef,
         config.dex.pancakeswap.RouterV2,
         worker.positionId,
         config.strategies.pancakeswap.AddBaseToken,
-        config.strategies.pancakeswap.Liquidate,
-        "100",
-        config.treasuryAccount,
-        [config.tokens.CAKE, vault.baseToken],
-        "100",
+        [config.tokens.CAKE, worker.token0],
+        config.defaultReinvestThreshold,
+        config.bountyCollector,
+        config.defaultTreasuryFeeBps,
+        [config.tokens.CAKE, config.tokens.WBNB, config.baseToken],
       ])) as PancakeswapWorker;
 
       await PancakeswapWorker.deployed();
+      deployedWorkers.push(PancakeswapWorker.address);
 
       logger(`  - ${worker.name} deployed at ${PancakeswapWorker.address}`);
     }
   }
+
+  const BountyCollector = await BountyCollector__factory.connect(config.bountyCollector, deployer);
+  BountyCollector.whitelistWorkers(deployedWorkers, true);
+  logger(`  - New workers have been whitelisted in the bounty collector`);
 };
 
 export default deployFunc;

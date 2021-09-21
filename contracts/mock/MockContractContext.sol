@@ -3,7 +3,7 @@ pragma solidity 0.6.6;
 contract MockContractContext {
   function executeTransaction(
     address target,
-    uint value,
+    uint256 value,
     string calldata signature,
     bytes calldata data
   ) external payable returns (bytes memory) {
@@ -16,7 +16,7 @@ contract MockContractContext {
     }
 
     // solium-disable-next-line security/no-call-value
-    (bool success, bytes memory returnData) = target.call{value: value}(callData);
+    (bool success, bytes memory returnData) = target.call{ value: value }(callData);
     require(success, _getRevertMsg(returnData));
 
     return returnData;

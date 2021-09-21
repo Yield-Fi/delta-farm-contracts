@@ -47,7 +47,11 @@ const tokens = {
 
 export const mainnetConfig = {
   WNativeRelayer: "",
-  treasuryAccount: "",
+  bountyCollector: "",
+  bountyThreshold: 500,
+  defaultReinvestThreshold: 100,
+  defaultTreasuryFeeBps: 1000,
+  baseToken: tokens.BUSD,
   tokens,
   dex: {
     pancakeswap: {

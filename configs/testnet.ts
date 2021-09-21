@@ -49,7 +49,11 @@ const tokens = {
 
 export const testnetConfig: ProjectConfigType = {
   WNativeRelayer: "0x49D5cCd9f978712b53d3F7f1B54bEb5F0C60fF7D",
-  treasuryAccount: "0x94FC2d635D65e6f657b7617843915a41c87B7852",
+  bountyCollector: "0x4051E70f3Fe8969eA7BeCAA58bADf655742659a3",
+  baseToken: tokens.BUSD,
+  bountyThreshold: 500,
+  defaultReinvestThreshold: 100,
+  defaultTreasuryFeeBps: 1000,
   tokens,
   dex: {
     pancakeswap: {
