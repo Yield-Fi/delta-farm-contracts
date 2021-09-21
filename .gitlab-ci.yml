@@ -23,6 +23,8 @@ test:
   script:
     # node_modules inherited from pipeline cache
     - apt-get update && apt-get install -y gawk
+    # Mock .env configuration
+    - echo "TESTNET=localhost\nTESTNET_PRIVATE_KEY=0000" > .env
     - npm run compile
     - npm run coverage
     # Flatten out the contracts for symbolic analysis
