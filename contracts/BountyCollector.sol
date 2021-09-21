@@ -7,9 +7,15 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 
+import "./interfaces/IBountyCollector.sol";
 import "./utils/SafeToken.sol";
 
-contract BountyCollector is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe {
+contract BountyCollector is
+  Initializable,
+  OwnableUpgradeSafe,
+  ReentrancyGuardUpgradeSafe,
+  IBountyCollector
+{
   /// @dev Libraries
   using SafeToken for address;
   using SafeMath for uint256;
@@ -53,25 +59,25 @@ contract BountyCollector is Initializable, OwnableUpgradeSafe, ReentrancyGuardUp
     _bountyThreshold = bountyThreshold;
   }
 
-  function setConfig(address bountyToken, uint256 bountyThreshold) external onlyOwner {
+  function setConfig(address bountyToken, uint256 bountyThreshold) external override onlyOwner {
     _setConfig(bountyToken, bountyThreshold);
   }
 
   /// Whitetlist collectors so they can collect bounties
-  function whitelistCollectors(address[] calldata collectors, bool ok) external onlyOwner {
+  function whitelistCollectors(address[] calldata collectors, bool ok) external override onlyOwner {
     for (uint128 i = 0; i < collectors.length; i++) {
       okCollectors[collectors[i]] = ok;
     }
   }
 
   /// Whitetlist worker so it can register new bounties
-  function whitelistWorkers(address[] calldata workers, bool ok) external onlyOwner {
+  function whitelistWorkers(address[] calldata workers, bool ok) external override onlyOwner {
     for (uint128 i = 0; i < workers.length; i++) {
       okWorkers[workers[i]] = ok;
     }
   }
 
-  function collect(address client) external onlyWhitelistedCollectors {
+  function collect(address client) external override onlyWhitelistedCollectors {
     uint256 _bounty = bounties[client]; /// Gas savings
 
     require(_bounty >= _bountyThreshold, "YieldFi BountyCollector::BountyAmountTooLow");
@@ -84,12 +90,12 @@ contract BountyCollector is Initializable, OwnableUpgradeSafe, ReentrancyGuardUp
   }
 
   /// @dev Be aware of gas cost!
-  function collectAll() public view onlyWhitelistedCollectors {
+  function collectAll() public view override onlyWhitelistedCollectors {
     require(false, "NOT IMPLEMENTED");
   }
 
   /// Register bounties
-  function registerBounty(address client, uint256 amount) external onlyWhitelistedWorkers {
+  function registerBounty(address client, uint256 amount) external override onlyWhitelistedWorkers {
     bounties[client] = bounties[client].add(amount);
   }
 }

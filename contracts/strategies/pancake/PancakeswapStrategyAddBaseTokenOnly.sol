@@ -10,6 +10,8 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
+import "hardhat/console.sol";
+
 import "../../../contracts/libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
@@ -59,6 +61,7 @@ contract PancakeswapStrategyAddBaseTokenOnly is
     // 4(1-f) = 4*9975*10000 = 399000000, where f = 0.0025 and 10,000 is a way to avoid floating point
     // 19975^2 = 399000625
     // 9975*2 = 19950
+
     uint256 aIn = CustomMath.sqrt(rIn.mul(balance.mul(399000000).add(rIn.mul(399000625)))).sub(
       rIn.mul(19975)
     ) / 19950;
@@ -66,6 +69,7 @@ contract PancakeswapStrategyAddBaseTokenOnly is
     address[] memory path = new address[](2);
     path[0] = baseToken;
     path[1] = farmingToken;
+
     router.swapExactTokensForTokens(aIn, 0, path, address(this), block.timestamp);
     // 5. Mint more LP tokens and return all LP tokens to the sender.
     (, , uint256 moreLPAmount) = router.addLiquidity(

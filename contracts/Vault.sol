@@ -109,7 +109,7 @@ contract Vault is
   /// @param id The position ID to query.
   function positionInfo(uint256 id) external view returns (uint256) {
     Position storage pos = positions[id];
-    return (IWorker(pos.worker).health(id));
+    return (IWorker(pos.worker).tokensToReceive(id));
   }
 
   /// @dev Return the total token entitled to the token holders. Be careful of unaccrued interests.

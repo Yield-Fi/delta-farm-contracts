@@ -16,8 +16,8 @@ interface IWorker {
   /// @dev Re-invest whatever the worker is working on.
   function reinvest() external;
 
-  /// @dev Return the amount of wei to get back if we are to liquidate the position.
-  function health(uint256 id) external view returns (uint256);
+  /// @dev Return the amount of base token to get back if we are to liquidate the position.
+  function tokensToReceive(uint256 id) external view returns (uint256);
 
   /// @dev Liquidate the given position to token. Send all token back to its Vault.
   function liquidate(uint256 id) external;
