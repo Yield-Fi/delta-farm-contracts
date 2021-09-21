@@ -274,56 +274,9 @@ describe("Vault - interactions", async () => {
     await waffle.loadFixture(fixture);
   });
 
-  context("upon primary worker init", async () => {
-    it("should have valid baseToken set", async () => {
-      expect(await pancakeswapWorker01.baseToken()).to.be.eql(baseToken.address);
-    });
-
-    it("should give rewards out when you stake LP tokens", async () => {
-      // Deployer sends some LP tokens to Alice and Bob
-      await lp.transfer(aliceAddress, ethers.utils.parseEther("0.05"));
-
-      await lp.transfer(bobAddress, ethers.utils.parseEther("0.05"));
-
-      // Alice and Bob stake 0.01 LP tokens and waits for 1 day
-      await lpAsAlice.approve(masterChef.address, ethers.utils.parseEther("0.01"));
-
-      await lpAsBob.approve(masterChef.address, ethers.utils.parseEther("0.02"));
-
-      await pancakeMasterChefAsAlice.deposit(POOL_ID, ethers.utils.parseEther("0.01"));
-      await pancakeMasterChefAsBob.deposit(POOL_ID, ethers.utils.parseEther("0.02")); // alice +1 Reward
-
-      // Alice and Bob withdraw stake from the pool
-      await pancakeMasterChefAsBob.withdraw(POOL_ID, ethers.utils.parseEther("0.02")); // alice +1/3 Reward  Bob + 2/3 Reward
-      await pancakeMasterChefAsAlice.withdraw(POOL_ID, ethers.utils.parseEther("0.01")); // alice +1 Reward
-
-      assertAlmostEqual(
-        (await cake.balanceOf(aliceAddress)).toString(),
-        CAKE_REWARD_PER_BLOCK.mul(BigNumber.from(7)).div(BigNumber.from(3)).toString()
-      );
-      assertAlmostEqual(
-        (await cake.balanceOf(bobAddress)).toString(),
-        CAKE_REWARD_PER_BLOCK.mul(2).div(3).toString()
-      );
-    });
-  });
-
-  context("work - EOA", async () => {
-    it("should allow to open a new position", async () => {
-      // Deployer deposits 3 BaseToken to the protocol
-      await baseToken.approve(vault.address, ethers.utils.parseEther("3"));
-      // await vault.deposit(ethers.utils.parseEther("3"));
-
-      // await baseTokenAsAlice.approve(vault.address, ethers.utils.parseEther("0.3"));
-      // await vaultAsAlice.work(
-      //   0,
-      //   pancakeswapWorker01.address,
-      //   ethers.utils.parseEther("0.3"),
-      //   ethers.utils.defaultAbiCoder.encode(
-      //     ["address", "bytes"],
-      //     [addStrat.address, ethers.utils.defaultAbiCoder.encode(["uint256"], ["0"])]
-      //   )
-      // );
-    });
+  context("TODO: Vault-related test suite", async () => {
+    it("should provide well-written test suite in the future", async () => {
+      console.log("TODO: Vault test suite.");
+    })
   });
 });
