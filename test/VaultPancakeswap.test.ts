@@ -277,6 +277,6 @@ describe("Vault - interactions", async () => {
   context("TODO: Vault-related test suite", async () => {
     it("should provide well-written test suite in the future", async () => {
       console.log("TODO: Vault test suite.");
-    })
+    });
   });
 });

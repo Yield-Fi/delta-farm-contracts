@@ -104,12 +104,15 @@ contract BountyCollector is
   /// One function to wrap two calls. They should be called one by one anyway.
   /// (If client recevies fee, yieldFi does too.)
   function dev_registerBounty(address[] calldata clients, uint256[] calldata amounts)
-  external onlyWhitelistedWorkers nonReentrant {
+    external
+    onlyWhitelistedWorkers
+    nonReentrant
+  {
     require(clients.length == amounts.length, "YieldFi BountyCollector::BadCollectData");
 
     address clientAddres;
 
-    for(uint i = 0; i < clients.length; i++) {
+    for (uint256 i = 0; i < clients.length; i++) {
       clientAddres = clients[i];
 
       bounties[clientAddres] = bounties[clientAddres].add(amounts[i]);
