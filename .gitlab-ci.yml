@@ -25,23 +25,13 @@ test:
     - apt-get update && apt-get install -y gawk
     - npm run compile
     - npm run coverage
-    # Flatten out the contracts for symbolic analysis
-    - npm run flatten
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     paths:
       - coverage
-      - flatten.sol
     expire_in: 10 days
     reports:
       cobertura: coverage/cobertura-coverage.xml
-
-mythril:
-  image: sharathkumaranbu/mythril-ci
-  stage: security
-  script:
-    # From artifacts
-    - myth -x flatten.sol
 
 slither:
   image: python
