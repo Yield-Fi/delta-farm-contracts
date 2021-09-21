@@ -8,6 +8,14 @@ cache:
     - node_modules/
     - build/
 
+linters:
+  image: node:lts
+  stage: lint
+  script:
+    - npm install
+    - npm run lint
+    - npm run solhint
+
 test:
   image: node:lts
   stage: test
@@ -34,10 +42,10 @@ mythril:
     # From artifacts
     - myth -x flatten.sol
 
-linters:
-  image: node:lts
-  stage: lint
+slither:
+  image: python
+  stage: security
+  before_script:
+    - pip3 install slither-analyzer
   script:
-    - npm install
-    - npm run lint
-    - npm run solhint
+    - slither .
