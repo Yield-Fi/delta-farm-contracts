@@ -11,6 +11,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IWorker.sol";
+import "./interfaces/IBountyCollector.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWBNB.sol";
@@ -49,6 +50,7 @@ contract Vault is
   struct Position {
     address worker;
     address owner;
+    address client;
   }
 
   IVaultConfig public config;
@@ -56,6 +58,8 @@ contract Vault is
   uint256 public nextPositionID;
 
   /// Reward-related stuff
+  IBountyCollector public bountyCollector;
+
   /// @dev Position ID => Native Token Amount
   mapping(uint256 => uint256) public rewards;
   mapping(address => bool) public okRewardAssigners;
@@ -98,6 +102,7 @@ contract Vault is
   function initialize(
     IVaultConfig _config,
     address _token,
+    IBountyCollector _bountyCollector,
     string calldata _name,
     string calldata _symbol
   ) external initializer {
@@ -108,6 +113,8 @@ contract Vault is
     nextPositionID = 1;
     config = _config;
     token = _token;
+
+    bountyCollector = _bountyCollector;
 
     // free-up execution scope
     _IN_EXEC_LOCK = _NOT_ENTERED;
@@ -165,11 +172,13 @@ contract Vault is
       pos = positions[id];
       pos.worker = worker;
       pos.owner = msg.sender;
+      pos.client = client;
     } else {
       pos = positions[id];
       require(id < nextPositionID, "bad position id");
       require(pos.worker == worker, "bad position worker");
       require(pos.owner == msg.sender, "not position owner");
+      require(pos.client == client, "bad source-client address");
     }
     emit Work(id, amount);
     // Update execution scope variables
@@ -198,11 +207,11 @@ contract Vault is
     SafeToken.safeTransfer(token, to, value);
   }
 
-  function registerRewards(
-    uint256[] calldata pids,
-    uint256[] calldata amounts,
-    uint256 totalAmount
-  ) external override onlyWhitelistedRewardAssigners {
+  function registerRewards(uint256[] calldata pids, uint256[] calldata amounts)
+    external
+    override
+    onlyWhitelistedRewardAssigners
+  {
     uint256 length = pids.length;
 
     require(length == amounts.length, "Vault: invalid input data");
@@ -213,7 +222,39 @@ contract Vault is
   }
 
   function collectReward(uint256 pid) external override {
-    token.safeTransfer(positions[pid].owner, rewards[pid]);
+    // 1. Extract BPS' (yieldFi fee percentage for given worker(farm) & the client one)
+    // TODO: Awating implementation
+    // (uint256 yieldFiBps, uint256 clientBps) = IWorker(address(worker)).getBps(positions[pid].client)
+
+    uint16 yieldFiBps = 1000; // 10%;
+    uint16 clientBps = 500; // 5%;
+
+    // Gas savings
+    uint256 baseReward = rewards[pid];
+
+    // Fee amounts
+    uint256 yieldFiFee = baseReward.mul(yieldFiBps).div(10000);
+    uint256 clientFee = baseReward.mul(clientBps).div(10000);
+
+    // Part of reward that user will receive
+    uint256 userReward = baseReward.sub(yieldFiFee).sub(clientFee);
+
+    // Static array to dynamic array cast
+    uint256[] memory fees = new uint256[](2);
+    address[] memory addresses = new address[](2);
+
+    fees[0] = yieldFiFee;
+    fees[1] = clientFee;
+
+    addresses[0] = config.getTreasuryAddr();
+    addresses[1] = positions[pid].client;
+
+    // Transfer assets to bounty collector and register the amounts
+    bountyCollector.registerBounties(addresses, fees);
+    token.safeTransfer(address(bountyCollector), yieldFiFee.add(clientFee));
+
+    // Finally transfer assets to the end user
+    token.safeTransfer(positions[pid].owner, userReward);
   }
 
   /// @dev Fallback function to accept BNB.

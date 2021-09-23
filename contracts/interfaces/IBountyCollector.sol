@@ -17,5 +17,5 @@ interface IBountyCollector {
   function collectAll() external view;
 
   /// Register bounties
-  function registerBounty(address client, uint256 amount) external;
+  function registerBounties(address[] calldata clients, uint256[] calldata amount) external;
 }
