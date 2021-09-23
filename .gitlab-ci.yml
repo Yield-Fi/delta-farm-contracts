@@ -5,9 +5,17 @@ stages:
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
-  - node_modules/
-  - build/
+    - node_modules/
+    - build/
 
+linters:
+  image: node:lts
+  stage: lint
+  script:
+    - npm install
+    - npm run lint
+    - npm run solhint
+  allow_failure: true
 
 test:
   image: node:lts
@@ -17,35 +25,18 @@ test:
     - apt-get update && apt-get install -y gawk
     - npm run compile
     - npm run coverage
-    # Flatten out the contracts for symbolic analysis
-    - npm run flatten
   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
   artifacts:
     paths:
       - coverage
-      - flatten.sol
     expire_in: 10 days
     reports:
       cobertura: coverage/cobertura-coverage.xml
 
-mythril:
-  image: sharathkumaranbu/mythril-ci
+slither:
+  image: python
   stage: security
+  before_script:
+    - pip3 install slither-analyzer
   script:
-    # From artifacts
-    - myth -x flatten.sol
-
-solium:
-  image: node:lts
-  stage: security
-  script:
-    - npm install -g solium
-    - solium -d contracts/
-
-linters:
-  image: node:lts
-  stage: lint
-  script:
-    - npm install
-    - npm run lint
-    - npm run solhint
+    - slither .
