@@ -99,6 +99,7 @@ contract BountyCollector is
   /// (If client recevies fee, yieldFi does as well)
   function registerBounties(address[] calldata clients, uint256[] calldata amounts)
     external
+    override
     onlyWhitelistedWorkers
     nonReentrant
   {

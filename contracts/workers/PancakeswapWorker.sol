@@ -515,7 +515,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     uint256 amountForClient;
     if (clientAccount != address(0)) {
       amountForClient = baseTokenBalance.mul(clientFee).div(clientFee.add(treasuryFee));
-      bountyCollector.registerBounty(clientAccount, amountForClient);
+      // bountyCollector.registerBount(clientAccount, amountForClient);
     }
 
     emit SendFeeToBountyCollector(
