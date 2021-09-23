@@ -55,10 +55,20 @@ contract Vault is
   mapping(uint256 => Position) public positions;
   uint256 public nextPositionID;
 
+  /// Reward-related stuff
+  /// @dev Position ID => Native Token Amount
+  mapping(uint256 => uint256) public rewards;
+  mapping(address => bool) public okRewardAssigners;
+
+  modifier onlyWhitelistedRewardAssigners() {
+    require(okRewardAssigners[msg.sender], "Vault: Reward assigner not whitelisted");
+    _;
+  }
+
   /// @dev Require that the caller must be an EOA account if not whitelisted.
   modifier onlyEOAorWhitelisted() {
     if (!config.whitelistedCallers(msg.sender)) {
-      require(msg.sender == tx.origin, "not eoa");
+      require(msg.sender == tx.origin, "Vault: Not EOA");
     }
     _;
   }
@@ -186,6 +196,24 @@ contract Vault is
   /// @param value The number of BaseToken tokens to withdraw. Must not exceed `reservePool`.
   function withdrawReserve(address to, uint256 value) external onlyOwner nonReentrant {
     SafeToken.safeTransfer(token, to, value);
+  }
+
+  function registerRewards(
+    uint256[] calldata pids,
+    uint256[] calldata amounts,
+    uint256 totalAmount
+  ) external override onlyWhitelistedRewardAssigners {
+    uint256 length = pids.length;
+
+    require(length == amounts.length, "Vault: invalid input data");
+
+    for (uint256 i = 0; i < length; i++) {
+      rewards[pids[i]] = rewards[pids[i]].add(amounts[i]);
+    }
+  }
+
+  function collectReward(uint256 pid) external override {
+    token.safeTransfer(positions[pid].owner, rewards[pid]);
   }
 
   /// @dev Fallback function to accept BNB.
