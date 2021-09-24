@@ -188,7 +188,7 @@ contract Vault is
 
     require(amount <= SafeToken.myBalance(token), "insufficient funds in the vault");
     SafeToken.safeTransfer(token, worker, amount);
-    IWorker(worker).work(id, client, clientBps, data);
+    IWorker(worker).work(id, data);
     // 5. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;

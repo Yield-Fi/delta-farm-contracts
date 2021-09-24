@@ -208,12 +208,9 @@ describe("Vault - interactions", async () => {
       masterChef,
       router,
       POOL_ID,
-      addStrat,
       [cake.address, mockWBNB.address, baseToken.address],
       0,
-      eveAddress,
       REINVEST_BOUNTY_BPS,
-      [cake.address, mockWBNB.address, baseToken.address],
       deployer
     );
 
@@ -223,12 +220,9 @@ describe("Vault - interactions", async () => {
       masterChef,
       router,
       POOL_ID,
-      addStrat,
       [cake.address, mockWBNB.address, baseToken.address],
       0,
-      eveAddress,
       REINVEST_BOUNTY_BPS,
-      [cake.address, mockWBNB.address, baseToken.address],
       deployer
     );
 
