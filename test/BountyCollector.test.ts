@@ -23,32 +23,32 @@ describe("BountyCollector", async () => {
   let deployer: Signer;
   let yieldFi: Signer;
   let bitterex: Signer;
-  let okWorker: Signer;
-  let evilWorker: Signer;
+  let okVault: Signer;
+  let evilVault: Signer;
   let okCollector: Signer;
   let evilCollector: Signer;
 
   // Addresses
   let yieldFiAddress: string;
   let bitterexAddress: string;
-  let evilWorkerAddress: string;
+  let evilVaultAddress: string;
 
   let bountyCollector: BountyCollector;
 
   // Signatures
-  let bountyCollectorAsOkWorker: BountyCollector;
-  let bountyCollectorAsEvilWorker: BountyCollector;
+  let bountyCollectorAsOkVault: BountyCollector;
+  let bountyCollectorAsEvilVault: BountyCollector;
   let bountyCollectorAsOkCollector: BountyCollector;
   let bountyCollectorAsEvilCollector: BountyCollector;
 
   async function fixture() {
-    [deployer, yieldFi, bitterex, okWorker, evilWorker, okCollector, evilCollector] =
+    [deployer, yieldFi, bitterex, okVault, evilVault, okCollector, evilCollector] =
       await ethers.getSigners();
 
-    [yieldFiAddress, bitterexAddress, evilWorkerAddress] = await Promise.all([
+    [yieldFiAddress, bitterexAddress, evilVaultAddress] = await Promise.all([
       yieldFi.getAddress(),
       bitterex.getAddress(),
-      evilWorker.getAddress(),
+      evilVault.getAddress(),
     ]);
 
     bountyToken = await deployToken(
@@ -73,13 +73,13 @@ describe("BountyCollector", async () => {
 
     await bountyCollector.deployed();
 
-    // Whitelist collector and worker
+    // Whitelist collector and vault
     await bountyCollector.whitelistCollectors([await okCollector.getAddress()], true);
-    await bountyCollector.whitelistWorkers([await okWorker.getAddress()], true);
+    await bountyCollector.whitelistVaults([await okVault.getAddress()], true);
 
     // Signatures
-    bountyCollectorAsOkWorker = bountyCollector.connect(okWorker);
-    bountyCollectorAsEvilWorker = bountyCollector.connect(evilWorker);
+    bountyCollectorAsOkVault = bountyCollector.connect(okVault);
+    bountyCollectorAsEvilVault = bountyCollector.connect(evilVault);
     bountyCollectorAsOkCollector = bountyCollector.connect(okCollector);
     bountyCollectorAsEvilCollector = bountyCollector.connect(evilCollector);
   }
@@ -89,13 +89,13 @@ describe("BountyCollector", async () => {
   });
 
   it("should respect access modifiers", async () => {
-    // Not whitelisted (evil) worker tries to register bounty - revert
+    // Not whitelisted (evil) vault tries to register bounty - revert
     await expect(
-      bountyCollectorAsEvilWorker.registerBounties(
-        [evilWorkerAddress],
+      bountyCollectorAsEvilVault.registerBounties(
+        [evilVaultAddress],
         [ethers.utils.parseEther("1")]
       )
-    ).to.be.revertedWith("YieldFi BountyCollector::WorkerNotWhitelisted");
+    ).to.be.revertedWith("YieldFi BountyCollector::VaultNotWhitelisted");
 
     // Not whitelisted (evil) collector tries to collect bounty - revert
     await expect(
@@ -107,8 +107,8 @@ describe("BountyCollector", async () => {
     // Mint some tokens to simulate fees' harvested from reinvest-related event.
     await bountyToken.mint(bountyCollector.address, ethers.utils.parseEther("10"));
 
-    // Register fees/shares as ok worker (0.5 below the threshold)
-    await bountyCollectorAsOkWorker.registerBounties(
+    // Register fees/shares as ok vault (0.5 below the threshold)
+    await bountyCollectorAsOkVault.registerBounties(
       [yieldFiAddress],
       [ethers.utils.parseEther("0.5")]
     );
@@ -122,12 +122,12 @@ describe("BountyCollector", async () => {
     // Mint some tokens to simulate fees' harvested from reinvest-related event.
     await bountyToken.mint(bountyCollector.address, ethers.utils.parseEther("10"));
 
-    // Register fees/shares as ok worker
-    await bountyCollectorAsOkWorker.registerBounties(
+    // Register fees/shares as ok vault
+    await bountyCollectorAsOkVault.registerBounties(
       [yieldFiAddress],
       [ethers.utils.parseEther("9")]
     );
-    await bountyCollectorAsOkWorker.registerBounties(
+    await bountyCollectorAsOkVault.registerBounties(
       [bitterexAddress],
       [ethers.utils.parseEther("1")]
     );

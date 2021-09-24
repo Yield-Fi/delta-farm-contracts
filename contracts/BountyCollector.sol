@@ -25,8 +25,8 @@ contract BountyCollector is
 
   /// Only whitelisted collector should be able to call collect-related functions
   mapping(address => bool) okCollectors;
-  /// Workers will call contract upon each reinvest-related event
-  mapping(address => bool) okWorkers;
+  /// Vaults will call contract upon each reinvest-related event
+  mapping(address => bool) okVaults;
 
   /// Config
   address _bountyToken;
@@ -37,8 +37,8 @@ contract BountyCollector is
     _;
   }
 
-  modifier onlyWhitelistedWorkers() {
-    require(okWorkers[msg.sender], "YieldFi BountyCollector::WorkerNotWhitelisted");
+  modifier onlyWhitelistedVaults() {
+    require(okVaults[msg.sender], "YieldFi BountyCollector::VaultNotWhitelisted");
     _;
   }
 
@@ -70,10 +70,10 @@ contract BountyCollector is
     }
   }
 
-  /// Whitetlist worker so it can register new bounties
-  function whitelistWorkers(address[] calldata workers, bool ok) external override onlyOwner {
-    for (uint128 i = 0; i < workers.length; i++) {
-      okWorkers[workers[i]] = ok;
+  /// Whitetlist vaults so it can register new bounties
+  function whitelistVaults(address[] calldata vaults, bool ok) external override onlyOwner {
+    for (uint128 i = 0; i < vaults.length; i++) {
+      okVaults[vaults[i]] = ok;
     }
   }
 
@@ -100,7 +100,7 @@ contract BountyCollector is
   function registerBounties(address[] calldata clients, uint256[] calldata amounts)
     external
     override
-    onlyWhitelistedWorkers
+    onlyWhitelistedVaults
     nonReentrant
   {
     require(clients.length == amounts.length, "YieldFi BountyCollector::BadCollectData");
