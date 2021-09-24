@@ -31,7 +31,7 @@ contract Vault is
 
   /// @notice Events
   event Work(uint256 indexed id, uint256 loan);
-  event RewardCollect(address indexed caller, uint256 indexed reward);
+  event RewardCollect(address indexed caller, address indexed rewardOwner, uint256 indexed reward);
 
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;
@@ -263,7 +263,7 @@ contract Vault is
     token.safeTransfer(position.owner, userReward);
 
     // Emit
-    emit RewardCollect(msg.sender, userReward);
+    emit RewardCollect(msg.sender, position.owner, userReward);
   }
 
   /// @dev Fallback function to accept BNB.
