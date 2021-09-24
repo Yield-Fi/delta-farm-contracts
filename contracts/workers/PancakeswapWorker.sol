@@ -179,6 +179,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
     // 4. Send all base token to the operatingVault
     baseToken.safeTransfer(operatingVault, baseToken.myBalance());
+    /// TODO: Register reward on the vault contract
 
     // 5. Reset approval
     cake.safeApprove(address(router), 0);

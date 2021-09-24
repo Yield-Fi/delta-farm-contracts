@@ -20,9 +20,6 @@ interface IWorker {
   /// @dev Set address that can be harvest
   function setHarvestersOk(address[] calldata harvesters, bool isOk) external;
 
-  /// @dev Set fee in bps for specific client
-  function setClientFee(address clientAccount, uint256 clientFeeBps) external;
-
   /// @dev LP token holds by worker
   function lpToken() external view returns (IPancakePair);
 
@@ -39,6 +36,8 @@ interface IWorker {
   function treasuryFeeBps() external view returns (uint256);
 
   /// @dev Get fee in bps for given client
-  /// @param clientAccount address of client account
   function getClientFee(address clientAccount) external view returns (uint256);
+
+  /// @dev Set fee in bps for specific client
+  function setClientFee(address clientAccount, uint256 clientFeeBps) external;
 }

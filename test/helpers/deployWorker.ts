@@ -9,20 +9,15 @@ import {
 } from "../../typechain";
 import { ethers, upgrades } from "hardhat";
 
-import { PancakeswapStrategyAddBaseTokenOnly } from "../../typechain/PancakeswapStrategyAddBaseTokenOnly";
-
 export const deployPancakeWorker = async (
   vault: Vault,
   baseToken: MockToken,
   masterChef: PancakeMasterChef,
   router: PancakeRouterV2,
   poolId: number,
-  reinvestStrategy: PancakeswapStrategyAddBaseTokenOnly,
   reinvestPath: string[],
   reinvestThreshold: BigNumberish,
-  bountyCollector: string,
   treasuryFeeBps: BigNumberish,
-  rewardToFeePat: string[],
   deployer: Signer
 ): Promise<PancakeswapWorker> => {
   const PancakeswapWorker = (await ethers.getContractFactory(
@@ -35,12 +30,9 @@ export const deployPancakeWorker = async (
     masterChef.address,
     router.address,
     poolId,
-    reinvestStrategy.address,
     reinvestPath,
     reinvestThreshold,
-    bountyCollector,
     treasuryFeeBps,
-    rewardToFeePat,
   ])) as PancakeswapWorker;
 
   await pancakeswapWorker.deployed();
