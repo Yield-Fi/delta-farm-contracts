@@ -11,6 +11,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IWorker.sol";
+import "./interfaces/IBountyCollector.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWBNB.sol";
@@ -30,6 +31,7 @@ contract Vault is
 
   /// @notice Events
   event Work(uint256 indexed id, uint256 loan);
+  event RewardCollect(address indexed caller, address indexed rewardOwner, uint256 indexed reward);
 
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;
@@ -49,16 +51,29 @@ contract Vault is
   struct Position {
     address worker;
     address owner;
+    address client;
   }
 
   IVaultConfig public config;
   mapping(uint256 => Position) public positions;
   uint256 public nextPositionID;
 
+  /// Reward-related stuff
+  IBountyCollector public bountyCollector;
+
+  /// @dev Position ID => Native Token Amount
+  mapping(uint256 => uint256) public rewards;
+  mapping(address => bool) public okRewardAssigners;
+
+  modifier onlyWhitelistedRewardAssigners() {
+    require(okRewardAssigners[msg.sender], "Vault: Reward assigner not whitelisted");
+    _;
+  }
+
   /// @dev Require that the caller must be an EOA account if not whitelisted.
   modifier onlyEOAorWhitelisted() {
     if (!config.whitelistedCallers(msg.sender)) {
-      require(msg.sender == tx.origin, "not eoa");
+      require(msg.sender == tx.origin, "Vault: Not EOA");
     }
     _;
   }
@@ -88,6 +103,7 @@ contract Vault is
   function initialize(
     IVaultConfig _config,
     address _token,
+    IBountyCollector _bountyCollector,
     string calldata _name,
     string calldata _symbol
   ) external initializer {
@@ -98,6 +114,8 @@ contract Vault is
     nextPositionID = 1;
     config = _config;
     token = _token;
+
+    bountyCollector = _bountyCollector;
 
     // free-up execution scope
     _IN_EXEC_LOCK = _NOT_ENTERED;
@@ -145,7 +163,6 @@ contract Vault is
     address worker,
     uint256 amount,
     address client,
-    uint256 clientBps,
     bytes calldata data
   ) external payable onlyEOAorWhitelisted transferTokenToVault(amount) nonReentrant {
     // 1. Sanity check the input position, or add a new position of ID is 0.
@@ -155,11 +172,13 @@ contract Vault is
       pos = positions[id];
       pos.worker = worker;
       pos.owner = msg.sender;
+      pos.client = client;
     } else {
       pos = positions[id];
       require(id < nextPositionID, "bad position id");
       require(pos.worker == worker, "bad position worker");
       require(pos.owner == msg.sender, "not position owner");
+      require(pos.client == client, "bad source-client address");
     }
     emit Work(id, amount);
     // Update execution scope variables
@@ -186,6 +205,65 @@ contract Vault is
   /// @param value The number of BaseToken tokens to withdraw. Must not exceed `reservePool`.
   function withdrawReserve(address to, uint256 value) external onlyOwner nonReentrant {
     SafeToken.safeTransfer(token, to, value);
+  }
+
+  function registerRewards(uint256[] calldata pids, uint256[] calldata amounts)
+    external
+    override
+    onlyWhitelistedRewardAssigners
+  {
+    uint256 length = pids.length;
+
+    require(length == amounts.length, "Vault: invalid input data");
+
+    for (uint256 i = 0; i < length; i++) {
+      rewards[pids[i]] = rewards[pids[i]].add(amounts[i]);
+    }
+  }
+
+  function collectReward(uint256 pid) external override {
+    Position memory position = positions[pid];
+
+    IWorker worker = IWorker(position.worker);
+
+    uint256 yieldFiBps = worker.treasuryFeeBps();
+    uint256 clientBps = worker.getClientFee(position.client);
+
+    // Gas savings
+    uint256 baseReward = rewards[pid];
+
+    require(
+      (baseReward * 10000) / 10000 == baseReward,
+      "Vault: Too little amout to collect (precision loss)"
+    );
+
+    // Fee amounts
+    uint256 yieldFiFee = baseReward.mul(yieldFiBps).div(10000);
+    uint256 clientFee = baseReward.mul(clientBps).div(10000);
+    uint256 feeSum = yieldFiFee.add(clientFee);
+
+    // Part of reward that user will receive
+    uint256 userReward = baseReward.sub(feeSum);
+
+    // Static array to dynamic array cast
+    uint256[] memory fees = new uint256[](2);
+    address[] memory addresses = new address[](2);
+
+    fees[0] = yieldFiFee;
+    fees[1] = clientFee;
+
+    addresses[0] = config.getTreasuryAddr();
+    addresses[1] = positions[pid].client;
+
+    // Transfer assets to bounty collector and register the amounts
+    bountyCollector.registerBounties(addresses, fees);
+    token.safeTransfer(address(bountyCollector), feeSum);
+
+    // Finally transfer assets to the end user
+    token.safeTransfer(position.owner, userReward);
+
+    // Emit
+    emit RewardCollect(msg.sender, position.owner, userReward);
   }
 
   /// @dev Fallback function to accept BNB.

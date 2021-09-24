@@ -23,32 +23,32 @@ describe("BountyCollector", async () => {
   let deployer: Signer;
   let yieldFi: Signer;
   let bitterex: Signer;
-  let okWorker: Signer;
-  let evilWorker: Signer;
+  let okVault: Signer;
+  let evilVault: Signer;
   let okCollector: Signer;
   let evilCollector: Signer;
 
   // Addresses
   let yieldFiAddress: string;
-  let bitterexAddresss: string;
-  let evilWorkerAddress: string;
+  let bitterexAddress: string;
+  let evilVaultAddress: string;
 
   let bountyCollector: BountyCollector;
 
   // Signatures
-  let bountyCollectorAsOkWorker: BountyCollector;
-  let bountyCollectorAsEvilWorker: BountyCollector;
+  let bountyCollectorAsOkVault: BountyCollector;
+  let bountyCollectorAsEvilVault: BountyCollector;
   let bountyCollectorAsOkCollector: BountyCollector;
   let bountyCollectorAsEvilCollector: BountyCollector;
 
   async function fixture() {
-    [deployer, yieldFi, bitterex, okWorker, evilWorker, okCollector, evilCollector] =
+    [deployer, yieldFi, bitterex, okVault, evilVault, okCollector, evilCollector] =
       await ethers.getSigners();
 
-    [yieldFiAddress, bitterexAddresss, evilWorkerAddress] = await Promise.all([
+    [yieldFiAddress, bitterexAddress, evilVaultAddress] = await Promise.all([
       yieldFi.getAddress(),
       bitterex.getAddress(),
-      evilWorker.getAddress(),
+      evilVault.getAddress(),
     ]);
 
     bountyToken = await deployToken(
@@ -73,13 +73,13 @@ describe("BountyCollector", async () => {
 
     await bountyCollector.deployed();
 
-    // Whitelist collector and worker
+    // Whitelist collector and vault
     await bountyCollector.whitelistCollectors([await okCollector.getAddress()], true);
-    await bountyCollector.whitelistWorkers([await okWorker.getAddress()], true);
+    await bountyCollector.whitelistVaults([await okVault.getAddress()], true);
 
     // Signatures
-    bountyCollectorAsOkWorker = bountyCollector.connect(okWorker);
-    bountyCollectorAsEvilWorker = bountyCollector.connect(evilWorker);
+    bountyCollectorAsOkVault = bountyCollector.connect(okVault);
+    bountyCollectorAsEvilVault = bountyCollector.connect(evilVault);
     bountyCollectorAsOkCollector = bountyCollector.connect(okCollector);
     bountyCollectorAsEvilCollector = bountyCollector.connect(evilCollector);
   }
@@ -89,10 +89,13 @@ describe("BountyCollector", async () => {
   });
 
   it("should respect access modifiers", async () => {
-    // Not whitelisted (evil) worker tries to register bounty - revert
+    // Not whitelisted (evil) vault tries to register bounty - revert
     await expect(
-      bountyCollectorAsEvilWorker.registerBounty(evilWorkerAddress, ethers.utils.parseEther("1"))
-    ).to.be.revertedWith("YieldFi BountyCollector::WorkerNotWhitelisted");
+      bountyCollectorAsEvilVault.registerBounties(
+        [evilVaultAddress],
+        [ethers.utils.parseEther("1")]
+      )
+    ).to.be.revertedWith("YieldFi BountyCollector::VaultNotWhitelisted");
 
     // Not whitelisted (evil) collector tries to collect bounty - revert
     await expect(
@@ -104,8 +107,11 @@ describe("BountyCollector", async () => {
     // Mint some tokens to simulate fees' harvested from reinvest-related event.
     await bountyToken.mint(bountyCollector.address, ethers.utils.parseEther("10"));
 
-    // Register fees/shares as ok worker (0.5 below the threshold)
-    await bountyCollectorAsOkWorker.registerBounty(yieldFiAddress, ethers.utils.parseEther("0.5"));
+    // Register fees/shares as ok vault (0.5 below the threshold)
+    await bountyCollectorAsOkVault.registerBounties(
+      [yieldFiAddress],
+      [ethers.utils.parseEther("0.5")]
+    );
 
     await expect(bountyCollectorAsOkCollector.collect(yieldFiAddress)).to.be.revertedWith(
       "YieldFi BountyCollector::BountyAmountTooLow"
@@ -116,9 +122,15 @@ describe("BountyCollector", async () => {
     // Mint some tokens to simulate fees' harvested from reinvest-related event.
     await bountyToken.mint(bountyCollector.address, ethers.utils.parseEther("10"));
 
-    // Register fees/shares as ok worker
-    await bountyCollectorAsOkWorker.registerBounty(yieldFiAddress, ethers.utils.parseEther("9"));
-    await bountyCollectorAsOkWorker.registerBounty(bitterexAddresss, ethers.utils.parseEther("1"));
+    // Register fees/shares as ok vault
+    await bountyCollectorAsOkVault.registerBounties(
+      [yieldFiAddress],
+      [ethers.utils.parseEther("9")]
+    );
+    await bountyCollectorAsOkVault.registerBounties(
+      [bitterexAddress],
+      [ethers.utils.parseEther("1")]
+    );
 
     // Check the mint
     expect(await bountyToken.balanceOf(bountyCollector.address)).to.be.a.bignumber.that.is.eql(
@@ -129,7 +141,7 @@ describe("BountyCollector", async () => {
     expect(await bountyCollector.bounties(yieldFiAddress)).to.be.a.bignumber.that.is.eql(
       ethers.utils.parseEther("9")
     );
-    expect(await bountyCollector.bounties(bitterexAddresss)).to.be.a.bignumber.that.is.eql(
+    expect(await bountyCollector.bounties(bitterexAddress)).to.be.a.bignumber.that.is.eql(
       ethers.utils.parseEther("1")
     );
 
@@ -149,15 +161,15 @@ describe("BountyCollector", async () => {
 
     /// Collects fee for the bitterex
     // Call the collect as whitelisted collector
-    await bountyCollectorAsOkCollector.collect(bitterexAddresss);
+    await bountyCollectorAsOkCollector.collect(bitterexAddress);
 
-    expect(await bountyCollector.bounties(bitterexAddresss)).to.be.a.bignumber.that.is.eql(
+    expect(await bountyCollector.bounties(bitterexAddress)).to.be.a.bignumber.that.is.eql(
       ethers.utils.parseEther("0")
     ); // 1 BT to claim - 1 BT collected = 0 BT left
     expect(await bountyToken.balanceOf(bountyCollector.address)).to.be.a.bignumber.that.is.eql(
       ethers.utils.parseEther("0")
     ); // 1 BT total - 1 BT reward = 0 BT left
-    expect(await bountyToken.balanceOf(bitterexAddresss)).to.be.a.bignumber.that.is.eql(
+    expect(await bountyToken.balanceOf(bitterexAddress)).to.be.a.bignumber.that.is.eql(
       ethers.utils.parseEther("1")
     ); // 0 BT before + 1 BT collected = 1 BT total
   });

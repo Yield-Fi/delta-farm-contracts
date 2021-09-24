@@ -3,6 +3,7 @@ import "@openzeppelin/test-helpers";
 import { BigNumber, Signer, constants } from "ethers";
 import {
   CakeToken,
+  BountyCollector,
   MockContractContext__factory,
   MockToken__factory,
   MockWBNB,
@@ -34,7 +35,7 @@ import { Worker02Helper } from "./helpers/worker";
 import { assertAlmostEqual } from "./helpers/assert";
 import chai from "chai";
 import { deployPancakeStrategies } from "./helpers/deployStrategies";
-import { deployPancakeV2 } from "./helpers";
+import { deployPancakeV2, deployProxyContract } from "./helpers";
 import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { parseEther } from "ethers/lib/utils";
@@ -63,16 +64,25 @@ describe("Vault - interactions", async () => {
   let cake: CakeToken;
   let syrup: SyrupBar;
 
+  // BC
+  let bountyCollector: BountyCollector;
+
   // Signers
   let deployer: Signer;
   let alice: Signer;
   let bob: Signer;
   let eve: Signer;
 
+  let yieldFi: Signer;
+  let binance: Signer;
+
   let deployerAddress: string;
   let aliceAddress: string;
   let bobAddress: string;
   let eveAddress: string;
+
+  let yieldFiAddress: string;
+  let binanceAddress: string;
 
   // Protocol
   let vault: Vault;
@@ -107,13 +117,16 @@ describe("Vault - interactions", async () => {
   let vaultAsEve: Vault;
 
   async function fixture() {
-    [deployer, alice, bob, eve] = await ethers.getSigners();
-    [deployerAddress, aliceAddress, bobAddress, eveAddress] = await Promise.all([
-      deployer.getAddress(),
-      alice.getAddress(),
-      bob.getAddress(),
-      eve.getAddress(),
-    ]);
+    [deployer, alice, bob, eve, yieldFi, binance] = await ethers.getSigners();
+    [deployerAddress, aliceAddress, bobAddress, eveAddress, yieldFiAddress, binanceAddress] =
+      await Promise.all([
+        deployer.getAddress(),
+        alice.getAddress(),
+        bob.getAddress(),
+        eve.getAddress(),
+        yieldFi.getAddress(),
+        binance.getAddress(),
+      ]);
 
     // Setup MockContractContext
     const MockContractContext = (await ethers.getContractFactory(
@@ -160,10 +173,17 @@ describe("Vault - interactions", async () => {
       deployer
     );
 
-    // Treasury acc = address zero (?)
+    bountyCollector = (await deployProxyContract(
+      "BountyCollector",
+      [baseToken.address, "500"],
+      deployer
+    )) as BountyCollector;
+
+    // Treasury acc = yieldFi protocol owner
     [vault, vaultConfig, wNativeRelayer] = await deployVault(
       mockWBNB,
-      ethers.constants.AddressZero,
+      bountyCollector.address,
+      yieldFiAddress,
       baseToken,
       deployer
     );
@@ -271,6 +291,7 @@ describe("Vault - interactions", async () => {
   context("TODO: Vault-related test suite", async () => {
     it("should provide well-written test suite in the future", async () => {
       console.log("TODO: Vault test suite.");
+      console.log("Notice: Vault tests awaits fresh worker implementation.");
     });
   });
 });

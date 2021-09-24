@@ -10,4 +10,10 @@ interface IVault {
   function requestFunds(address targetedToken, uint256 amount) external;
 
   function token() external view returns (address);
+
+  /// Register rewards for positions for the worker
+  function registerRewards(uint256[] calldata pids, uint256[] calldata amounts) external;
+
+  /// Send the rewards to position owner
+  function collectReward(uint256 pid) external;
 }

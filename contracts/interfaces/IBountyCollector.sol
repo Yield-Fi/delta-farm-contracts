@@ -8,8 +8,8 @@ interface IBountyCollector {
   /// Whitetlist collectors so they can collect bounties
   function whitelistCollectors(address[] calldata collectors, bool ok) external;
 
-  /// Whitetlist worker so it can register new bounties
-  function whitelistWorkers(address[] calldata workers, bool ok) external;
+  /// Whitetlist vault so it can register new bounties
+  function whitelistVaults(address[] calldata vaults, bool ok) external;
 
   function collect(address client) external;
 
@@ -17,5 +17,5 @@ interface IBountyCollector {
   function collectAll() external view;
 
   /// Register bounties
-  function registerBounty(address client, uint256 amount) external;
+  function registerBounties(address[] calldata clients, uint256[] calldata amount) external;
 }

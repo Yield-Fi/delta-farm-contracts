@@ -25,8 +25,8 @@ contract BountyCollector is
 
   /// Only whitelisted collector should be able to call collect-related functions
   mapping(address => bool) okCollectors;
-  /// Workers will call contract upon each reinvest-related event
-  mapping(address => bool) okWorkers;
+  /// Vaults will call contract upon each reinvest-related event
+  mapping(address => bool) okVaults;
 
   /// Config
   address _bountyToken;
@@ -37,8 +37,8 @@ contract BountyCollector is
     _;
   }
 
-  modifier onlyWhitelistedWorkers() {
-    require(okWorkers[msg.sender], "YieldFi BountyCollector::WorkerNotWhitelisted");
+  modifier onlyWhitelistedVaults() {
+    require(okVaults[msg.sender], "YieldFi BountyCollector::VaultNotWhitelisted");
     _;
   }
 
@@ -70,10 +70,10 @@ contract BountyCollector is
     }
   }
 
-  /// Whitetlist worker so it can register new bounties
-  function whitelistWorkers(address[] calldata workers, bool ok) external override onlyOwner {
-    for (uint128 i = 0; i < workers.length; i++) {
-      okWorkers[workers[i]] = ok;
+  /// Whitetlist vaults so it can register new bounties
+  function whitelistVaults(address[] calldata vaults, bool ok) external override onlyOwner {
+    for (uint128 i = 0; i < vaults.length; i++) {
+      okVaults[vaults[i]] = ok;
     }
   }
 
@@ -94,25 +94,21 @@ contract BountyCollector is
     require(false, "NOT IMPLEMENTED");
   }
 
-  /// Register bounties
-  function registerBounty(address client, uint256 amount) external override onlyWhitelistedWorkers {
-    bounties[client] = bounties[client].add(amount);
-  }
-
-  /// @dev Fix proposal (TODO)
-  /// Register bounties (at the same time register amount for the client and for the yeildFi)
+  /// Register bounties (at the same time register amount for the client and for the yieldFi)
   /// One function to wrap two calls. They should be called one by one anyway.
-  /// (If client recevies fee, yieldFi does too.)
-  function dev_registerBounty(address[] calldata clients, uint256[] calldata amounts)
+  /// (If client recevies fee, yieldFi does as well)
+  function registerBounties(address[] calldata clients, uint256[] calldata amounts)
     external
-    onlyWhitelistedWorkers
+    override
+    onlyWhitelistedVaults
     nonReentrant
   {
     require(clients.length == amounts.length, "YieldFi BountyCollector::BadCollectData");
 
     address clientAddres;
+    uint256 length = clients.length;
 
-    for (uint256 i = 0; i < clients.length; i++) {
+    for (uint256 i = 0; i < length; i++) {
       clientAddres = clients[i];
 
       bounties[clientAddres] = bounties[clientAddres].add(amounts[i]);

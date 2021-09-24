@@ -15,6 +15,7 @@ import { Signer } from "@ethersproject/abstract-signer";
 export const deployVault = async (
   mockBNB: MockWBNB,
   treasuryAccountAddress: string,
+  bountyCollectorAddress: string,
   baseToken: MockToken,
   deployer: Signer
 ): Promise<[Vault, VaultConfig, WNativeRelayer]> => {
@@ -41,6 +42,7 @@ export const deployVault = async (
   const vault = (await upgrades.deployProxy(Vault, [
     vaultConfig.address,
     baseToken.address,
+    bountyCollectorAddress,
     `Deficentral ${baseTokenSymbol}}`,
     `defin${baseTokenSymbol}`,
   ])) as Vault;
