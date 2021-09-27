@@ -8,20 +8,27 @@ cache:
     - node_modules/
     - build/
 
-linters:
-  image: node:lts
+eslint:
+  image: node:14.17.6
   stage: lint
   script:
     - npm install
     - npm run lint
+  allow_failure: true
+
+solhint:
+  image: node:14.17.6
+  stage: lint
+  script:
+    - npm install
     - npm run solhint
   allow_failure: true
 
 test:
-  image: node:lts
+  image: node:14.17.6
   stage: test
   script:
-    # node_modules inherited from pipeline cache
+    - npm install
     - apt-get update && apt-get install -y gawk
     - npm run compile
     - npm run coverage
@@ -37,6 +44,15 @@ slither:
   image: python
   stage: security
   before_script:
+    - apt install curl
+    - curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" --no-use
+    - eval "[ -f .nvmrc ] && nvm install 14.17.6"
+    - eval "[ -f .nvmrc ] && nvm use 14.17.6"
+    - npm install
     - pip3 install slither-analyzer
+    - pip3 install solc-select
+    - solc-select install 0.6.6
+    - solc-select use 0.6.6
   script:
-    - slither .
+    - slither . --print human-summary
