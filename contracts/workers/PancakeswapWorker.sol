@@ -8,6 +8,8 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
+import "hardhat/console.sol";
+
 import "../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../interfaces/IStrategy.sol";
 import "../interfaces/IWorker.sol";
@@ -15,7 +17,6 @@ import "../libs/pancake/interfaces/IPancakeMasterChef.sol";
 import "../utils/CustomMath.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IVault.sol";
-import "../interfaces/IBountyCollector.sol";
 
 contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWorker {
   /// @notice Libraries
@@ -56,6 +57,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @notice Mutable state variables
   mapping(uint256 => uint256) public shares;
+  uint256[] private positionIds;
   mapping(address => bool) public approvedStrategies;
   uint256 public totalShare;
   uint256 public override treasuryFeeBps;
@@ -137,6 +139,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Require that the caller must be the operatingVault.
   modifier onlyOperator() {
+    console.log("%s", msg.sender);
     require(msg.sender == operatingVault, "PancakeswapWorker::onlyOperator:: not operatingVault");
     _;
   }
@@ -174,14 +177,24 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     // 2. Approve tokens
     cake.safeApprove(address(router), uint256(-1));
 
-    // 3. Convert all the remaining rewards to BaseToken according to config path.
+    // 3. Convert all rewards to BaseToken according to config path.
     router.swapExactTokensForTokens(reward, 0, getHarvestPath(), address(this), block.timestamp);
 
     // 4. Send all base token to the operatingVault
     baseToken.safeTransfer(operatingVault, baseToken.myBalance());
-    /// TODO: Register reward on the vault contract
 
-    // 5. Reset approval
+    // 5. Calculate the amount of reward for the given positions
+    uint256 numberOfPositions = positionIds.length;
+    uint256[] memory rewardsPerPosition;
+    for (uint256 i = 0; i < numberOfPositions; i++) {
+      uint256 positionShare = shares[positionIds[i]];
+      rewardsPerPosition[i] = reward.mul(positionShare).div(totalShare);
+    }
+
+    // 6. Register rewards
+    IVault(operatingVault).registerRewards(positionIds, rewardsPerPosition);
+
+    // 7. Reset approval
     cake.safeApprove(address(router), 0);
 
     emit Harvest(reward);
@@ -191,6 +204,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   /// @param id The position ID to work on.
   /// @param data The encoded data, consisting of strategy address and calldata.
   function work(uint256 id, bytes calldata data) external override onlyOperator nonReentrant {
+    addPositionId(id);
     // 1. Convert this position back to LP tokens.
     _removeShare(id);
     // 2. Perform the worker strategy; sending LP tokens + BaseToken; expecting LP tokens + BaseToken.
@@ -384,5 +398,21 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   /// @param clientFeeBps The fee in BPS
   function setClientFee(address clientAccount, uint256 clientFeeBps) external override {
     clientFeesBps[clientAccount] = clientFeeBps;
+  }
+
+  /// @dev add new position id to the array with position ids
+  /// @param positionId The position ID to work on
+  function addPositionId(uint256 positionId) internal {
+    uint256 numberOfPositions = positionIds.length;
+
+    // End the execution of function if position id is contained in the array
+    for (uint256 i = 0; i < numberOfPositions; i++) {
+      if (positionIds[i] == positionId) {
+        return;
+      }
+    }
+
+    // Add new positon id to the array
+    positionIds.push(positionId);
   }
 }
