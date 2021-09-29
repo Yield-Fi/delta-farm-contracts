@@ -236,6 +236,10 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     return numerator / denominator;
   }
 
+  function getOperatingVault() external view override returns (address) {
+    return operatingVault;
+  }
+
   /// @dev Return the amount of BaseToken to receive if we are to liquidate the given position.
   /// @param id The position ID.
   function tokensToReceive(uint256 id) external view override returns (uint256) {
