@@ -13,7 +13,6 @@ import {
   PancakeswapStrategyLiquidate,
   PancakeswapWorker,
   PancakeswapWorker__factory,
-  SyrupBar,
 } from "../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
@@ -30,6 +29,7 @@ import { parseEther } from "@ethersproject/units";
 import { SwapHelper } from "./helpers/swap";
 import { MockWBNB } from "../typechain";
 import { assertAlmostEqual } from "./helpers/assert";
+import { MockVaultToRegisterRewards } from "../typechain/MockVaultToRegisterRewards";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -40,13 +40,12 @@ describe("PancakeswapWorker", () => {
 
   let deployer: Signer;
   let deployerAddress: string;
-  let vaultOperator: Signer;
-  let vaultOperatorAddress: string;
   let account1: Signer;
   let account1Address: string;
   let account2: Signer;
   let account2Address: string;
 
+  let MockVaultToRegisterRewards: MockVaultToRegisterRewards;
   let WorkerBUSD_TOK0: PancakeswapWorker;
   let WorkerTOK0_TOK1: PancakeswapWorker;
   let PancakeFactory: PancakeFactory;
@@ -55,7 +54,6 @@ describe("PancakeswapWorker", () => {
   let PancakeMasterChef__account2: PancakeMasterChef;
   let PancakeRouterV2: PancakeRouterV2;
   let CakeToken: CakeToken;
-  let SyrupBar: SyrupBar;
 
   let AddBaseTokenOnlyStrategy: PancakeswapStrategyAddBaseTokenOnly;
   let LiquidateStrategy: PancakeswapStrategyLiquidate;
@@ -69,18 +67,15 @@ describe("PancakeswapWorker", () => {
   let lpBUSD_TOK0__account2: PancakePair;
 
   let lpTOK0_TOK1__deployer: PancakePair;
-  let lpTOK0_TOK1__account1: PancakePair;
-  let lpTOK0_TOK1__account2: PancakePair;
 
   let swapHelper: SwapHelper;
 
   async function fixture() {
-    [deployer, account1, account2, vaultOperator] = await ethers.getSigners();
-    [deployerAddress, account1Address, account2Address, vaultOperatorAddress] = await Promise.all([
+    [deployer, account1, account2] = await ethers.getSigners();
+    [deployerAddress, account1Address, account2Address] = await Promise.all([
       deployer.getAddress(),
       account1.getAddress(),
       account2.getAddress(),
-      vaultOperator.getAddress(),
     ]);
 
     [BaseToken, Token0, Token1] = await deployTokens(
@@ -145,13 +140,18 @@ describe("PancakeswapWorker", () => {
 
     const MockWBNB = (await deployContract("MockWBNB", [], deployer)) as MockWBNB;
 
-    [PancakeFactory, PancakeRouterV2, CakeToken, SyrupBar, PancakeMasterChef] =
-      await deployPancakeV2(
-        MockWBNB,
-        CAKE_PER_BLOCK,
-        [{ address: deployerAddress, amount: parseEther("200") }],
-        deployer
-      );
+    MockVaultToRegisterRewards = (await deployContract(
+      "MockVaultToRegisterRewards",
+      [],
+      deployer
+    )) as MockVaultToRegisterRewards;
+
+    [PancakeFactory, PancakeRouterV2, CakeToken, , PancakeMasterChef] = await deployPancakeV2(
+      MockWBNB,
+      CAKE_PER_BLOCK,
+      [{ address: deployerAddress, amount: parseEther("200") }],
+      deployer
+    );
 
     await PancakeFactory.createPair(BaseToken.address, Token0.address);
     const lpBUSD_TOK0 = await PancakeFactory.getPair(BaseToken.address, Token0.address);
@@ -172,7 +172,7 @@ describe("PancakeswapWorker", () => {
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 
     WorkerBUSD_TOK0 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
-      vaultOperatorAddress,
+      MockVaultToRegisterRewards.address,
       BaseToken.address,
       PancakeMasterChef.address,
       PancakeRouterV2.address,
@@ -185,7 +185,7 @@ describe("PancakeswapWorker", () => {
     await WorkerBUSD_TOK0.deployed();
 
     WorkerTOK0_TOK1 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
-      vaultOperatorAddress,
+      MockVaultToRegisterRewards.address,
       BaseToken.address,
       PancakeMasterChef.address,
       PancakeRouterV2.address,
@@ -233,8 +233,6 @@ describe("PancakeswapWorker", () => {
 
     lpBUSD_TOK0__account1 = PancakePair__factory.connect(lpBUSD_TOK0, account1);
     lpBUSD_TOK0__account2 = PancakePair__factory.connect(lpBUSD_TOK0, account2);
-    lpTOK0_TOK1__account1 = PancakePair__factory.connect(lpTOK0_TOK1, account1);
-    lpTOK0_TOK1__account2 = PancakePair__factory.connect(lpTOK0_TOK1, account2);
     PancakeMasterChef__account1 = PancakeMasterChef__factory.connect(
       PancakeMasterChef.address,
       account1
@@ -262,37 +260,41 @@ describe("PancakeswapWorker", () => {
     });
 
     it("Should add, remove liquidity via strategies and reinvest funds", async () => {
-      const worker__operator = PancakeswapWorker__factory.connect(
-        WorkerBUSD_TOK0.address,
-        vaultOperator
-      );
-
       const worker__deployer = PancakeswapWorker__factory.connect(
         WorkerBUSD_TOK0.address,
         deployer
       );
-      await worker__deployer.setHarvestersOk([vaultOperatorAddress], true);
+
+      await worker__deployer.setHarvestersOk([deployerAddress], true);
       await worker__deployer.setApprovedStrategies(
         [LiquidateStrategy.address, AddBaseTokenOnlyStrategy.address],
         true
       );
 
       /// send 0.1 base token to the worker
-      await BaseToken__account1.transfer(worker__operator.address, parseEther("0.1"));
+      await BaseToken__account1.transfer(WorkerBUSD_TOK0.address, parseEther("0.1"));
 
       /// Initially the amount of tokens to receive from a given position should equal 0
-      expect((await worker__operator.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
+      expect((await WorkerBUSD_TOK0.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
 
       /// add liquidity to the pool via add base token only strategy
-      await worker__operator.work(
-        1,
+      await MockVaultToRegisterRewards.executeTransaction(
+        WorkerBUSD_TOK0.address,
+        0,
+        "work(uint256,bytes)",
         ethers.utils.defaultAbiCoder.encode(
-          ["address", "bytes"],
+          ["uint256", "bytes"],
           [
-            AddBaseTokenOnlyStrategy.address,
+            1,
             ethers.utils.defaultAbiCoder.encode(
-              ["address", "address", "uint256"],
-              [BaseToken.address, Token0.address, "0"]
+              ["address", "bytes"],
+              [
+                AddBaseTokenOnlyStrategy.address,
+                ethers.utils.defaultAbiCoder.encode(
+                  ["address", "address", "uint256"],
+                  [BaseToken.address, Token0.address, "0"]
+                ),
+              ]
             ),
           ]
         )
@@ -300,7 +302,7 @@ describe("PancakeswapWorker", () => {
 
       /// expected ~ 0.1 Base Token (minus some trading fee) ~ 0.099 BASE TOKEN
       assertAlmostEqual(
-        (await worker__operator.tokensToReceive(1)).toString(),
+        (await WorkerBUSD_TOK0.tokensToReceive(1)).toString(),
         parseEther("0.0997518").toString()
       );
 
@@ -309,7 +311,7 @@ describe("PancakeswapWorker", () => {
       await time.advanceBlockTo(latestBlock.add(1).toNumber()); /// + 1 BLOCK
 
       // Harvest rewards and send them to the operating vault in Base token
-      await worker__operator.harvestRewards(); /// + 1 BLOCK
+      await worker__deployer.harvestRewards(); /// + 1 BLOCK
 
       /*
       There are two positions in pancakeMasterChef with the same alloc points, so 0.5 CAKE per block is generated for the given position.
@@ -318,30 +320,39 @@ describe("PancakeswapWorker", () => {
       10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
       */
       assertAlmostEqual(
-        (await BaseToken.balanceOf(vaultOperatorAddress)).toString(),
+        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
         parseEther("9.755679966928919588").toString()
       );
 
-      await worker__operator.work(
-        1,
+      /// Withdraw all funds from pool via LiquidateStrategy
+      await MockVaultToRegisterRewards.executeTransaction(
+        WorkerBUSD_TOK0.address,
+        0,
+        "work(uint256,bytes)",
         ethers.utils.defaultAbiCoder.encode(
-          ["address", "bytes"],
+          ["uint256", "bytes"],
           [
-            LiquidateStrategy.address,
+            1,
             ethers.utils.defaultAbiCoder.encode(
-              ["address", "address", "uint256"],
-              [BaseToken.address, Token0.address, "0"]
+              ["address", "bytes"],
+              [
+                LiquidateStrategy.address,
+                ethers.utils.defaultAbiCoder.encode(
+                  ["address", "address", "uint256"],
+                  [BaseToken.address, Token0.address, "0"]
+                ),
+              ]
             ),
           ]
         )
       );
 
       /*
-      9.75 BASE TOKEN + 0.099 BASE TOKEN = 9.85 BASE TOKEN
+      9.75 BASE TOKEN + 0.099 BASE TOKEN ~= 9.85 BASE TOKEN
       */
 
       assertAlmostEqual(
-        (await BaseToken.balanceOf(vaultOperatorAddress)).toString(),
+        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
         parseEther("9.855429985630498983").toString()
       );
     });

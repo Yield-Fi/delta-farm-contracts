@@ -8,8 +8,6 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
-import "hardhat/console.sol";
-
 import "../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../interfaces/IStrategy.sol";
 import "../interfaces/IWorker.sol";
@@ -139,7 +137,6 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Require that the caller must be the operatingVault.
   modifier onlyOperator() {
-    console.log("%s", msg.sender);
     require(msg.sender == operatingVault, "PancakeswapWorker::onlyOperator:: not operatingVault");
     _;
   }
@@ -185,7 +182,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
     // 5. Calculate the amount of reward for the given positions
     uint256 numberOfPositions = positionIds.length;
-    uint256[] memory rewardsPerPosition;
+    uint256[] storage rewardsPerPosition;
     for (uint256 i = 0; i < numberOfPositions; i++) {
       uint256 positionShare = shares[positionIds[i]];
       rewardsPerPosition[i] = reward.mul(positionShare).div(totalShare);
