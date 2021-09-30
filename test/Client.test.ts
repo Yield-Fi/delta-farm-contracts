@@ -19,6 +19,9 @@ import {
   VaultConfig,
   Vault__factory,
   WNativeRelayer,
+  Client,
+  MockWBNB__factory,
+  Client__factory,
 } from "../typechain";
 import { config, ethers, upgrades, waffle } from "hardhat";
 import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
@@ -40,10 +43,11 @@ import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { parseEther } from "ethers/lib/utils";
 import { solidity } from "ethereum-waffle";
+import { advanceBlock } from "./helpers/time";
 
 chai.use(solidity);
 const { expect } = chai;
-describe("Vault - interactions", async () => {
+describe("Client contract", async () => {
   const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("0.076");
   const POOL_ID = 1;
   const REINVEST_BOUNTY_BPS = "100";
@@ -84,6 +88,9 @@ describe("Vault - interactions", async () => {
   let yieldFiAddress: string;
   let binanceAddress: string;
 
+  // Clients
+  let exampleClient: Client;
+
   // Protocol
   let vault: Vault;
   let vaultConfig: VaultConfig;
@@ -111,6 +118,10 @@ describe("Vault - interactions", async () => {
   let pancakeMasterChefAsBob: PancakeMasterChef;
 
   let pancakeswapWorkerAsEve: PancakeswapWorker;
+
+  let mockWBNBAsAlice: MockWBNB;
+
+  let clientAsAlice: Client;
 
   let vaultAsAlice: Vault;
   let vaultAsBob: Vault;
@@ -226,6 +237,10 @@ describe("Vault - interactions", async () => {
       deployer
     );
 
+    // Approve strategies
+    await pancakeswapWorker01.setApprovedStrategies([addStrat.address], true);
+    await pancakeswapWorker02.setApprovedStrategies([addStrat.address], true);
+
     // Whitelist workers
     await vaultConfig.setWorkers(
       [pancakeswapWorker01.address, pancakeswapWorker02.address], // Workers
@@ -244,8 +259,8 @@ describe("Vault - interactions", async () => {
       {
         token0: baseToken,
         token1: targetToken,
-        amount0desired: ethers.utils.parseEther("1"),
-        amount1desired: ethers.utils.parseEther("0.1"),
+        amount0desired: ethers.utils.parseEther("0.1"),
+        amount1desired: ethers.utils.parseEther("1"),
       },
       {
         token0: cake,
@@ -266,6 +281,18 @@ describe("Vault - interactions", async () => {
         amount1desired: ethers.utils.parseEther("1"),
       },
     ]);
+
+    // Clients
+    exampleClient = (await deployProxyContract(
+      "Client",
+      ["HotWallet", "Binance Client"],
+      deployer
+    )) as Client;
+
+    // Whitelist clients within vault config
+    await vaultConfig.setWhitelistedCallers([exampleClient.address], true);
+
+    // Signers
     baseTokenAsAlice = MockToken__factory.connect(baseToken.address, alice);
     baseTokenAsBob = MockToken__factory.connect(baseToken.address, bob);
 
@@ -282,16 +309,39 @@ describe("Vault - interactions", async () => {
     vaultAsEve = Vault__factory.connect(vault.address, eve);
 
     pancakeswapWorkerAsEve = PancakeswapWorker__factory.connect(pancakeswapWorker01.address, eve);
+
+    clientAsAlice = Client__factory.connect(exampleClient.address, alice);
   }
 
   beforeEach(async () => {
     await waffle.loadFixture(fixture);
   });
 
-  context("TODO: Vault-related test suite", async () => {
-    it("should provide well-written test suite in the future", async () => {
-      console.log("TODO: Vault test suite.");
-      console.log("Notice: Vault tests awaits fresh worker implementation.");
+  context("# deposit method", async () => {
+    it("should execute deposit flow on behalf of given end user", async () => {
+      // Mint some token for the client contract
+      await baseToken.mint(exampleClient.address, ethers.utils.parseEther("1"));
+
+      // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
+      await exampleClient.deposit(
+        aliceAddress,
+        pancakeswapWorker01.address,
+        ethers.utils.parseEther("1"),
+        addStrat.address
+      );
+      // ID 1 = first position withing the vault
+      const position = await vault.positions(1);
+      const positionInfo = await vault.positionInfo(1);
+
+      // Validate position info
+      expect(position.worker).to.be.eql(pancakeswapWorker01.address);
+      expect(position.owner).to.be.eql(aliceAddress);
+      expect(position.client).to.be.eql(exampleClient.address);
+
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.999649838808597569;
+      expect(positionInfo).to.be.bignumber.that.is.eql(
+        ethers.utils.parseEther("0.999649838808597569")
+      );
     });
   });
 });

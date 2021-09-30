@@ -1,16 +1,34 @@
 pragma solidity 0.6.6;
 
-import { IWorker } from "../interfaces/IWorker.sol";
-import { IVault } from "../interfaces/IVault.sol";
+import { IWorker } from "./interfaces/IWorker.sol";
+import { IVault } from "./interfaces/IVault.sol";
 
-abstract contract BaseClient {
+import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
+import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
+import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
+
+import "./utils/SafeToken.sol";
+
+contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe {
+  using SafeMath for uint256;
+  using SafeToken for address;
+
   string _KIND_;
   string _CLIENT_NAME_;
+
+  function initialize(string memory kind, string memory clientName) public initializer {
+    _KIND_ = kind;
+    _CLIENT_NAME_ = clientName;
+  }
 
   function deposit(
     address endUser,
     address worker,
-    uint256 amount
+    uint256 amount,
+    address strat
   ) external {
     // 1. Some fancy stuff goes here - obtian add liquidity strategy address & vault address
     // Ad.1 Solution proposal: Reversed obtainement?
@@ -21,13 +39,17 @@ abstract contract BaseClient {
 
     IVault vault = IVault(_worker.getOperatingVault());
 
+    address vaultToken = vault.token();
+
+    vaultToken.safeApprove(address(vault), amount);
+
     /// @dev encoded: (address strat, (address baseToken, address farmingToken, uint256 minLPAmount))
     vault.work(
       0,
       address(worker),
       amount,
       endUser,
-      abi.encode(addLiquidityStrategy, abi.encode(_worker.token0(), _worker.token1(), 0))
+      abi.encode(strat, abi.encode(_worker.token1(), _worker.token0(), 0))
     );
   }
 
