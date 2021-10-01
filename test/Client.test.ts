@@ -22,6 +22,7 @@ import {
   Client,
   MockWBNB__factory,
   Client__factory,
+  WorkerRouter,
 } from "../typechain";
 import { config, ethers, upgrades, waffle } from "hardhat";
 import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
@@ -51,7 +52,6 @@ describe("Client contract", async () => {
   const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("0.076");
   const POOL_ID = 1;
   const REINVEST_BOUNTY_BPS = "100";
-  const REINVEST_THRESHOLD = ethers.utils.parseEther("1"); // Reinvest CAKE rewards only when 1 unit of CAKE is has been reached
 
   // DEX (PCS)
   let factory: PancakeFactory;
@@ -91,12 +91,13 @@ describe("Client contract", async () => {
   // Clients
   let exampleClient: Client;
 
+  // Worker Router
+  let workerRouter: WorkerRouter;
+
   // Protocol
   let vault: Vault;
   let vaultConfig: VaultConfig;
   let wNativeRelayer: WNativeRelayer;
-  let whitelistedContract: MockContractContext;
-  let evilContract: MockContractContext;
 
   // Strats
   let addStrat: PancakeswapStrategyAddBaseTokenOnly;
@@ -104,28 +105,6 @@ describe("Client contract", async () => {
 
   // Helpers & misc
   let swapHelper: SwapHelper;
-
-  // Connected entities (signer to target entity)
-  let baseTokenAsAlice: MockToken;
-  let baseTokenAsBob: MockToken;
-
-  let farmTokenAsAlice: MockToken;
-
-  let lpAsAlice: PancakePair;
-  let lpAsBob: PancakePair;
-
-  let pancakeMasterChefAsAlice: PancakeMasterChef;
-  let pancakeMasterChefAsBob: PancakeMasterChef;
-
-  let pancakeswapWorkerAsEve: PancakeswapWorker;
-
-  let mockWBNBAsAlice: MockWBNB;
-
-  let clientAsAlice: Client;
-
-  let vaultAsAlice: Vault;
-  let vaultAsBob: Vault;
-  let vaultAsEve: Vault;
 
   async function fixture() {
     [deployer, alice, bob, eve, yieldFi, binance] = await ethers.getSigners();
@@ -138,16 +117,6 @@ describe("Client contract", async () => {
         yieldFi.getAddress(),
         binance.getAddress(),
       ]);
-
-    // Setup MockContractContext
-    const MockContractContext = (await ethers.getContractFactory(
-      "MockContractContext",
-      deployer
-    )) as MockContractContext__factory;
-    whitelistedContract = await MockContractContext.deploy();
-    await whitelistedContract.deployed();
-    evilContract = await MockContractContext.deploy();
-    await evilContract.deployed();
 
     baseToken = await deployToken(
       {
@@ -241,6 +210,10 @@ describe("Client contract", async () => {
     await pancakeswapWorker01.setApprovedStrategies([addStrat.address], true);
     await pancakeswapWorker02.setApprovedStrategies([addStrat.address], true);
 
+    // Set critical strategies
+    await pancakeswapWorker01.setCriticalAddBaseTokenOnlyStrategy(addStrat.address);
+    await pancakeswapWorker02.setCriticalAddBaseTokenOnlyStrategy(addStrat.address);
+
     // Whitelist workers
     await vaultConfig.setWorkers(
       [pancakeswapWorker01.address, pancakeswapWorker02.address], // Workers
@@ -282,35 +255,24 @@ describe("Client contract", async () => {
       },
     ]);
 
+    // Setup workers router that will provide pairs' mapping later on
+    workerRouter = (await deployProxyContract("WorkerRouter", [], deployer)) as WorkerRouter;
+
+    // Whitelist deployer so we can add workers to the register
+    await workerRouter.whitelistOperators([deployerAddress], true);
+
+    // Add worker to the register
+    await workerRouter.addWorkerAutoDiscover(pancakeswapWorker01.address, false);
+
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["HotWallet", "Binance Client"],
+      ["HotWallet", "Binance Client", workerRouter.address],
       deployer
     )) as Client;
 
     // Whitelist clients within vault config
     await vaultConfig.setWhitelistedCallers([exampleClient.address], true);
-
-    // Signers
-    baseTokenAsAlice = MockToken__factory.connect(baseToken.address, alice);
-    baseTokenAsBob = MockToken__factory.connect(baseToken.address, bob);
-
-    farmTokenAsAlice = MockToken__factory.connect(targetToken.address, alice);
-
-    lpAsAlice = PancakePair__factory.connect(lp.address, alice);
-    lpAsBob = PancakePair__factory.connect(lp.address, bob);
-
-    pancakeMasterChefAsAlice = PancakeMasterChef__factory.connect(masterChef.address, alice);
-    pancakeMasterChefAsBob = PancakeMasterChef__factory.connect(masterChef.address, bob);
-
-    vaultAsAlice = Vault__factory.connect(vault.address, alice);
-    vaultAsBob = Vault__factory.connect(vault.address, bob);
-    vaultAsEve = Vault__factory.connect(vault.address, eve);
-
-    pancakeswapWorkerAsEve = PancakeswapWorker__factory.connect(pancakeswapWorker01.address, eve);
-
-    clientAsAlice = Client__factory.connect(exampleClient.address, alice);
   }
 
   beforeEach(async () => {
@@ -325,11 +287,11 @@ describe("Client contract", async () => {
       // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
       await exampleClient.deposit(
         aliceAddress,
-        pancakeswapWorker01.address,
-        ethers.utils.parseEther("1"),
-        addStrat.address
+        baseToken.address,
+        targetToken.address,
+        ethers.utils.parseEther("1")
       );
-      // ID 1 = first position withing the vault
+      // ID 1 = first position within the vault
       const position = await vault.positions(1);
       const positionInfo = await vault.positionInfo(1);
 

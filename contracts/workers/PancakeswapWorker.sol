@@ -62,6 +62,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   mapping(address => uint256) public clientFeesBps;
   uint256 public maxFeeBps;
   mapping(address => bool) public okHarvesters;
+  address public override criticalAddBaseTokenOnlyStrategy;
 
   /// @notice Configuration variables for PancakeswapV2
   uint256 public fee;
@@ -415,5 +416,9 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
     // Add new positon id to the array
     positionIds.push(positionId);
+  }
+
+  function setCriticalAddBaseTokenOnlyStrategy(address strategy) external onlyOwner {
+    criticalAddBaseTokenOnlyStrategy = strategy;
   }
 }

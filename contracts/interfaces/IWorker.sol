@@ -43,4 +43,7 @@ interface IWorker {
 
   /// @dev Get operating vault address.
   function getOperatingVault() external view returns (address);
+
+  /// @dev Get add base token only strategy address
+  function criticalAddBaseTokenOnlyStrategy() external view returns (address);
 }
