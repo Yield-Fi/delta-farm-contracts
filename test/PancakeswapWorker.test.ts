@@ -259,7 +259,7 @@ describe("PancakeswapWorker", () => {
       expect(result).to.include(Token0.address.toLowerCase());
     });
 
-    it("Should add, remove liquidity via strategies and reinvest funds", async () => {
+    it("should add, remove liquidity via strategies and harvest funds", async () => {
       const worker__deployer = PancakeswapWorker__factory.connect(
         WorkerBUSD_TOK0.address,
         deployer

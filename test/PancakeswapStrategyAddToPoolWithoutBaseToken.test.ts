@@ -20,6 +20,7 @@ import { parseEther } from "@ethersproject/units";
 import { deployContract, deployPancakeV2, deployProxyContract, deployTokens } from "./helpers";
 import { SwapHelper } from "./helpers/swap";
 import { defaultAbiCoder } from "@ethersproject/abi";
+import { assertAlmostEqual } from "./helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -63,7 +64,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2300"),
+              amount: parseEther("23000000"),
             },
           ],
         },
@@ -77,7 +78,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2000"),
+              amount: parseEther("2000000"),
             },
           ],
         },
@@ -91,7 +92,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2000"),
+              amount: parseEther("2000000"),
             },
           ],
         },
@@ -124,20 +125,20 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
       {
         token0: BaseToken,
         token1: Token0,
-        amount0desired: ethers.utils.parseEther("100"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("100000"),
       },
       {
         token0: BaseToken,
         token1: Token1,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("100000"),
+        amount1desired: ethers.utils.parseEther("100000"),
       },
       {
         token0: Token0,
         token1: Token1,
-        amount0desired: ethers.utils.parseEther("100"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("100000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
     ]);
 
@@ -177,11 +178,38 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
       )
     );
 
-    expect((await lpTOK0_TOK1.balanceOf(account1Address)).toString()).to.be.eq(
-      parseEther("0.286501283247051729").toString()
+    assertAlmostEqual(
+      (await lpTOK0_TOK1.balanceOf(account1Address)).toString(),
+      parseEther("15.763997536318553037").toString()
     );
     expect((await BaseToken.balanceOf(strategy.address)).toString()).to.be.eq(
       parseEther("0").toString()
+    );
+  });
+
+  it("should revert when amount of received lp tokens is too low", async () => {
+    const baseToken__account1 = MockToken__factory.connect(BaseToken.address, account1);
+    const strategy__account1 = PancakeStrategyAddToPoolWithoutBaseToken__factory.connect(
+      strategy.address,
+      account1
+    );
+
+    // Transfer 1 BASE TOKEN to the strategy
+    await baseToken__account1.transfer(strategy.address, parseEther("1"));
+
+    expect((await BaseToken.balanceOf(strategy.address)).toString()).to.be.eq(
+      parseEther("1").toString()
+    );
+
+    expect(
+      strategy__account1.execute(
+        defaultAbiCoder.encode(
+          ["address", "address", "address", "uint256"],
+          [BaseToken.address, Token0.address, Token1.address, parseEther("10")]
+        )
+      )
+    ).to.be.revertedWith(
+      "PancakeStrategyAddToPoolWithoutBaseToken->execute: insufficient LP tokens received"
     );
   });
 });

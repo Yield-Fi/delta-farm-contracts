@@ -45,32 +45,35 @@ contract PancakeStrategyAddToPoolWithoutBaseToken is
       (address, address, address, uint256)
     );
 
-    // 2. Find appropriate lp token
-    IPancakePair lpToken = IPancakePair(factory.getPair(token0, token1));
+    // 2. Find appropriate lp tokens
+    IPancakePair T0_T1_LP = IPancakePair(factory.getPair(token0, token1));
+    IPancakePair BT_T0_LP = IPancakePair(factory.getPair(baseToken, token0));
+    IPancakePair BT_T1_LP = IPancakePair(factory.getPair(baseToken, token1));
 
-    baseToken.safeApprove(address(router), uint256(-1));
-
-    // 3. Get params for _addLiquidity function
-    uint256 baseTokenBalance = baseToken.myBalance();
-    (uint256 r0, uint256 r1, ) = lpToken.getReserves();
+    // 3. Calculate amount of base token to swap on token 0
+    uint256 amountOfBaseTokenToSwapOnToken0 = _calculateAmountOfBaseTokenToSwapOnToken0(
+      T0_T1_LP,
+      BT_T0_LP,
+      BT_T1_LP,
+      baseToken,
+      token0
+    );
 
     // 4. Add liquidity and get amount of new lp tokens
     uint256 amountOfNewLpTokens = _addLiquidity(
+      amountOfBaseTokenToSwapOnToken0,
       baseToken,
-      baseTokenBalance,
       token0,
-      token1,
-      r0,
-      r1
+      token1
     );
 
     require(
       amountOfNewLpTokens >= minLPAmount,
-      "PancakeStrategyAddToPoolWithoutBaseToken::execute:: insufficient LP tokens received"
+      "PancakeStrategyAddToPoolWithoutBaseToken->execute: insufficient LP tokens received"
     );
     require(
-      lpToken.transfer(msg.sender, lpToken.balanceOf(address(this))),
-      "PancakeStrategyAddToPoolWithoutBaseToken::execute:: failed to transfer LP token to msg.sender"
+      T0_T1_LP.transfer(msg.sender, T0_T1_LP.balanceOf(address(this))),
+      "PancakeStrategyAddToPoolWithoutBaseToken->execute: failed to transfer LP token"
     );
     // 5. Reset approval for safety reason
     baseToken.safeApprove(address(router), 0);
@@ -79,19 +82,14 @@ contract PancakeStrategyAddToPoolWithoutBaseToken is
   }
 
   function _addLiquidity(
+    uint256 baseTokenToSwapOnToken0,
     address baseToken,
-    uint256 baseTokenBalance,
     address token0,
-    address token1,
-    uint256 reserveToken0,
-    uint256 reserveToken1
+    address token1
   ) internal returns (uint256) {
-    // 1. Calculate amount of base token to swap on token0
-    uint256 baseTokenToSwapOnToken0 = baseTokenBalance.mul(reserveToken0).div(
-      reserveToken0.add(reserveToken1)
-    );
+    baseToken.safeApprove(address(router), uint256(-1));
 
-    // 2. Swap baseToken to token0 and token1
+    // 1. Swap baseToken to token0 and token1
     address[] memory baseTokenToToken0Path = new address[](2);
     baseTokenToToken0Path[0] = baseToken;
     baseTokenToToken0Path[1] = token0;
@@ -114,7 +112,7 @@ contract PancakeStrategyAddToPoolWithoutBaseToken is
       block.timestamp
     );
 
-    // 5. Add liquidity and back lt token to the sender.
+    // 2. Add liquidity and return amount of new lp tokens.
     token0.safeApprove(address(router), uint256(-1));
     token1.safeApprove(address(router), uint256(-1));
 
@@ -130,6 +128,55 @@ contract PancakeStrategyAddToPoolWithoutBaseToken is
     );
 
     return amountOfNewLpTokens;
+  }
+
+  function _calculateAmountOfBaseTokenToSwapOnToken0(
+    IPancakePair t0_t1_LP,
+    IPancakePair bt_t0_LP,
+    IPancakePair bt_t1_LP,
+    address baseToken,
+    address token0
+  ) internal view returns (uint256) {
+    // Calculate ratio in which base token will be swapped to token0 and token1
+    (uint256 x, uint256 y) = _calculateBaseTokenRatioToSwapOnTokens(
+      t0_t1_LP,
+      bt_t0_LP,
+      bt_t1_LP,
+      baseToken,
+      token0
+    );
+
+    return baseToken.myBalance().mul(x).div(x.add(y));
+  }
+
+  function _calculateBaseTokenRatioToSwapOnTokens(
+    IPancakePair t0_t1_LP,
+    IPancakePair bt_t0_LP,
+    IPancakePair bt_t1_LP,
+    address baseToken,
+    address token0
+  ) internal view returns (uint256, uint256) {
+    // Get reserves of tokens in given pools needed to the calculations
+    // Naming convention: e.g. ResBTOK_bt_t0 - Reserve of base token in the baseToken-token0 pool
+    (uint256 r0, uint256 r1, ) = t0_t1_LP.getReserves();
+    (uint256 ResTOK0_t0_t1, uint256 ResTOK1_t0_t1) = t0_t1_LP.token0() == token0
+      ? (r0, r1)
+      : (r1, r0);
+
+    (r0, r1, ) = bt_t0_LP.getReserves();
+    (uint256 ResBTOK_bt_t0, uint256 ResTOK0_bt_t0) = bt_t0_LP.token0() == baseToken
+      ? (r0, r1)
+      : (r1, r0);
+
+    (r0, r1, ) = bt_t1_LP.getReserves();
+    (uint256 ResBTOK_bt_t1, uint256 ResTOK1_bt_t1) = bt_t1_LP.token0() == baseToken
+      ? (r0, r1)
+      : (r1, r0);
+
+    uint256 x = ResTOK0_t0_t1.mul(ResBTOK_bt_t0).div(ResTOK0_bt_t0);
+    uint256 y = ResTOK1_t0_t1.mul(ResBTOK_bt_t1).div(ResTOK1_bt_t1);
+
+    return (x, y);
   }
 
   receive() external payable {}
