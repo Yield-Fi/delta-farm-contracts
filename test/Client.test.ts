@@ -24,6 +24,7 @@ import {
   Client__factory,
   WorkerRouter,
   PancakeswapStrategyAddToPoolWithBaseToken,
+  PancakeswapStrategyAddToPoolWithoutBaseToken,
 } from "../typechain";
 import { config, ethers, upgrades, waffle } from "hardhat";
 import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
@@ -94,6 +95,7 @@ describe("Client contract", async () => {
 
   // Strats
   let addStrat: PancakeswapStrategyAddToPoolWithBaseToken;
+  let addStratNoBase: PancakeswapStrategyAddToPoolWithoutBaseToken;
   let liqStrat: PancakeswapStrategyLiquidate;
 
   // Helpers & misc
@@ -156,7 +158,7 @@ describe("Client contract", async () => {
     );
 
     // Setup strategies
-    [addStrat, liqStrat] = await deployPancakeStrategies(router, deployer);
+    [addStrat, addStratNoBase, liqStrat] = await deployPancakeStrategies(router, deployer);
 
     // Setup BTOKEN-FTOKEN pair on Pancakeswap
     // Add lp to masterChef's pool
@@ -193,8 +195,16 @@ describe("Client contract", async () => {
       deployer
     );
 
-    await pancakeswapWorker01.setStrategies([addStrat.address, addStrat.address, liqStrat.address]);
-    await pancakeswapWorker02.setStrategies([addStrat.address, addStrat.address, liqStrat.address]);
+    await pancakeswapWorker01.setStrategies([
+      addStrat.address,
+      addStratNoBase.address,
+      liqStrat.address,
+    ]);
+    await pancakeswapWorker02.setStrategies([
+      addStrat.address,
+      addStratNoBase.address,
+      liqStrat.address,
+    ]);
 
     // Whitelist workers
     await vaultConfig.setWorkers(
@@ -302,6 +312,35 @@ describe("Client contract", async () => {
       // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.999649838808597569;
       expect(positionInfo).to.be.bignumber.that.is.eql(
         ethers.utils.parseEther("0.999649838808597569")
+      );
+    });
+  });
+
+  context("# withdraw method", async () => {
+    it("should execute withdrawal flow on behalf of given end user", async () => {
+      // Same stuff above
+      const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+      await exampleClient.whitelistOperators([deployerAddress], true);
+      await exampleClient.whitelistCallers([aliceAddress], true);
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await exampleClientAsAlice.deposit(
+        aliceAddress,
+        baseToken.address,
+        targetToken.address,
+        DEPOSIT_AMOUNT
+      );
+
+      // Alice entered protocol with 1 BASE TOKEN and now her wallet is empty
+      expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.is.eql(
+        ethers.utils.parseEther("0")
+      );
+
+      // Execute withdrawal flow
+      await exampleClientAsAlice.withdraw(1, aliceAddress, baseToken.address, targetToken.address);
+
+      console.log(
+        "TODO: Aktualnie strategia likwidacji wyplaca asset na callera - w przypadku wyplaty przy aktualnej logice, callerem jest Vault. Do zmiany"
       );
     });
   });
