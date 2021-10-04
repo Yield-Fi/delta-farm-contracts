@@ -8,8 +8,8 @@ import {
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
-  PancakeStrategyAddToPoolWithoutBaseToken,
-  PancakeStrategyAddToPoolWithoutBaseToken__factory,
+  PancakeswapStrategyAddToPoolWithoutBaseToken,
+  PancakeswapStrategyAddToPoolWithoutBaseToken__factory,
 } from "../typechain";
 import { ethers, waffle } from "hardhat";
 
@@ -43,7 +43,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
 
   let swapHelper: SwapHelper;
 
-  let strategy: PancakeStrategyAddToPoolWithoutBaseToken;
+  let strategy: PancakeswapStrategyAddToPoolWithoutBaseToken;
 
   async function fixture() {
     [deployer, account1] = await ethers.getSigners();
@@ -143,10 +143,10 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
     ]);
 
     strategy = (await deployProxyContract(
-      "PancakeStrategyAddToPoolWithoutBaseToken",
+      "PancakeswapStrategyAddToPoolWithoutBaseToken",
       [PancakeRouterV2.address],
       deployer
-    )) as PancakeStrategyAddToPoolWithoutBaseToken;
+    )) as PancakeswapStrategyAddToPoolWithoutBaseToken;
   }
 
   beforeEach(async () => {
@@ -159,7 +159,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
 
   it("should convert all base token to LP tokens at best rate", async () => {
     const baseToken__account1 = MockToken__factory.connect(BaseToken.address, account1);
-    const strategy__account1 = PancakeStrategyAddToPoolWithoutBaseToken__factory.connect(
+    const strategy__account1 = PancakeswapStrategyAddToPoolWithoutBaseToken__factory.connect(
       strategy.address,
       account1
     );
@@ -189,7 +189,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
 
   it("should revert when amount of received lp tokens is too low", async () => {
     const baseToken__account1 = MockToken__factory.connect(BaseToken.address, account1);
-    const strategy__account1 = PancakeStrategyAddToPoolWithoutBaseToken__factory.connect(
+    const strategy__account1 = PancakeswapStrategyAddToPoolWithoutBaseToken__factory.connect(
       strategy.address,
       account1
     );
@@ -209,7 +209,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
         )
       )
     ).to.be.revertedWith(
-      "PancakeStrategyAddToPoolWithoutBaseToken->execute: insufficient LP tokens received"
+      "PancakeswapStrategyAddToPoolWithoutBaseToken->execute: insufficient LP tokens received"
     );
   });
 });

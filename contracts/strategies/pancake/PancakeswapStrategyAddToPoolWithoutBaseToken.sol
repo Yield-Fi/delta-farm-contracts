@@ -14,7 +14,7 @@ import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
 import "../../utils/CustomMath.sol";
 
-contract PancakeStrategyAddToPoolWithoutBaseToken is
+contract PancakeswapStrategyAddToPoolWithoutBaseToken is
   Initializable,
   OwnableUpgradeSafe,
   ReentrancyGuardUpgradeSafe,
@@ -69,11 +69,11 @@ contract PancakeStrategyAddToPoolWithoutBaseToken is
 
     require(
       amountOfNewLpTokens >= minLPAmount,
-      "PancakeStrategyAddToPoolWithoutBaseToken->execute: insufficient LP tokens received"
+      "PancakeswapStrategyAddToPoolWithoutBaseToken->execute: insufficient LP tokens received"
     );
     require(
       T0_T1_LP.transfer(msg.sender, T0_T1_LP.balanceOf(address(this))),
-      "PancakeStrategyAddToPoolWithoutBaseToken->execute: failed to transfer LP token"
+      "PancakeswapStrategyAddToPoolWithoutBaseToken->execute: failed to transfer LP token"
     );
     // 5. Reset approval for safety reason
     baseToken.safeApprove(address(router), 0);

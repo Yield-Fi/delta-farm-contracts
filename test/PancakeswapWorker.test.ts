@@ -9,7 +9,8 @@ import {
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
-  PancakeswapStrategyAddBaseTokenOnly,
+  PancakeswapStrategyAddToPoolWithBaseToken,
+  PancakeswapStrategyAddToPoolWithoutBaseToken,
   PancakeswapStrategyLiquidate,
   PancakeswapWorker,
   PancakeswapWorker__factory,
@@ -55,7 +56,8 @@ describe("PancakeswapWorker", () => {
   let PancakeRouterV2: PancakeRouterV2;
   let CakeToken: CakeToken;
 
-  let AddBaseTokenOnlyStrategy: PancakeswapStrategyAddBaseTokenOnly;
+  let AddToPoolWithBaseToken: PancakeswapStrategyAddToPoolWithBaseToken;
+  let AddToPoolWithoutBaseToken: PancakeswapStrategyAddToPoolWithoutBaseToken;
   let LiquidateStrategy: PancakeswapStrategyLiquidate;
 
   let BaseToken: MockToken;
@@ -164,10 +166,8 @@ describe("PancakeswapWorker", () => {
     await PancakeMasterChef.add(1, lpBUSD_TOK0__deployer.address, true);
     await PancakeMasterChef.add(1, lpTOK0_TOK1__deployer.address, true);
 
-    [AddBaseTokenOnlyStrategy, LiquidateStrategy] = await deployPancakeStrategies(
-      PancakeRouterV2,
-      deployer
-    );
+    [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, LiquidateStrategy] =
+      await deployPancakeStrategies(PancakeRouterV2, deployer);
 
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 
@@ -272,10 +272,11 @@ describe("PancakeswapWorker", () => {
       );
 
       await worker__deployer.setHarvestersOk([deployerAddress], true);
-      await worker__deployer.setApprovedStrategies(
-        [LiquidateStrategy.address, AddBaseTokenOnlyStrategy.address],
-        true
-      );
+      await worker__deployer.setStrategies([
+        AddToPoolWithBaseToken.address,
+        AddToPoolWithoutBaseToken.address,
+        LiquidateStrategy.address,
+      ]);
 
       /// send 0.1 base token to the worker
       await BaseToken__account1.transfer(WorkerBUSD_TOK0.address, parseEther("0.1"));
@@ -295,7 +296,7 @@ describe("PancakeswapWorker", () => {
             ethers.utils.defaultAbiCoder.encode(
               ["address", "bytes"],
               [
-                AddBaseTokenOnlyStrategy.address,
+                AddToPoolWithBaseToken.address,
                 ethers.utils.defaultAbiCoder.encode(
                   ["address", "address", "uint256"],
                   [BaseToken.address, Token0.address, "0"]
@@ -397,10 +398,5 @@ describe("PancakeswapWorker", () => {
   it("should successfully set a treasury config", async () => {
     await WorkerTOK0_TOK1.setTreasuryFee("500");
     expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq("500");
-  });
-
-  it("should approve new strategy", async () => {
-    await WorkerTOK0_TOK1.setApprovedStrategies([LiquidateStrategy.address], true);
-    expect(await WorkerTOK0_TOK1.approvedStrategies(LiquidateStrategy.address)).to.be.eq(true);
   });
 });

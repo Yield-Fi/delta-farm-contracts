@@ -55,10 +55,13 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   address public operatingVault;
   uint256 public pid;
 
+  /// @notice [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
+  address[] private strategies;
+  mapping(address => bool) private approvedStrategies;
+
   /// @notice Mutable state variables
   mapping(uint256 => uint256) public shares;
   uint256[] private positionIds;
-  mapping(address => bool) public approvedStrategies;
   uint256 public totalShare;
   uint256 public override treasuryFeeBps;
   mapping(address => uint256) public clientFeesBps;
@@ -304,6 +307,26 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     }
   }
 
+  /// @dev Set addresses of the supported strategies
+  /// @param supportedStrategies Array of strategies,
+  /// expect [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
+  function setStrategies(address[] calldata supportedStrategies) external override onlyOwner {
+    require(
+      supportedStrategies.length == 3,
+      "PancakeswapWorker->setStrategies: Array of strategies must have 3 items"
+    );
+    strategies = supportedStrategies;
+    for (uint256 i; i < strategies.length; i++) {
+      approvedStrategies[strategies[i]] = true;
+    }
+  }
+
+  /// @dev Get addresses of the supported strategies
+  /// @return Array of strategies: [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
+  function getStrategies() external view override returns (address[] memory) {
+    return strategies;
+  }
+
   /// @dev Internal function to get harvest path. Return route through WBNB if harvestPath not set.
   function getHarvestPath() public view returns (address[] memory) {
     if (harvestPath.length != 0) return harvestPath;
@@ -358,22 +381,6 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     maxFeeBps = _maxFeeBps;
 
     emit SetMaxHarvestBountyBps(msg.sender, maxFeeBps);
-  }
-
-  /// @dev Set the given strategies' approval status.
-  /// @param strats - The strategy addresses.
-  /// @param isApproved - Whether to approve or unapprove the given strategies.
-  function setApprovedStrategies(address[] calldata strats, bool isApproved)
-    external
-    override
-    onlyOwner
-  {
-    uint256 len = strats.length;
-    for (uint256 idx = 0; idx < len; idx++) {
-      approvedStrategies[strats[idx]] = isApproved;
-
-      emit SetApprovedStrategy(msg.sender, strats[idx], isApproved);
-    }
   }
 
   /// @dev Set the given address's to be harvestor.
