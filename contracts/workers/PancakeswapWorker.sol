@@ -243,6 +243,11 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
         _estimateSwapOutput(token1, baseToken, userToken1, userToken1, userToken0).add(userToken0);
     }
 
+    if (token1 == baseToken) {
+      return
+        _estimateSwapOutput(token0, baseToken, userToken0, userToken0, userToken1).add(userToken1);
+    }
+
     return
       _estimateSwapOutput(token0, baseToken, userToken0, userToken0, 0).add(
         _estimateSwapOutput(token1, baseToken, userToken1, userToken1, 0)
