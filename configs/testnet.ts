@@ -381,7 +381,8 @@ export const testnetConfig: ProjectConfigType = {
   },
   strategies: {
     pancakeswap: {
-      AddBaseToken: "0x73d6950d37Cf17f6d38da5291FC2783EE7d2431b",
+      AddToPoolWithBaseToken: "0x73d6950d37Cf17f6d38da5291FC2783EE7d2431b",
+      AddToPoolWithoutBaseToken: "",
       Liquidate: "0x85ff4165f2ce8dbB342461279277B3acD71BE713",
     },
   },

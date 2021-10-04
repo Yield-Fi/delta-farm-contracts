@@ -9,6 +9,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
 import "../libs/pancake/interfaces/IPancakeRouterV2.sol";
+import "../libs/pancake/PancakeLibraryV2.sol";
 import "../interfaces/IStrategy.sol";
 import "../interfaces/IWorker.sol";
 import "../libs/pancake/interfaces/IPancakeMasterChef.sol";
@@ -42,6 +43,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   );
 
   /// @notice Configuration variables
+  IPancakeFactory public factory;
   IPancakeMasterChef public masterChef;
   IPancakeRouterV2 public router;
   IPancakePair public override lpToken;
@@ -53,16 +55,18 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   address public operatingVault;
   uint256 public pid;
 
+  /// @notice [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
+  address[] private strategies;
+  mapping(address => bool) private approvedStrategies;
+
   /// @notice Mutable state variables
   mapping(uint256 => uint256) public shares;
   uint256[] private positionIds;
-  mapping(address => bool) public approvedStrategies;
   uint256 public totalShare;
   uint256 public override treasuryFeeBps;
   mapping(address => uint256) public clientFeesBps;
   uint256 public maxFeeBps;
   mapping(address => bool) public okHarvesters;
-  address public override criticalAddBaseTokenOnlyStrategy;
 
   /// @notice Configuration variables for PancakeswapV2
   uint256 public fee;
@@ -91,6 +95,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     wNative = _router.WETH();
     masterChef = _masterChef;
     router = _router;
+    factory = IPancakeFactory(_router.factory());
 
     // 3. Assign tokens state variables
     baseToken = _baseToken;
@@ -220,48 +225,55 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     baseToken.safeTransfer(msg.sender, baseToken.myBalance());
   }
 
-  /// @dev Return maximum output given the input amount and the status of Uniswap reserves.
-  /// @param aIn The amount of asset to market sell.
-  /// @param rIn the amount of asset in reserve for input.
-  /// @param rOut The amount of asset in reserve for output.
-  function getMktSellAmount(
-    uint256 aIn,
-    uint256 rIn,
-    uint256 rOut
-  ) public view returns (uint256) {
-    if (aIn == 0) return 0;
-    require(rIn > 0 && rOut > 0, "PancakeswapWorker::getMktSellAmount:: bad reserve values");
-    uint256 aInWithFee = aIn.mul(fee);
-    uint256 numerator = aInWithFee.mul(rOut);
-    uint256 denominator = rIn.mul(feeDenom).add(aInWithFee);
-    return numerator / denominator;
-  }
-
-  function getOperatingVault() external view override returns (address) {
-    return operatingVault;
-  }
-
   /// @dev Return the amount of BaseToken to receive if we are to liquidate the given position.
   /// @param id The position ID.
   function tokensToReceive(uint256 id) external view override returns (uint256) {
     // 1. Get the position's LP balance and LP total supply.
     uint256 lpBalance = shareToBalance(shares[id]);
     uint256 lpSupply = lpToken.totalSupply(); // Ignore pending mintFee as it is insignificant
-    // 2. Get the pool's total supply of BaseToken and FarmingToken.
+    // 2. Get the reserves of token0 and token1 in the pool
     (uint256 r0, uint256 r1, ) = lpToken.getReserves();
-    (uint256 totalBaseToken, uint256 totalFarmingToken) = lpToken.token0() == baseToken
+    (uint256 totalToken0, uint256 totalToken1) = lpToken.token0() == token0 ? (r0, r1) : (r1, r0);
+    // 3. Convert the position's LP tokens to the underlying assets.
+    uint256 userToken0 = lpBalance.mul(totalToken0).div(lpSupply);
+    uint256 userToken1 = lpBalance.mul(totalToken1).div(lpSupply);
+    // 4. Estimate and return amount of base token to receive
+    if (token0 == baseToken) {
+      return
+        _estimateSwapOutput(token1, baseToken, userToken1, userToken1, userToken0).add(userToken0);
+    }
+
+    return
+      _estimateSwapOutput(token0, baseToken, userToken0, userToken0, 0).add(
+        _estimateSwapOutput(token1, baseToken, userToken1, userToken1, 0)
+      );
+  }
+
+  /// Function to estimate swap result on pancakeswap router
+  function _estimateSwapOutput(
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn,
+    uint256 reserveInToSubtract,
+    uint256 reserveOutToSubtract
+  ) internal view returns (uint256) {
+    if (amountIn <= 0) {
+      return 0;
+    }
+    // 1. Get the reserves of tokenIn and tokenOut
+    IPancakePair Tin_Tout_LP = IPancakePair(factory.getPair(tokenIn, tokenOut));
+    (uint256 r0, uint256 r1, ) = Tin_Tout_LP.getReserves();
+    (uint256 totalTokenIn, uint256 totalTokenOut) = Tin_Tout_LP.token0() == tokenIn
       ? (r0, r1)
       : (r1, r0);
-    // 3. Convert the position's LP tokens to the underlying assets.
-    uint256 userBaseToken = lpBalance.mul(totalBaseToken).div(lpSupply);
-    uint256 userFarmingToken = lpBalance.mul(totalFarmingToken).div(lpSupply);
-    // 4. Convert all FarmingToken to BaseToken and return total BaseToken.
+
+    // 2. Get amountOut from pancakeswap
     return
-      getMktSellAmount(
-        userFarmingToken,
-        totalFarmingToken.sub(userFarmingToken),
-        totalBaseToken.sub(userBaseToken)
-      ).add(userBaseToken);
+      PancakeLibraryV2.getAmountOut(
+        amountIn,
+        totalTokenIn.sub(reserveInToSubtract),
+        totalTokenOut.sub(reserveOutToSubtract)
+      );
   }
 
   /// @dev Internal function to stake all outstanding LP tokens to the given position ID.
@@ -293,6 +305,26 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
       shares[id] = 0;
       emit RemoveShare(id, share);
     }
+  }
+
+  /// @dev Set addresses of the supported strategies
+  /// @param supportedStrategies Array of strategies,
+  /// expect [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
+  function setStrategies(address[] calldata supportedStrategies) external override onlyOwner {
+    require(
+      supportedStrategies.length == 3,
+      "PancakeswapWorker->setStrategies: Array of strategies must have 3 items"
+    );
+    strategies = supportedStrategies;
+    for (uint256 i; i < strategies.length; i++) {
+      approvedStrategies[strategies[i]] = true;
+    }
+  }
+
+  /// @dev Get addresses of the supported strategies
+  /// @return Array of strategies: [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
+  function getStrategies() external view override returns (address[] memory) {
+    return strategies;
   }
 
   /// @dev Internal function to get harvest path. Return route through WBNB if harvestPath not set.
@@ -351,22 +383,6 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     emit SetMaxHarvestBountyBps(msg.sender, maxFeeBps);
   }
 
-  /// @dev Set the given strategies' approval status.
-  /// @param strats - The strategy addresses.
-  /// @param isApproved - Whether to approve or unapprove the given strategies.
-  function setApprovedStrategies(address[] calldata strats, bool isApproved)
-    external
-    override
-    onlyOwner
-  {
-    uint256 len = strats.length;
-    for (uint256 idx = 0; idx < len; idx++) {
-      approvedStrategies[strats[idx]] = isApproved;
-
-      emit SetApprovedStrategy(msg.sender, strats[idx], isApproved);
-    }
-  }
-
   /// @dev Set the given address's to be harvestor.
   /// @param harvesters - The harvest bot addresses.
   /// @param isOk - Whether to approve or unapprove the given strategies.
@@ -416,9 +432,5 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
     // Add new positon id to the array
     positionIds.push(positionId);
-  }
-
-  function setCriticalAddBaseTokenOnlyStrategy(address strategy) external onlyOwner {
-    criticalAddBaseTokenOnlyStrategy = strategy;
   }
 }

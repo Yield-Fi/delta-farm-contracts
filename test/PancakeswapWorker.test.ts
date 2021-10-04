@@ -9,7 +9,8 @@ import {
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
-  PancakeswapStrategyAddBaseTokenOnly,
+  PancakeswapStrategyAddToPoolWithBaseToken,
+  PancakeswapStrategyAddToPoolWithoutBaseToken,
   PancakeswapStrategyLiquidate,
   PancakeswapWorker,
   PancakeswapWorker__factory,
@@ -55,7 +56,8 @@ describe("PancakeswapWorker", () => {
   let PancakeRouterV2: PancakeRouterV2;
   let CakeToken: CakeToken;
 
-  let AddBaseTokenOnlyStrategy: PancakeswapStrategyAddBaseTokenOnly;
+  let AddToPoolWithBaseToken: PancakeswapStrategyAddToPoolWithBaseToken;
+  let AddToPoolWithoutBaseToken: PancakeswapStrategyAddToPoolWithoutBaseToken;
   let LiquidateStrategy: PancakeswapStrategyLiquidate;
 
   let BaseToken: MockToken;
@@ -94,7 +96,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2300"),
+              amount: parseEther("2300000"),
             },
           ],
         },
@@ -112,7 +114,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2000"),
+              amount: parseEther("2000000"),
             },
           ],
         },
@@ -130,7 +132,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2000"),
+              amount: parseEther("2000000"),
             },
           ],
         },
@@ -164,10 +166,8 @@ describe("PancakeswapWorker", () => {
     await PancakeMasterChef.add(1, lpBUSD_TOK0__deployer.address, true);
     await PancakeMasterChef.add(1, lpTOK0_TOK1__deployer.address, true);
 
-    [AddBaseTokenOnlyStrategy, LiquidateStrategy] = await deployPancakeStrategies(
-      PancakeRouterV2,
-      deployer
-    );
+    [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, LiquidateStrategy] =
+      await deployPancakeStrategies(PancakeRouterV2, deployer);
 
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 
@@ -229,6 +229,12 @@ describe("PancakeswapWorker", () => {
         amount0desired: ethers.utils.parseEther("1000"),
         amount1desired: ethers.utils.parseEther("1000"),
       },
+      {
+        token0: BaseToken,
+        token1: Token0,
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
+      },
     ]);
 
     lpBUSD_TOK0__account1 = PancakePair__factory.connect(lpBUSD_TOK0, account1);
@@ -259,17 +265,18 @@ describe("PancakeswapWorker", () => {
       expect(result).to.include(Token0.address.toLowerCase());
     });
 
-    it("Should add, remove liquidity via strategies and reinvest funds", async () => {
+    it("should add, remove liquidity via strategies and harvest funds", async () => {
       const worker__deployer = PancakeswapWorker__factory.connect(
         WorkerBUSD_TOK0.address,
         deployer
       );
 
       await worker__deployer.setHarvestersOk([deployerAddress], true);
-      await worker__deployer.setApprovedStrategies(
-        [LiquidateStrategy.address, AddBaseTokenOnlyStrategy.address],
-        true
-      );
+      await worker__deployer.setStrategies([
+        AddToPoolWithBaseToken.address,
+        AddToPoolWithoutBaseToken.address,
+        LiquidateStrategy.address,
+      ]);
 
       /// send 0.1 base token to the worker
       await BaseToken__account1.transfer(WorkerBUSD_TOK0.address, parseEther("0.1"));
@@ -289,7 +296,7 @@ describe("PancakeswapWorker", () => {
             ethers.utils.defaultAbiCoder.encode(
               ["address", "bytes"],
               [
-                AddBaseTokenOnlyStrategy.address,
+                AddToPoolWithBaseToken.address,
                 ethers.utils.defaultAbiCoder.encode(
                   ["address", "address", "uint256"],
                   [BaseToken.address, Token0.address, "0"]
@@ -366,6 +373,8 @@ describe("PancakeswapWorker", () => {
       expect(result).to.include(Token0.address.toLowerCase());
       expect(result).to.include(Token1.address.toLowerCase());
     });
+
+    it("TODO: should add, remove liquidity via strategies and harvest funds", () => true);
   });
 
   it("should give rewards out when you stake LP tokens", async () => {
@@ -389,10 +398,5 @@ describe("PancakeswapWorker", () => {
   it("should successfully set a treasury config", async () => {
     await WorkerTOK0_TOK1.setTreasuryFee("500");
     expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq("500");
-  });
-
-  it("should approve new strategy", async () => {
-    await WorkerTOK0_TOK1.setApprovedStrategies([LiquidateStrategy.address], true);
-    expect(await WorkerTOK0_TOK1.approvedStrategies(LiquidateStrategy.address)).to.be.eq(true);
   });
 });

@@ -14,8 +14,11 @@ interface IWorker {
   /// @dev Return the amount of base token to get back if we are to liquidate the position.
   function tokensToReceive(uint256 id) external view returns (uint256);
 
-  /// @dev SetStretegy that be able to executed by the worker.
-  function setApprovedStrategies(address[] calldata strats, bool isOk) external;
+  /// @dev Set addresses of the supported strategies
+  function setStrategies(address[] calldata supportedStrategies) external;
+
+  /// @dev Get addresses of the supported strategies
+  function getStrategies() external view returns (address[] memory);
 
   /// @dev Set address that can be harvest
   function setHarvestersOk(address[] calldata harvesters, bool isOk) external;
@@ -43,7 +46,4 @@ interface IWorker {
 
   /// @dev Get operating vault address.
   function getOperatingVault() external view returns (address);
-
-  /// @dev Get add base token only strategy address
-  function criticalAddBaseTokenOnlyStrategy() external view returns (address);
 }

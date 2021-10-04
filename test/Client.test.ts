@@ -29,7 +29,6 @@ import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
 
 import { MockContractContext } from "../typechain/MockContractContext";
 import { MockToken } from "../typechain/MockToken";
-import { PancakeswapStrategyAddBaseTokenOnly } from "../typechain/PancakeswapStrategyAddBaseTokenOnly";
 import { PancakeswapStrategyLiquidate } from "../typechain/PancakeswapStrategyLiquidate";
 // import * as AssertHelpers from "./helpers/assert";
 // import * as TimeHelpers from "./helpers/time";
@@ -100,7 +99,7 @@ describe("Client contract", async () => {
   let wNativeRelayer: WNativeRelayer;
 
   // Strats
-  let addStrat: PancakeswapStrategyAddBaseTokenOnly;
+  let addStrat: PancakeswapStrategyAddToPoolWithBaseToken;
   let liqStrat: PancakeswapStrategyLiquidate;
 
   // Helpers & misc
