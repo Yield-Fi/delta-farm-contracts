@@ -1,7 +1,9 @@
 import {
   PancakeRouterV2,
-  PancakeswapStrategyAddBaseTokenOnly,
-  PancakeswapStrategyAddBaseTokenOnly__factory,
+  PancakeswapStrategyAddToPoolWithBaseToken,
+  PancakeswapStrategyAddToPoolWithBaseToken__factory,
+  PancakeswapStrategyAddToPoolWithoutBaseToken,
+  PancakeswapStrategyAddToPoolWithoutBaseToken__factory,
   PancakeswapStrategyLiquidate,
   PancakeswapStrategyLiquidate__factory,
 } from "../../typechain";
@@ -12,25 +14,47 @@ import { Signer } from "ethers";
 export const deployPancakeStrategies = async (
   router: PancakeRouterV2,
   deployer: Signer
-): Promise<[PancakeswapStrategyAddBaseTokenOnly, PancakeswapStrategyLiquidate]> => {
+): Promise<
+  [
+    PancakeswapStrategyAddToPoolWithBaseToken,
+    PancakeswapStrategyAddToPoolWithoutBaseToken,
+    PancakeswapStrategyLiquidate
+  ]
+> => {
   /// Setup strategy
-  const PancakeswapStrategyAddBaseTokenOnly = (await ethers.getContractFactory(
-    "PancakeswapStrategyAddBaseTokenOnly",
+  const PancakeswapStrategyAddToPoolWithBaseTokenFactory = (await ethers.getContractFactory(
+    "PancakeswapStrategyAddToPoolWithBaseToken",
     deployer
-  )) as PancakeswapStrategyAddBaseTokenOnly__factory;
-  const addStrat = (await upgrades.deployProxy(PancakeswapStrategyAddBaseTokenOnly, [
-    router.address,
-  ])) as PancakeswapStrategyAddBaseTokenOnly;
-  await addStrat.deployed();
+  )) as PancakeswapStrategyAddToPoolWithBaseToken__factory;
+  const PancakeswapStrategyAddToPoolWithBaseToken = (await upgrades.deployProxy(
+    PancakeswapStrategyAddToPoolWithBaseTokenFactory,
+    [router.address]
+  )) as PancakeswapStrategyAddToPoolWithBaseToken;
+  await PancakeswapStrategyAddToPoolWithBaseToken.deployed();
 
-  const PancakeswapStrategyLiquidate = (await ethers.getContractFactory(
+  const PancakeswapStrategyAddToPoolWithoutBaseTokenFactory = (await ethers.getContractFactory(
+    "PancakeswapStrategyAddToPoolWithoutBaseToken",
+    deployer
+  )) as PancakeswapStrategyAddToPoolWithoutBaseToken__factory;
+  const PancakeswapStrategyAddToPoolWithoutBaseToken = (await upgrades.deployProxy(
+    PancakeswapStrategyAddToPoolWithoutBaseTokenFactory,
+    [router.address]
+  )) as PancakeswapStrategyAddToPoolWithoutBaseToken;
+  await PancakeswapStrategyAddToPoolWithoutBaseToken.deployed();
+
+  const PancakeswapStrategyLiquidateFactory = (await ethers.getContractFactory(
     "PancakeswapStrategyLiquidate",
     deployer
   )) as PancakeswapStrategyLiquidate__factory;
-  const liqStrat = (await upgrades.deployProxy(PancakeswapStrategyLiquidate, [
-    router.address,
-  ])) as PancakeswapStrategyLiquidate;
-  await liqStrat.deployed();
+  const PancakeswapStrategyLiquidate = (await upgrades.deployProxy(
+    PancakeswapStrategyLiquidateFactory,
+    [router.address]
+  )) as PancakeswapStrategyLiquidate;
+  await PancakeswapStrategyLiquidate.deployed();
 
-  return [addStrat, liqStrat];
+  return [
+    PancakeswapStrategyAddToPoolWithBaseToken,
+    PancakeswapStrategyAddToPoolWithoutBaseToken,
+    PancakeswapStrategyLiquidate,
+  ];
 };

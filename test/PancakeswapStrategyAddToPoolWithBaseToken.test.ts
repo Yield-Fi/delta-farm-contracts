@@ -9,8 +9,8 @@ import {
   PancakePair__factory,
   PancakeRouterV2,
   PancakeRouterV2__factory,
-  PancakeswapStrategyAddBaseTokenOnly,
-  PancakeswapStrategyAddBaseTokenOnly__factory,
+  PancakeswapStrategyAddToPoolWithBaseToken,
+  PancakeswapStrategyAddToPoolWithBaseToken__factory,
   WBNB,
   WBNB__factory,
 } from "../typechain";
@@ -24,7 +24,7 @@ import { parseEther } from "@ethersproject/units";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
+describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
   const FOREVER = "2000000000";
 
   /// Pancakeswap-related instance(s)
@@ -38,7 +38,7 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
   let farmingToken: MockToken;
 
   /// Strategy-ralted instance(s)
-  let strat: PancakeswapStrategyAddBaseTokenOnly;
+  let strat: PancakeswapStrategyAddToPoolWithBaseToken;
 
   // Accounts
   let deployer: Signer;
@@ -55,7 +55,7 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
 
   let routerV2AsAlice: PancakeRouterV2;
 
-  let stratAsBob: PancakeswapStrategyAddBaseTokenOnly;
+  let stratAsBob: PancakeswapStrategyAddToPoolWithBaseToken;
 
   async function fixture() {
     [deployer, alice, bob] = await ethers.getSigners();
@@ -100,13 +100,13 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
       deployer
     );
 
-    const PancakeswapStrategyAddBaseTokenOnly = (await ethers.getContractFactory(
-      "PancakeswapStrategyAddBaseTokenOnly",
+    const PancakeswapStrategyAddToPoolWithBaseToken = (await ethers.getContractFactory(
+      "PancakeswapStrategyAddToPoolWithBaseToken",
       deployer
-    )) as PancakeswapStrategyAddBaseTokenOnly__factory;
-    strat = (await upgrades.deployProxy(PancakeswapStrategyAddBaseTokenOnly, [
+    )) as PancakeswapStrategyAddToPoolWithBaseToken__factory;
+    strat = (await upgrades.deployProxy(PancakeswapStrategyAddToPoolWithBaseToken, [
       routerV2.address,
-    ])) as PancakeswapStrategyAddBaseTokenOnly;
+    ])) as PancakeswapStrategyAddToPoolWithBaseToken;
     await strat.deployed();
 
     // Assign contract signer
@@ -119,7 +119,7 @@ describe("PancakeswapV2 - StrategyAddBaseTokenOnly", () => {
 
     lpAsBob = PancakePair__factory.connect(lpV2.address, bob);
 
-    stratAsBob = PancakeswapStrategyAddBaseTokenOnly__factory.connect(strat.address, bob);
+    stratAsBob = PancakeswapStrategyAddToPoolWithBaseToken__factory.connect(strat.address, bob);
   }
 
   beforeEach(async () => {

@@ -379,7 +379,8 @@ export const mainnetConfig = {
   },
   strategies: {
     pancakeswap: {
-      AddBaseToken: "",
+      AddToPoolWithBaseToken: "",
+      AddToPoolWithoutBaseToken: "",
       Liquidate: "",
     },
   },

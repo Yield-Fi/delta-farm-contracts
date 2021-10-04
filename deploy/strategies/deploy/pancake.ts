@@ -1,7 +1,10 @@
 import { ethers, upgrades } from "hardhat";
 
 import { DeployFunction } from "hardhat-deploy/types";
-import { PancakeswapStrategyAddBaseTokenOnly } from "../../../typechain";
+import {
+  PancakeswapStrategyAddToPoolWithBaseToken,
+  PancakeswapStrategyAddToPoolWithoutBaseToken,
+} from "../../../typechain";
 import { getConfig } from "../../utils/config";
 import { logger } from "../../utils/logger";
 
@@ -11,17 +14,35 @@ const deployFunc: DeployFunction = async () => {
 
   logger("---> Deploying strategies for the pancakeswap workers... <---");
 
-  const AddBaseTokenOnlyStrategyFactory = await ethers.getContractFactory(
-    "PancakeswapStrategyAddBaseTokenOnly",
+  const AddToPoolWithBaseTokenStrategyFactory = await ethers.getContractFactory(
+    "PancakeswapStrategyAddToPoolWithBaseToken",
     deployer
   );
 
-  const AddBaseTokenOnlyStrategy = (await upgrades.deployProxy(AddBaseTokenOnlyStrategyFactory, [
-    config.dex.pancakeswap.RouterV2,
-  ])) as PancakeswapStrategyAddBaseTokenOnly;
+  const AddToPoolWithBaseTokenStrategy = (await upgrades.deployProxy(
+    AddToPoolWithBaseTokenStrategyFactory,
+    [config.dex.pancakeswap.RouterV2]
+  )) as PancakeswapStrategyAddToPoolWithBaseToken;
 
-  await AddBaseTokenOnlyStrategy.deployed();
-  logger(`- AddBaseTokenOnlyStrategy deployed at ${AddBaseTokenOnlyStrategy.address}`);
+  await AddToPoolWithBaseTokenStrategy.deployed();
+  logger(
+    `- PancakeswapStrategyAddToPoolWithBaseToken deployed at ${AddToPoolWithBaseTokenStrategy.address}`
+  );
+
+  const AddToPoolWithoutBaseTokenStrategyFactory = await ethers.getContractFactory(
+    "PancakeswapStrategyAddToPoolWithoutBaseToken",
+    deployer
+  );
+
+  const AddToPoolWithoutBaseTokenStrategy = (await upgrades.deployProxy(
+    AddToPoolWithoutBaseTokenStrategyFactory,
+    [config.dex.pancakeswap.RouterV2]
+  )) as PancakeswapStrategyAddToPoolWithoutBaseToken;
+
+  await AddToPoolWithoutBaseTokenStrategy.deployed();
+  logger(
+    `- PancakeswapStrategyAddToPoolWithoutBaseToken deployed at ${AddToPoolWithoutBaseTokenStrategy.address}`
+  );
 
   const LiquidateStrategyFactory = await ethers.getContractFactory(
     "PancakeswapStrategyLiquidate",

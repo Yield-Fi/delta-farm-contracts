@@ -9,28 +9,55 @@ const upgradeFunc: DeployFunction = async () => {
 
   logger("---> Upgrading strategies implementation for the pancakeswap workers... <---");
 
-  const addBaseTokenOnlyStrategyProxyAddress = config.strategies.pancakeswap.AddBaseToken;
+  const addToPoolWithBaseTokenStrategyProxyAddress =
+    config.strategies.pancakeswap.AddToPoolWithBaseToken;
 
-  if (!addBaseTokenOnlyStrategyProxyAddress) {
-    throw new Error("Address for PancakeswapStrategyAddBaseTokenOnly not found");
+  if (!addToPoolWithBaseTokenStrategyProxyAddress) {
+    throw new Error("Address for PancakeswapStrategyAddToPoolWithBaseToken not found");
   }
 
-  const AddBaseTokenOnlyStrategyFactory = await ethers.getContractFactory(
-    "PancakeswapStrategyAddBaseTokenOnly",
+  const addToPoolWithoutBaseTokenStrategyProxyAddress =
+    config.strategies.pancakeswap.AddToPoolWithoutBaseToken;
+
+  if (!addToPoolWithoutBaseTokenStrategyProxyAddress) {
+    throw new Error("Address for PancakeswapStrategyAddToPoolWithoutBaseToken not found");
+  }
+
+  const liquidateStrategyProxyAddress = config.strategies.pancakeswap.Liquidate;
+
+  if (!liquidateStrategyProxyAddress) {
+    throw new Error("Address for PancakeswapStrategyLiquidate not found");
+  }
+
+  const AddToPoolWithBaseTokenStrategyFactory = await ethers.getContractFactory(
+    "PancakeswapStrategyAddToPoolWithBaseToken",
     deployer
   );
 
-  const AddBaseTokenOnlyStrategy = await upgrades.upgradeProxy(
-    addBaseTokenOnlyStrategyProxyAddress,
-    AddBaseTokenOnlyStrategyFactory
+  const AddToPoolWithBaseTokenStrategy = await upgrades.upgradeProxy(
+    addToPoolWithBaseTokenStrategyProxyAddress,
+    AddToPoolWithBaseTokenStrategyFactory
   );
 
-  await AddBaseTokenOnlyStrategy.deployed();
+  await AddToPoolWithBaseTokenStrategy.deployed();
   logger(
-    `- new implementation of AddBaseTokenOnlyStrategy deployed at ${AddBaseTokenOnlyStrategy.address}`
+    `- new implementation of AddToPoolWithBaseTokenStrategy deployed at ${AddToPoolWithBaseTokenStrategy.address}`
   );
 
-  const liquidateStrategyProxyAddress = config.strategies.pancakeswap.Liquidate;
+  const AddToPoolWithoutBaseTokenStrategyFactory = await ethers.getContractFactory(
+    "PancakeswapStrategyAddToPoolWithoutBaseToken",
+    deployer
+  );
+
+  const AddToPoolWithoutBaseTokenStrategy = await upgrades.upgradeProxy(
+    addToPoolWithBaseTokenStrategyProxyAddress,
+    AddToPoolWithoutBaseTokenStrategyFactory
+  );
+
+  await AddToPoolWithoutBaseTokenStrategy.deployed();
+  logger(
+    `- new implementation of AddToPoolWithoutBaseTokenStrategy deployed at ${AddToPoolWithoutBaseTokenStrategy.address}`
+  );
 
   const LiquidateStrategyFactory = await ethers.getContractFactory(
     "PancakeswapStrategyLiquidate",

@@ -19,13 +19,13 @@ import {
   VaultConfig,
   Vault__factory,
   WNativeRelayer,
+  PancakeswapStrategyAddToPoolWithBaseToken,
 } from "../typechain";
 import { config, ethers, upgrades, waffle } from "hardhat";
 import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
 
 import { MockContractContext } from "../typechain/MockContractContext";
 import { MockToken } from "../typechain/MockToken";
-import { PancakeswapStrategyAddBaseTokenOnly } from "../typechain/PancakeswapStrategyAddBaseTokenOnly";
 import { PancakeswapStrategyLiquidate } from "../typechain/PancakeswapStrategyLiquidate";
 // import * as AssertHelpers from "./helpers/assert";
 // import * as TimeHelpers from "./helpers/time";
@@ -92,7 +92,7 @@ describe("Vault - interactions", async () => {
   let evilContract: MockContractContext;
 
   // Strats
-  let addStrat: PancakeswapStrategyAddBaseTokenOnly;
+  let addStrat: PancakeswapStrategyAddToPoolWithBaseToken;
   let liqStrat: PancakeswapStrategyLiquidate;
 
   // Helpers & misc

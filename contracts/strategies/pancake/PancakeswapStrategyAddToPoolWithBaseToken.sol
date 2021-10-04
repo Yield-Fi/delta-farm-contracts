@@ -17,7 +17,7 @@ import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
 import "../../utils/CustomMath.sol";
 
-contract PancakeswapStrategyAddBaseTokenOnly is
+contract PancakeswapStrategyAddToPoolWithBaseToken is
   Initializable,
   OwnableUpgradeSafe,
   ReentrancyGuardUpgradeSafe,

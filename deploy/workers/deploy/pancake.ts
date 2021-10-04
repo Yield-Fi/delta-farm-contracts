@@ -2,7 +2,7 @@ import { WorkerConfigType, getConfig } from "../../utils/config";
 import { ethers, upgrades } from "hardhat";
 
 import { DeployFunction } from "hardhat-deploy/types";
-import { BountyCollector__factory, PancakeswapWorker } from "../../../typechain";
+import { PancakeswapWorker } from "../../../typechain";
 import { logger } from "../../utils/logger";
 
 const deployFunc: DeployFunction = async () => {
@@ -33,24 +33,23 @@ const deployFunc: DeployFunction = async () => {
         config.dex.pancakeswap.MasterChef,
         config.dex.pancakeswap.RouterV2,
         worker.positionId,
-        config.strategies.pancakeswap.AddBaseToken,
-        [config.tokens.CAKE, worker.token0],
+        [config.tokens.CAKE, config.baseToken],
         config.defaultReinvestThreshold,
-        config.bountyCollector,
         config.defaultTreasuryFeeBps,
-        [config.tokens.CAKE, config.tokens.WBNB, config.baseToken],
       ])) as PancakeswapWorker;
 
       await PancakeswapWorker.deployed();
       deployedWorkers.push(PancakeswapWorker.address);
 
+      await PancakeswapWorker.setStrategies([
+        config.strategies.pancakeswap.AddToPoolWithBaseToken,
+        config.strategies.pancakeswap.AddToPoolWithoutBaseToken,
+        config.strategies.pancakeswap.Liquidate,
+      ]);
+
       logger(`  - ${worker.name} deployed at ${PancakeswapWorker.address}`);
     }
   }
-
-  const BountyCollector = await BountyCollector__factory.connect(config.bountyCollector, deployer);
-  BountyCollector.whitelistWorkers(deployedWorkers, true);
-  logger(`  - New workers have been whitelisted in the bounty collector`);
 };
 
 export default deployFunc;
