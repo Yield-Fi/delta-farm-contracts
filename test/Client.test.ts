@@ -106,6 +106,10 @@ describe("Client contract", async () => {
   // Helpers & misc
   let swapHelper: SwapHelper;
 
+  // Connectors
+  let baseTokenAsAlice: MockToken;
+  let exampleClientAsAlice: Client;
+
   async function fixture() {
     [deployer, alice, bob, eve, yieldFi, binance] = await ethers.getSigners();
     [deployerAddress, aliceAddress, bobAddress, eveAddress, yieldFiAddress, binanceAddress] =
@@ -273,6 +277,10 @@ describe("Client contract", async () => {
 
     // Whitelist clients within vault config
     await vaultConfig.setWhitelistedCallers([exampleClient.address], true);
+
+    // Signers
+    baseTokenAsAlice = baseToken.connect(alice);
+    exampleClientAsAlice = exampleClient.connect(alice);
   }
 
   beforeEach(async () => {
@@ -281,15 +289,27 @@ describe("Client contract", async () => {
 
   context("# deposit method", async () => {
     it("should execute deposit flow on behalf of given end user", async () => {
-      // Mint some token for the client contract
-      await baseToken.mint(exampleClient.address, ethers.utils.parseEther("1"));
+      // Deposit amount
+      const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
+
+      // Mint some token for the alice
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+
+      // Whitelist operator
+      await exampleClient.whitelistOperators([deployerAddress], true);
+
+      // Whitelist Alice (caller)
+      await exampleClient.whitelistCallers([aliceAddress], true);
+
+      // Alice (DEX user) must approve client contract, so client contract can transfer asset to the Vault
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
 
       // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
-      await exampleClient.deposit(
+      await exampleClientAsAlice.deposit(
         aliceAddress,
         baseToken.address,
         targetToken.address,
-        ethers.utils.parseEther("1")
+        DEPOSIT_AMOUNT
       );
       // ID 1 = first position within the vault
       const position = await vault.positions(1);

@@ -25,6 +25,39 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev WorkerRouter responsible for mapping token pairs to proper worker addresses
   IWorkerRouter private _workerRouter;
 
+  /// @dev Whitelist mappings
+  mapping(address => bool) whitelistedCallers;
+  mapping(address => bool) whitelistedOperators;
+
+  /// @dev Whitelist modifiers - callers
+  modifier onlyWhitelistedCallers() {
+    require(whitelistedCallers[msg.sender], "ClientContract: Caller not whitelisted.");
+    _;
+  }
+
+  /// @dev Whitelist modifiers - operators
+  modifier onlyWhitelistedOperators() {
+    require(whitelistedOperators[msg.sender], "ClientContract: Operator not whitelisted.");
+    _;
+  }
+
+  /// @dev Whitelist methods - callers
+  function whitelistCallers(address[] calldata callers, bool isOk)
+    external
+    onlyWhitelistedOperators
+  {
+    for (uint256 i = 0; i < callers.length; i++) {
+      whitelistedCallers[callers[i]] = isOk;
+    }
+  }
+
+  /// @dev Whitelist methods - operators
+  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
+    for (uint256 i = 0; i < operators.length; i++) {
+      whitelistedOperators[operators[i]] = isOk;
+    }
+  }
+
   function initialize(
     string memory kind,
     string memory clientName,
@@ -33,6 +66,8 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     _KIND_ = kind;
     _CLIENT_NAME_ = clientName;
     _workerRouter = IWorkerRouter(workerRouter);
+
+    __Ownable_init();
   }
 
   /// @notice Deposit function for client's end user. a.k.a protocol entry point
@@ -50,7 +85,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     address token0,
     address token1,
     uint256 amount
-  ) external {
+  ) external onlyWhitelistedCallers {
     // Find proper worker
     address designatedWorker = _workerRouter.protocolWorkers(token0, token1);
 
@@ -65,6 +100,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
     // Get native vault token
     address vaultToken = vault.token();
+
+    // Transfer given amount of asset from the caller (Caller must SafeApprove client contract)
+    vaultToken.safeTransferFrom(msg.sender, address(this), amount);
 
     // Approve vault to use given assets
     vaultToken.safeApprove(address(vault), amount);
@@ -81,6 +119,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         abi.encode(worker.token1(), worker.token0(), 0)
       )
     );
+
+    // Reset approvals
+    vaultToken.safeApprove(address(vault), 0);
   }
 
   function withdraw(
