@@ -17,6 +17,8 @@ import "../utils/CustomMath.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IVault.sol";
 
+import "hardhat/console.sol";
+
 contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWorker {
   /// @notice Libraries
   using SafeToken for address;
@@ -241,6 +243,11 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     if (token0 == baseToken) {
       return
         _estimateSwapOutput(token1, baseToken, userToken1, userToken1, userToken0).add(userToken0);
+    }
+
+    if (token1 == baseToken) {
+      return
+        _estimateSwapOutput(token0, baseToken, userToken0, userToken0, userToken1).add(userToken1);
     }
 
     return
