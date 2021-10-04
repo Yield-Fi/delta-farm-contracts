@@ -96,7 +96,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     IWorker worker = IWorker(designatedWorker);
 
     // Cast vault for further method's usage
-    IVault vault = IVault(worker.getOperatingVault());
+    IVault vault = IVault(worker.operatingVault());
 
     // Get native vault token
     address vaultToken = vault.token();
@@ -114,10 +114,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
       designatedWorker,
       amount,
       recipient,
-      abi.encode(
-        worker.criticalAddBaseTokenOnlyStrategy(),
-        abi.encode(worker.token1(), worker.token0(), 0)
-      )
+      abi.encode(worker.getStrategies()[0], abi.encode(worker.token0(), worker.token1(), 0))
     );
 
     // Reset approvals
@@ -125,8 +122,31 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   }
 
   function withdraw(
-    address endUser,
-    address worker,
-    uint256 amount
-  ) external {}
+    uint256 pid,
+    address recipient,
+    address token0,
+    address token1
+  ) external onlyWhitelistedCallers {
+    // Find proper worker
+    address designatedWorker = _workerRouter.protocolWorkers(token0, token1);
+
+    // Check for worker existence
+    require(designatedWorker != address(0), "ClientContract: Target pool hasn't been found");
+
+    // Cast worker for further methods' usage
+    IWorker worker = IWorker(designatedWorker);
+
+    // Cast vault for further method's usage
+    IVault vault = IVault(worker.operatingVault());
+
+    // Enter the protocol using resolved worker strategy
+    /// @dev encoded: (address strategy, (address baseToken, address farmingToken, uint256 minLPAmount))
+    vault.work(
+      pid,
+      designatedWorker,
+      0,
+      recipient,
+      abi.encode(worker.getStrategies()[2], abi.encode(worker.token1(), worker.token0(), 0))
+    );
+  }
 }

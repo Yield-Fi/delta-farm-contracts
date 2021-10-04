@@ -23,6 +23,7 @@ import {
   MockWBNB__factory,
   Client__factory,
   WorkerRouter,
+  PancakeswapStrategyAddToPoolWithBaseToken,
 } from "../typechain";
 import { config, ethers, upgrades, waffle } from "hardhat";
 import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
@@ -73,19 +74,12 @@ describe("Client contract", async () => {
   // Signers
   let deployer: Signer;
   let alice: Signer;
-  let bob: Signer;
-  let eve: Signer;
 
   let yieldFi: Signer;
-  let binance: Signer;
 
   let deployerAddress: string;
   let aliceAddress: string;
-  let bobAddress: string;
-  let eveAddress: string;
-
   let yieldFiAddress: string;
-  let binanceAddress: string;
 
   // Clients
   let exampleClient: Client;
@@ -110,26 +104,18 @@ describe("Client contract", async () => {
   let exampleClientAsAlice: Client;
 
   async function fixture() {
-    [deployer, alice, bob, eve, yieldFi, binance] = await ethers.getSigners();
-    [deployerAddress, aliceAddress, bobAddress, eveAddress, yieldFiAddress, binanceAddress] =
-      await Promise.all([
-        deployer.getAddress(),
-        alice.getAddress(),
-        bob.getAddress(),
-        eve.getAddress(),
-        yieldFi.getAddress(),
-        binance.getAddress(),
-      ]);
+    [deployer, alice, yieldFi] = await ethers.getSigners();
+    [deployerAddress, aliceAddress, yieldFiAddress] = await Promise.all([
+      deployer.getAddress(),
+      alice.getAddress(),
+      yieldFi.getAddress(),
+    ]);
 
     baseToken = await deployToken(
       {
         name: "BASETOKEN",
         symbol: "BTOKEN",
-        holders: [
-          { address: deployerAddress, amount: ethers.utils.parseEther("1000") },
-          { address: aliceAddress, amount: ethers.utils.parseEther("1000") },
-          { address: bobAddress, amount: ethers.utils.parseEther("1000") },
-        ],
+        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
       },
       deployer
     );
@@ -138,21 +124,19 @@ describe("Client contract", async () => {
       {
         name: "TARGETTOKEN",
         symbol: "TTOKEN",
-        holders: [
-          { address: deployerAddress, amount: ethers.utils.parseEther("1000") },
-          { address: aliceAddress, amount: ethers.utils.parseEther("1000") },
-          { address: bobAddress, amount: ethers.utils.parseEther("1000") },
-        ],
+        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
       },
       deployer
     );
 
     mockWBNB = await deployWBNB(deployer);
 
+    await mockWBNB.mint(deployerAddress, ethers.utils.parseEther("10000"));
+
     [factory, router, cake, syrup, masterChef] = await deployPancakeV2(
       mockWBNB,
       CAKE_REWARD_PER_BLOCK,
-      [{ address: deployerAddress, amount: ethers.utils.parseEther("100") }],
+      [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
       deployer
     );
 
@@ -209,13 +193,8 @@ describe("Client contract", async () => {
       deployer
     );
 
-    // Approve strategies
-    await pancakeswapWorker01.setApprovedStrategies([addStrat.address], true);
-    await pancakeswapWorker02.setApprovedStrategies([addStrat.address], true);
-
-    // Set critical strategies
-    await pancakeswapWorker01.setCriticalAddBaseTokenOnlyStrategy(addStrat.address);
-    await pancakeswapWorker02.setCriticalAddBaseTokenOnlyStrategy(addStrat.address);
+    await pancakeswapWorker01.setStrategies([addStrat.address, addStrat.address, liqStrat.address]);
+    await pancakeswapWorker02.setStrategies([addStrat.address, addStrat.address, liqStrat.address]);
 
     // Whitelist workers
     await vaultConfig.setWorkers(
@@ -236,7 +215,7 @@ describe("Client contract", async () => {
         token0: baseToken,
         token1: targetToken,
         amount0desired: ethers.utils.parseEther("0.1"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount1desired: ethers.utils.parseEther("10"),
       },
       {
         token0: cake,
@@ -270,7 +249,7 @@ describe("Client contract", async () => {
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["HotWallet", "Binance Client", workerRouter.address],
+      ["Binance", "Binance Client", workerRouter.address],
       deployer
     )) as Client;
 
@@ -310,6 +289,7 @@ describe("Client contract", async () => {
         targetToken.address,
         DEPOSIT_AMOUNT
       );
+
       // ID 1 = first position within the vault
       const position = await vault.positions(1);
       const positionInfo = await vault.positionInfo(1);
