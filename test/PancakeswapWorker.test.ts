@@ -94,7 +94,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2300"),
+              amount: parseEther("2300000"),
             },
           ],
         },
@@ -112,7 +112,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2000"),
+              amount: parseEther("2000000"),
             },
           ],
         },
@@ -130,7 +130,7 @@ describe("PancakeswapWorker", () => {
             },
             {
               address: deployerAddress,
-              amount: parseEther("2000"),
+              amount: parseEther("2000000"),
             },
           ],
         },
@@ -226,6 +226,12 @@ describe("PancakeswapWorker", () => {
       {
         token0: Token0,
         token1: MockWBNB,
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
+      },
+      {
+        token0: BaseToken,
+        token1: Token0,
         amount0desired: ethers.utils.parseEther("1000"),
         amount1desired: ethers.utils.parseEther("1000"),
       },
@@ -366,6 +372,8 @@ describe("PancakeswapWorker", () => {
       expect(result).to.include(Token0.address.toLowerCase());
       expect(result).to.include(Token1.address.toLowerCase());
     });
+
+    it("TODO: should add, remove liquidity via strategies and harvest funds", () => true);
   });
 
   it("should give rewards out when you stake LP tokens", async () => {
