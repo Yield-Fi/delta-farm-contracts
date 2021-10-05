@@ -25,6 +25,7 @@ import {
   WorkerRouter,
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken,
+  ProtocolManager,
 } from "../typechain";
 import { config, ethers, upgrades, waffle } from "hardhat";
 import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
@@ -83,6 +84,9 @@ describe("Client contract", async () => {
   let deployerAddress: string;
   let aliceAddress: string;
   let yieldFiAddress: string;
+
+  // Protocol Manager
+  let protocolManager: ProtocolManager;
 
   // Clients
   let exampleClient: Client;
@@ -188,6 +192,13 @@ describe("Client contract", async () => {
     await masterChef.add(1, lp.address, true);
     await masterChef.add(2, lpExt.address, true);
 
+    // Setup general protocol manager
+    protocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [],
+      deployer
+    )) as ProtocolManager;
+
     /// Setup PancakeswapWorker
     pancakeswapWorker01 = await deployPancakeWorker(
       vault,
@@ -198,7 +209,7 @@ describe("Client contract", async () => {
       [cake.address, mockWBNB.address, baseToken.address],
       0,
       REINVEST_BOUNTY_BPS,
-      ethers.constants.AddressZero,
+      protocolManager.address,
       deployer
     );
 
@@ -211,7 +222,7 @@ describe("Client contract", async () => {
       [cake.address, mockWBNB.address, baseToken.address],
       0,
       REINVEST_BOUNTY_BPS,
-      ethers.constants.AddressZero,
+      protocolManager.address,
       deployer
     );
 
@@ -305,6 +316,18 @@ describe("Client contract", async () => {
     // Whitelist clients within vault config
     await vaultConfig.setWhitelistedCallers([exampleClient.address], true);
 
+    // Whitelist deployer as client contract operator
+    await exampleClient.whitelistOperators([deployerAddress], true);
+
+    // Enable workers on the client side
+    await exampleClient.toggleWorkers(
+      [pancakeswapWorker01.address, pancakeswapWorker02.address],
+      true
+    );
+
+    // Whitelist client
+    await protocolManager.approveClientContract(exampleClient.address, true);
+
     // Signers
     baseTokenAsAlice = baseToken.connect(alice);
     exampleClientAsAlice = exampleClient.connect(alice);
@@ -352,6 +375,26 @@ describe("Client contract", async () => {
       expect(positionInfo).to.be.bignumber.that.is.eql(
         ethers.utils.parseEther("0.999649838808597569")
       );
+    });
+
+    it("should revert if target work is disabled by client", async () => {
+      // Disable worker
+      await exampleClient.toggleWorkers([pancakeswapWorker01.address], false);
+
+      // Proceed with entering the protocol
+      const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+      await exampleClient.whitelistOperators([deployerAddress], true);
+      await exampleClient.whitelistCallers([aliceAddress], true);
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await expect(
+        exampleClientAsAlice.deposit(
+          aliceAddress,
+          baseToken.address,
+          targetToken.address,
+          DEPOSIT_AMOUNT
+        )
+      ).to.be.revertedWith("ClientContract: Target pool hasn't been enabled by the client");
     });
   });
 
@@ -422,6 +465,26 @@ describe("Client contract", async () => {
       console.log(
         "TODO: Aktualnie strategia likwidacji wyplaca asset na callera - w przypadku wyplaty przy aktualnej logice, callerem jest Vault. Do zmiany"
       );
+    });
+  });
+
+  context("# set worker fee", async () => {
+    it("should revert upon providing invalid worker address", async () => {
+      expect(exampleClient.setWorkerFee(ethers.constants.AddressZero, 100)).to.be.reverted;
+    });
+
+    it("should revert when fee is greater than or equal to 100%", async () => {
+      await expect(
+        exampleClient.setWorkerFee(pancakeswapWorker01.address, 10001)
+      ).to.be.revertedWith("ClientContract: Invalid fee amount given");
+    });
+
+    it("should work if provided fee is valid", async () => {
+      await exampleClient.setWorkerFee(pancakeswapWorker01.address, 500);
+
+      expect(
+        await pancakeswapWorker01.getClientFee(exampleClient.address)
+      ).to.be.bignumber.that.is.eql(ethers.BigNumber.from(500));
     });
   });
 });
