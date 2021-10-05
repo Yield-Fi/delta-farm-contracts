@@ -44,7 +44,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   address public override token0;
   address public override token1;
   address public cake;
-  address public operatingVault;
+  address public override operatingVault;
   uint256 public pid;
   ProtocolManager protocolManager;
   /// @notice Configuration variables for PancakeswapV2

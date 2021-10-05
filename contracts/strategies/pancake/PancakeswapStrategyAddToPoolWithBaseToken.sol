@@ -45,13 +45,16 @@ contract PancakeswapStrategyAddToPoolWithBaseToken is
       data,
       (address, address, uint256)
     );
+
     IPancakePair lpToken = IPancakePair(factory.getPair(farmingToken, baseToken));
     // 2. Approve router to do their stuffs
     farmingToken.safeApprove(address(router), uint256(-1));
     baseToken.safeApprove(address(router), uint256(-1));
     // 3. Compute the optimal amount of baseToken to be converted to farmingToken.
     uint256 balance = baseToken.myBalance();
+
     (uint256 r0, uint256 r1, ) = lpToken.getReserves();
+
     uint256 rIn = lpToken.token0() == baseToken ? r0 : r1;
     // find how many baseToken need to be converted to farmingToken
     // Constants come from

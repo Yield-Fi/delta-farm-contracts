@@ -7,7 +7,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 contract ProtocolManager is OwnableUpgradeSafe {
-  // Contains approved client contract's addresses
+  // Contains info about client contract's approvals
   mapping(address => bool) private approvedClients;
 
   function initialize() external initializer {
