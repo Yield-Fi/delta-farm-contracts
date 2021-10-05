@@ -2,7 +2,7 @@ pragma solidity 0.6.6;
 
 import { IWorker } from "./interfaces/IWorker.sol";
 import { IVault } from "./interfaces/IVault.sol";
-import { IWorkerRouter } from "./interfaces/IWorkerRouter.sol";
+import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
@@ -25,8 +25,8 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   string _KIND_;
   string _CLIENT_NAME_;
 
-  /// @dev WorkerRouter responsible for mapping token pairs to proper worker addresses
-  IWorkerRouter private _workerRouter;
+  /// @dev ProtocolManager responsible for mapping token pairs to proper worker addresses
+  IProtocolManager private _protocolManager;
 
   /// @dev Whitelist mappings
   mapping(address => bool) whitelistedCallers;
@@ -64,11 +64,12 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   function initialize(
     string memory kind,
     string memory clientName,
-    address workerRouter
+    address protocolManager
   ) public initializer {
     _KIND_ = kind;
     _CLIENT_NAME_ = clientName;
-    _workerRouter = IWorkerRouter(workerRouter);
+
+    _protocolManager = IProtocolManager(protocolManager);
 
     __Ownable_init();
   }
@@ -79,8 +80,8 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param token1 Address of token1 pair
   /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
   /// @dev Vault native token in which assets should have been provided will be resolved on-the-fly using
-  /// internal WorkerRouter.
-  /// Flow: WorkerRouter.protocolWorkers(token0, token1) returns worker's address (target farming protocol pool)
+  /// internal ProtocolManager.
+  /// Flow: ProtocolManager.protocolWorkers(token0, token1) returns worker's address (target farming protocol pool)
   /// or address(0) if no proper mapping was found (mapping = worker in this case)
   /// From worker's operating vault we are getting vault native token in which asset should have been provided
   function deposit(
@@ -90,7 +91,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     uint256 amount
   ) external onlyWhitelistedCallers {
     // Find proper worker
-    address designatedWorker = _workerRouter.protocolWorkers(token0, token1);
+    address designatedWorker = _protocolManager.protocolWorkers(token0, token1);
 
     // Check for worker existence
     require(designatedWorker != address(0), "ClientContract: Target pool hasn't been found");
@@ -142,7 +143,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     address token1
   ) external onlyWhitelistedCallers {
     // Find proper worker
-    address designatedWorker = _workerRouter.protocolWorkers(token0, token1);
+    address designatedWorker = _protocolManager.protocolWorkers(token0, token1);
 
     // Check for worker existence
     require(designatedWorker != address(0), "ClientContract: Target pool hasn't been found");

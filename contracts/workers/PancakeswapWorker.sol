@@ -16,7 +16,7 @@ import "../libs/pancake/interfaces/IPancakeMasterChef.sol";
 import "../utils/CustomMath.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IVault.sol";
-import "../ProtocolManager.sol";
+import "../interfaces/IProtocolManager.sol";
 
 contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWorker {
   /// @notice Libraries
@@ -46,7 +46,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   address public cake;
   address public override operatingVault;
   uint256 public pid;
-  ProtocolManager protocolManager;
+  IProtocolManager protocolManager;
   /// @notice Configuration variables for PancakeswapV2
   uint256 public fee;
   uint256 public feeDenom;
@@ -76,7 +76,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     address[] calldata _harvestPath,
     uint256 _harvestThreshold,
     uint256 _treasuryFeeBps,
-    ProtocolManager _protocolManager
+    IProtocolManager _protocolManager
   ) external initializer {
     // 1. Initialized imported library
     OwnableUpgradeSafe.__Ownable_init();
@@ -137,7 +137,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   modifier onlyClientContract() {
     require(
-      protocolManager.isApprovedClientContract(msg.sender),
+      protocolManager.approvedClients(msg.sender),
       "PancakeswapWorker->onlyClientContract: not client contract"
     );
     _;
