@@ -43,4 +43,7 @@ interface IWorker {
 
   /// @dev Set fee in bps for specific client
   function setClientFee(address clientAccount, uint256 clientFeeBps) external;
+
+  /// @dev Get operating vault address.
+  function operatingVault() external view returns (address);
 }

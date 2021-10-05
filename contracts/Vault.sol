@@ -162,23 +162,23 @@ contract Vault is
     uint256 id,
     address worker,
     uint256 amount,
-    address client,
+    address endUser,
     bytes calldata data
-  ) external payable onlyEOAorWhitelisted transferTokenToVault(amount) nonReentrant {
+  ) external payable override onlyEOAorWhitelisted transferTokenToVault(amount) nonReentrant {
     // 1. Sanity check the input position, or add a new position of ID is 0.
     Position storage pos;
     if (id == 0) {
       id = nextPositionID++;
       pos = positions[id];
       pos.worker = worker;
-      pos.owner = msg.sender;
-      pos.client = client;
+      pos.owner = endUser;
+      pos.client = msg.sender;
     } else {
       pos = positions[id];
       require(id < nextPositionID, "bad position id");
       require(pos.worker == worker, "bad position worker");
-      require(pos.owner == msg.sender, "not position owner");
-      require(pos.client == client, "bad source-client address");
+      require(pos.owner == endUser, "not position owner");
+      require(pos.client == msg.sender, "bad source-client address");
     }
     emit Work(id, amount);
     // Update execution scope variables

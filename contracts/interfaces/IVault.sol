@@ -16,4 +16,13 @@ interface IVault {
 
   /// Send the rewards to position owner
   function collectReward(uint256 pid) external;
+
+  /// @dev Protocol entry point
+  function work(
+    uint256 id,
+    address worker,
+    uint256 amount,
+    address endUser,
+    bytes calldata data
+  ) external payable;
 }
