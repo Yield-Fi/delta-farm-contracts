@@ -61,11 +61,13 @@ describe("Client contract", async () => {
   let pancakeswapWorker01: PancakeswapWorker;
   let pancakeswapWorker02: PancakeswapWorker;
   let lp: PancakePair;
+  let lpExt: PancakePair;
   let mockWBNB: MockWBNB;
 
   // Tokens
   let baseToken: MockToken;
   let targetToken: MockToken;
+  let testToken: MockToken;
   let cake: CakeToken;
   let syrup: SyrupBar;
 
@@ -131,6 +133,15 @@ describe("Client contract", async () => {
       deployer
     );
 
+    testToken = await deployToken(
+      {
+        name: "TESTTOKEN",
+        symbol: "TSTOKEN",
+        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
+      },
+      deployer
+    );
+
     mockWBNB = await deployWBNB(deployer);
 
     await mockWBNB.mint(deployerAddress, ethers.utils.parseEther("10000"));
@@ -163,12 +174,19 @@ describe("Client contract", async () => {
     // Setup BTOKEN-FTOKEN pair on Pancakeswap
     // Add lp to masterChef's pool
     await factory.createPair(baseToken.address, targetToken.address);
+    await factory.createPair(testToken.address, targetToken.address);
     lp = PancakePair__factory.connect(
       await factory.getPair(targetToken.address, baseToken.address),
       deployer
     );
 
+    lpExt = PancakePair__factory.connect(
+      await factory.getPair(targetToken.address, testToken.address),
+      deployer
+    );
+
     await masterChef.add(1, lp.address, true);
+    await masterChef.add(2, lpExt.address, true);
 
     /// Setup PancakeswapWorker
     pancakeswapWorker01 = await deployPancakeWorker(
@@ -188,7 +206,7 @@ describe("Client contract", async () => {
       baseToken,
       masterChef,
       router,
-      POOL_ID,
+      POOL_ID + 1, // Next alloc point
       [cake.address, mockWBNB.address, baseToken.address],
       0,
       REINVEST_BOUNTY_BPS,
@@ -245,6 +263,24 @@ describe("Client contract", async () => {
         amount0desired: ethers.utils.parseEther("1"),
         amount1desired: ethers.utils.parseEther("1"),
       },
+      {
+        token0: testToken,
+        token1: mockWBNB,
+        amount0desired: ethers.utils.parseEther("1"),
+        amount1desired: ethers.utils.parseEther("1"),
+      },
+      {
+        token0: testToken,
+        token1: baseToken,
+        amount0desired: ethers.utils.parseEther("1"),
+        amount1desired: ethers.utils.parseEther("1"),
+      },
+      {
+        token0: testToken,
+        token1: targetToken,
+        amount0desired: ethers.utils.parseEther("1"),
+        amount1desired: ethers.utils.parseEther("1"),
+      },
     ]);
 
     // Setup workers router that will provide pairs' mapping later on
@@ -255,6 +291,7 @@ describe("Client contract", async () => {
 
     // Add worker to the register
     await workerRouter.addWorkerAutoDiscover(pancakeswapWorker01.address, false);
+    await workerRouter.addWorkerAutoDiscover(pancakeswapWorker02.address, false);
 
     // Clients
     exampleClient = (await deployProxyContract(
@@ -275,7 +312,7 @@ describe("Client contract", async () => {
     await waffle.loadFixture(fixture);
   });
 
-  context("# deposit method", async () => {
+  context("# deposit method - base token only", async () => {
     it("should execute deposit flow on behalf of given end user", async () => {
       // Deposit amount
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
@@ -312,6 +349,47 @@ describe("Client contract", async () => {
       // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.999649838808597569;
       expect(positionInfo).to.be.bignumber.that.is.eql(
         ethers.utils.parseEther("0.999649838808597569")
+      );
+    });
+  });
+
+  context("# deposit method - no common token (Vault <-> Worker)", async () => {
+    it("should execute deposit flow on behalf of given end user", async () => {
+      // Deposit amount
+      const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
+
+      // Mint some token for the alice
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+
+      // Whitelist operator
+      await exampleClient.whitelistOperators([deployerAddress], true);
+
+      // Whitelist Alice (caller)
+      await exampleClient.whitelistCallers([aliceAddress], true);
+
+      // Alice (DEX user) must approve client contract, so client contract can transfer asset to the Vault
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+
+      // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
+      await exampleClientAsAlice.deposit(
+        aliceAddress,
+        testToken.address,
+        targetToken.address,
+        DEPOSIT_AMOUNT
+      );
+
+      // ID 1 = first position within the vault
+      const position = await vault.positions(1);
+      const positionInfo = await vault.positionInfo(1);
+
+      // Validate position info
+      expect(position.worker).to.be.eql(pancakeswapWorker02.address);
+      expect(position.owner).to.be.eql(aliceAddress);
+      expect(position.client).to.be.eql(exampleClient.address);
+
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 1.971394083659056878 (due to liquidity ratios) [1 BT -> TST -> TT];
+      expect(positionInfo).to.be.bignumber.that.is.eql(
+        ethers.utils.parseEther("1.971394083659056878")
       );
     });
   });

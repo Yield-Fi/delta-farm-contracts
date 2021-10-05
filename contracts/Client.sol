@@ -110,19 +110,17 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     // If worker makes usage of vault's operating token, we should covert only one asset to the second, proper one.
     /// @notice Strategy 0: Vault<BUSD> -> Worker<BUSD, USDT> (convert some portion of BUSD to USDT)
     /// @notice Strategy 1: Vault<BUSD> -> Worker<USDC, USDT> (do a split conversion)
-    address targetStrategy = worker.token0() == vaultToken || worker.token1() == vaultToken
-      ? worker.getStrategies()[0]
-      : worker.getStrategies()[1];
+
+    bytes memory payload = worker.token0() == vaultToken || worker.token1() == vaultToken
+      ? abi.encode(worker.getStrategies()[0], abi.encode(worker.token0(), worker.token1(), 0))
+      : abi.encode(
+        worker.getStrategies()[1],
+        abi.encode(vaultToken, worker.token0(), worker.token1(), 0)
+      );
 
     // Enter the protocol using resolved worker strategy
     /// @dev encoded: (address strategy, (address baseToken, address farmingToken, uint256 minLPAmount))
-    vault.work(
-      0,
-      designatedWorker,
-      amount,
-      recipient,
-      abi.encode(targetStrategy, abi.encode(worker.token0(), worker.token1(), 0))
-    );
+    vault.work(0, designatedWorker, amount, recipient, payload);
 
     // Reset approvals
     vaultToken.safeApprove(address(vault), 0);
