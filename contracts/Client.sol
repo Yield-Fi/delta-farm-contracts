@@ -18,6 +18,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   using SafeMath for uint256;
   using SafeToken for address;
 
+  /// @dev Enabled farms
+  mapping(address => bool) enabledWorkers;
+
   /// @dev Protocol related general metadata, may be removed in further versions
   string _KIND_;
   string _CLIENT_NAME_;
@@ -95,6 +98,12 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     // Cast worker for further methods' usage
     IWorker worker = IWorker(designatedWorker);
 
+    // Check for worker outage due to client-assigned pause
+    require(
+      enabledWorkers[designatedWorker],
+      "ClientContract: Target pool hasn't been enabled by the client"
+    );
+
     // Cast vault for further method's usage
     IVault vault = IVault(worker.operatingVault());
 
@@ -157,5 +166,26 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         abi.encode(worker.baseToken(), worker.token1(), worker.token0(), 0)
       )
     );
+  }
+
+  /// @dev Set client-side fee for given worker
+  /// @param worker target worker(pool) address
+  /// @param feeBps new fee denominator (0 < feeBps < 10000)
+  function setWorkerFee(address worker, uint256 feeBps) external onlyWhitelistedOperators {
+    require(0 <= feeBps && feeBps < 10000, "ClientContract: Invalid fee amount given");
+
+    IWorker(worker).setClientFee(feeBps);
+  }
+
+  /// @dev Enable or disabled given array of workers
+  /// @param workers array of workers' addresses to perform action on
+  /// @param isEnabled new worker status relative for client end users
+  function toggleWorkers(address[] calldata workers, bool isEnabled)
+    external
+    onlyWhitelistedOperators
+  {
+    for (uint256 i = 0; i < workers.length; i++) {
+      enabledWorkers[workers[i]] = isEnabled;
+    }
   }
 }
