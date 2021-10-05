@@ -16,6 +16,7 @@ import "../libs/pancake/interfaces/IPancakeMasterChef.sol";
 import "../utils/CustomMath.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IVault.sol";
+import "../ProtocolManager.sol";
 
 contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWorker {
   /// @notice Libraries
@@ -23,24 +24,15 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   using SafeMath for uint256;
 
   /// @notice Events
-  event Harvest(uint256 reward);
+  event Harvest(uint256 reward, address indexed operatingVault);
   event AddShare(uint256 indexed id, uint256 share);
   event RemoveShare(uint256 indexed id, uint256 share);
-  event SetTreasuryFee(address indexed caller, uint256 bountyBps);
-  event SetApprovedStrategy(
-    address indexed caller,
-    address indexed strategy,
-    bool indexed isApproved
-  );
-  event SetHarvestersOK(address indexed caller, address indexed harvestor, bool indexed isOk);
-  event SetMaxHarvestBountyBps(address indexed caller, uint256 indexed maxFeeBps);
-  event SetRewardToFeePath(address indexed caller, address[] newRewardPath);
   event SetHarvestConfig(address indexed caller, uint256 harvestThreshold, address[] harvestPath);
-  event SendFeeToBountyCollector(
-    address indexed clientAccount,
-    uint256 clientFee,
-    uint256 treasuryFee
-  );
+  event SetHarvestersOK(address indexed caller, address indexed harvestor, bool indexed isOk);
+  event SetTreasuryFee(address indexed caller, uint256 feeBps);
+  event SetClientFee(address indexed caller, uint256 feeBps);
+  event SetStrategies(address[] strategies, address indexed caller);
+  event Work(address indexed operatingVault, uint256 positionId, address strategy);
 
   /// @notice Configuration variables
   IPancakeFactory public factory;
@@ -54,6 +46,14 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   address public cake;
   address public operatingVault;
   uint256 public pid;
+  ProtocolManager protocolManager;
+  /// @notice Configuration variables for PancakeswapV2
+  uint256 public fee;
+  uint256 public feeDenom;
+
+  /// @notice Configuration variables for harvesting
+  uint256 public harvestThreshold;
+  address[] public harvestPath;
 
   /// @notice [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
   address[] private strategies;
@@ -61,20 +61,11 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @notice Mutable state variables
   mapping(uint256 => uint256) public shares;
-  uint256[] private positionIds;
   uint256 public totalShare;
+  uint256[] private positionIds;
   uint256 public override treasuryFeeBps;
   mapping(address => uint256) public clientFeesBps;
-  uint256 public maxFeeBps;
   mapping(address => bool) public okHarvesters;
-
-  /// @notice Configuration variables for PancakeswapV2
-  uint256 public fee;
-  uint256 public feeDenom;
-
-  /// @notice Upgraded State Variables for PancakeswapWorker
-  uint256 public harvestThreshold;
-  address[] public harvestPath;
 
   function initialize(
     address _operatingVault,
@@ -84,7 +75,8 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     uint256 _pid,
     address[] calldata _harvestPath,
     uint256 _harvestThreshold,
-    uint256 _treasuryFeeBps
+    uint256 _treasuryFeeBps,
+    ProtocolManager _protocolManager
   ) external initializer {
     // 1. Initialized imported library
     OwnableUpgradeSafe.__Ownable_init();
@@ -96,6 +88,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     masterChef = _masterChef;
     router = _router;
     factory = IPancakeFactory(_router.factory());
+    protocolManager = _protocolManager;
 
     // 3. Assign tokens state variables
     baseToken = _baseToken;
@@ -110,7 +103,6 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     treasuryFeeBps = _treasuryFeeBps;
     harvestThreshold = _harvestThreshold;
     harvestPath = _harvestPath;
-    maxFeeBps = 1000;
 
     // 6. Set PancakeswapV2 swap fees
     fee = 9975;
@@ -119,37 +111,35 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     // 7. Check if critical parameters are config properly
     require(
       baseToken != cake,
-      "PancakeswapWorker::initialize:: base token cannot be a reward token"
-    );
-    require(
-      treasuryFeeBps <= maxFeeBps,
-      "PancakeswapWorker::initialize:: treasuryFeeBps exceeded maxFeeBps"
+      "PancakeswapWorker->initialize: base token cannot be a reward token"
     );
     require(
       _harvestPath.length >= 2,
-      "PancakeswapWorker::setHarvestConfig:: _harvestPath length must >= 2"
+      "PancakeswapWorker->setHarvestConfig: _harvestPath length must >= 2"
     );
     require(
       _harvestPath[0] == cake && _harvestPath[_harvestPath.length - 1] == baseToken,
-      "PancakeswapWorker::setHarvestConfig:: _harvestPath must start with CAKE, end with baseToken"
+      "PancakeswapWorker->setHarvestConfig: _harvestPath must start with CAKE, end with baseToken"
     );
-  }
-
-  /// @dev Require that the caller must be an EOA account to avoid flash loans.
-  modifier onlyEOA() {
-    require(msg.sender == tx.origin, "PancakeswapWorker::onlyEOA:: not eoa");
-    _;
   }
 
   /// @dev Require that the caller must be the operatingVault.
   modifier onlyOperator() {
-    require(msg.sender == operatingVault, "PancakeswapWorker::onlyOperator:: not operatingVault");
+    require(msg.sender == operatingVault, "PancakeswapWorker->onlyOperator: not operatingVault");
     _;
   }
 
   //// @dev Require that the caller must be ok harvester.
   modifier onlyHarvester() {
-    require(okHarvesters[msg.sender], "PancakeswapWorker::onlyHarvester:: not harvester");
+    require(okHarvesters[msg.sender], "PancakeswapWorker->onlyHarvester: not harvester");
+    _;
+  }
+
+  modifier onlyClientContract() {
+    require(
+      protocolManager.isApprovedClientContract(msg.sender),
+      "PancakeswapWorker->onlyClientContract: not client contract"
+    );
     _;
   }
 
@@ -170,7 +160,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   }
 
   /// @dev Harvest reward tokens, swap them on base token and send to the Vault.
-  function harvestRewards() external override onlyEOA onlyHarvester nonReentrant {
+  function harvestRewards() external override onlyHarvester nonReentrant {
     // 1. Withdraw all the rewards. Return if reward <= _harvestThreshold.
     masterChef.withdraw(pid, 0);
     uint256 reward = cake.balanceOf(address(this));
@@ -200,29 +190,36 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     // 7. Reset approval
     cake.safeApprove(address(router), 0);
 
-    emit Harvest(reward);
+    emit Harvest(reward, operatingVault);
   }
 
   /// @dev Work on the given position. Must be called by the operatingVault.
-  /// @param id The position ID to work on.
-  /// @param data The encoded data, consisting of strategy address and calldata.
-  function work(uint256 id, bytes calldata data) external override onlyOperator nonReentrant {
-    addPositionId(id);
+  /// @param positionId The position ID to work on.
+  /// @param data The encoded data, consisting of strategy address and strategy params.
+  function work(uint256 positionId, bytes calldata data)
+    external
+    override
+    onlyOperator
+    nonReentrant
+  {
+    addPositionId(positionId);
     // 1. Convert this position back to LP tokens.
-    _removeShare(id);
-    // 2. Perform the worker strategy; sending LP tokens + BaseToken; expecting LP tokens + BaseToken.
-    (address strat, bytes memory ext) = abi.decode(data, (address, bytes));
-    require(approvedStrategies[strat], "PancakeswapWorker::work:: unapproved work strategy");
+    _removeShare(positionId);
+    // 2. Transfer funds and perform the worker strategy.
+    (address strategy, bytes memory stratParams) = abi.decode(data, (address, bytes));
+    require(approvedStrategies[strategy], "PancakeswapWorker->work: unapproved work strategy");
     require(
-      lpToken.transfer(strat, lpToken.balanceOf(address(this))),
-      "PancakeswapWorker::work:: unable to transfer lp to strat"
+      lpToken.transfer(strategy, lpToken.balanceOf(address(this))),
+      "PancakeswapWorker->work: unable to transfer lp to strategy"
     );
-    baseToken.safeTransfer(strat, baseToken.myBalance());
-    IStrategy(strat).execute(ext);
+    baseToken.safeTransfer(strategy, baseToken.myBalance());
+    IStrategy(strategy).execute(stratParams);
     // 3. Add LP tokens back to the farming pool.
-    _addShare(id);
+    _addShare(positionId);
     // 4. Return any remaining BaseToken back to the operatingVault.
     baseToken.safeTransfer(msg.sender, baseToken.myBalance());
+
+    emit Work(operatingVault, positionId, strategy);
   }
 
   /// @dev Return the amount of BaseToken to receive if we are to liquidate the given position.
@@ -324,6 +321,8 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     for (uint256 i; i < strategies.length; i++) {
       approvedStrategies[strategies[i]] = true;
     }
+
+    emit SetStrategies(supportedStrategies, msg.sender);
   }
 
   /// @dev Get addresses of the supported strategies
@@ -358,34 +357,17 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   {
     require(
       _harvestPath.length >= 2,
-      "PancakeswapWorker::setHarvestConfig:: _harvestPath length must >= 2"
+      "PancakeswapWorker->setHarvestConfig: _harvestPath length must >= 2"
     );
     require(
       _harvestPath[0] == cake && _harvestPath[_harvestPath.length - 1] == baseToken,
-      "PancakeswapWorker::setHarvestConfig:: _harvestPath must start with CAKE, end with baseToken"
+      "PancakeswapWorker->setHarvestConfig: _harvestPath must start with CAKE, end with baseToken"
     );
 
     harvestThreshold = _harvestThreshold;
     harvestPath = _harvestPath;
 
     emit SetHarvestConfig(msg.sender, _harvestThreshold, _harvestPath);
-  }
-
-  /// @dev Set Max harvest reward for set upper limit harvest bounty.
-  /// @param _maxFeeBps - The max harvest bounty value to update.
-  function setMaxHarvestBountyBps(uint256 _maxFeeBps) external onlyOwner {
-    require(
-      _maxFeeBps >= treasuryFeeBps,
-      "PancakeswapWorker::setMaxHarvestBountyBps:: _maxFeeBps lower than treasuryFeeBps"
-    );
-    require(
-      _maxFeeBps <= 3000,
-      "PancakeswapWorker::setMaxHarvestBountyBps:: _maxFeeBps exceeded 30%"
-    );
-
-    maxFeeBps = _maxFeeBps;
-
-    emit SetMaxHarvestBountyBps(msg.sender, maxFeeBps);
   }
 
   /// @dev Set the given address's to be harvestor.
@@ -400,14 +382,12 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     }
   }
 
-  /// @dev Set treasury configurations.
+  /// @dev Set treasury fee.
   /// @param _treasuryFeeBps - The fee in BPS that will be charged
   function setTreasuryFee(uint256 _treasuryFeeBps) external onlyOwner {
-    require(
-      _treasuryFeeBps <= maxFeeBps,
-      "PancakeswapWorker::setTreasuryFee:: _treasuryFeeBps exceeded maxFeeBps"
-    );
     treasuryFeeBps = _treasuryFeeBps;
+
+    emit SetTreasuryFee(msg.sender, _treasuryFeeBps);
   }
 
   /// @dev Get fee in bps for given client
@@ -417,10 +397,11 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   }
 
   /// @dev Set fee in bps for specific client
-  /// @param clientAccount address of client account
   /// @param clientFeeBps The fee in BPS
-  function setClientFee(address clientAccount, uint256 clientFeeBps) external override {
-    clientFeesBps[clientAccount] = clientFeeBps;
+  function setClientFee(uint256 clientFeeBps) external override onlyClientContract {
+    clientFeesBps[msg.sender] = clientFeeBps;
+
+    emit SetClientFee(msg.sender, clientFeeBps);
   }
 
   /// @dev add new position id to the array with position ids

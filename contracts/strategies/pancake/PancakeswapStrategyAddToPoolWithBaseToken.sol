@@ -10,8 +10,6 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
-import "hardhat/console.sol";
-
 import "../../../contracts/libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
