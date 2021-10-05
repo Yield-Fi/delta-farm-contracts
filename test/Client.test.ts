@@ -1,52 +1,37 @@
 import "@openzeppelin/test-helpers";
 
-import { BigNumber, Signer, constants } from "ethers";
+import { BigNumber, Signer } from "ethers";
 import {
   CakeToken,
   BountyCollector,
-  MockContractContext__factory,
-  MockToken__factory,
   MockWBNB,
   PancakeFactory,
   PancakeMasterChef,
-  PancakeMasterChef__factory,
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
-  PancakeswapWorker__factory,
   SyrupBar,
   Vault,
   VaultConfig,
-  Vault__factory,
   WNativeRelayer,
   Client,
-  MockWBNB__factory,
-  Client__factory,
-  WorkerRouter,
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken,
   ProtocolManager,
 } from "../typechain";
-import { config, ethers, upgrades, waffle } from "hardhat";
-import { deployToken, deployTokens, deployWBNB } from "./helpers/deployToken";
+import { ethers, waffle } from "hardhat";
+import { deployToken, deployWBNB } from "./helpers/deployToken";
 
-import { MockContractContext } from "../typechain/MockContractContext";
 import { MockToken } from "../typechain/MockToken";
 import { PancakeswapStrategyLiquidate } from "../typechain/PancakeswapStrategyLiquidate";
-// import * as AssertHelpers from "./helpers/assert";
-// import * as TimeHelpers from "./helpers/time";
 import { PancakeswapWorker } from "../typechain/PancakeswapWorker";
 import { SwapHelper } from "./helpers/swap";
-import { Worker02Helper } from "./helpers/worker";
-import { assertAlmostEqual } from "./helpers/assert";
 import chai from "chai";
 import { deployPancakeStrategies } from "./helpers/deployStrategies";
 import { deployPancakeV2, deployProxyContract } from "./helpers";
 import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
-import { parseEther } from "ethers/lib/utils";
 import { solidity } from "ethereum-waffle";
-import { advanceBlock } from "./helpers/time";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -90,9 +75,6 @@ describe("Client contract", async () => {
 
   // Clients
   let exampleClient: Client;
-
-  // Worker Router
-  let workerRouter: WorkerRouter;
 
   // Protocol
   let vault: Vault;
@@ -296,20 +278,17 @@ describe("Client contract", async () => {
       },
     ]);
 
-    // Setup workers router that will provide pairs' mapping later on
-    workerRouter = (await deployProxyContract("WorkerRouter", [], deployer)) as WorkerRouter;
-
     // Whitelist deployer so we can add workers to the register
-    await workerRouter.whitelistOperators([deployerAddress], true);
+    await protocolManager.whitelistOperators([deployerAddress], true);
 
     // Add worker to the register
-    await workerRouter.addWorkerAutoDiscover(pancakeswapWorker01.address, false);
-    await workerRouter.addWorkerAutoDiscover(pancakeswapWorker02.address, false);
+    await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
+    await protocolManager["addWorker(address,bool)"](pancakeswapWorker02.address, false);
 
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["Binance", "Binance Client", workerRouter.address],
+      ["Binance", "Binance Client", protocolManager.address],
       deployer
     )) as Client;
 
