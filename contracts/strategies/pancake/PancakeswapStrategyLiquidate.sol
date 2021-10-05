@@ -35,53 +35,65 @@ contract PancakeswapStrategyLiquidate is
   }
 
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
-  /// @param data Extra calldata information passed along to this strategy.
+  /// @param data Encoded strategy params.
   function execute(bytes calldata data) external override nonReentrant {
-    // 1. Find out what farming token we are dealing with.
-    (address baseToken, address farmingToken, uint256 minBaseToken) = abi.decode(
+    // 1. Decode strategy params and find lp token.
+    (address baseToken, address token0, address token1, uint256 minBaseToken) = abi.decode(
       data,
-      (address, address, uint256)
+      (address, address, address, uint256)
     );
-    IPancakePair lpToken = IPancakePair(factory.getPair(farmingToken, baseToken));
+
+    IPancakePair lpToken = IPancakePair(factory.getPair(token0, token1));
     // 2. Approve router to do their stuffs
+
     require(
       lpToken.approve(address(router), uint256(-1)),
-      "PancakeswapV2StrategyLiquidate::execute:: unable to approve LP token"
+      "PancakeswapStrategyLiquidate->execute: unable to approve LP token"
     );
-    farmingToken.safeApprove(address(router), uint256(-1));
-    // 3. Remove all liquidity back to BaseToken and farming tokens.
+
+    // 3. Remove all liquidity back to token0 and token1.
     router.removeLiquidity(
-      baseToken,
-      farmingToken,
+      token0,
+      token1,
       lpToken.balanceOf(address(this)),
       0,
       0,
       address(this),
       block.timestamp
     );
-    // 4. Convert farming tokens to baseToken.
-    address[] memory path = new address[](2);
-    path[0] = farmingToken;
-    path[1] = baseToken;
-    router.swapExactTokensForTokens(
-      farmingToken.myBalance(),
-      0,
-      path,
-      address(this),
-      block.timestamp
-    );
+
+    // 4. Convert tokens to baseToken.
+    if (token0 != baseToken) {
+      _convertTokenToBaseToken(token0, baseToken);
+    }
+
+    if (token1 != baseToken) {
+      _convertTokenToBaseToken(token1, baseToken);
+    }
+
     // 5. Return all baseToken back to the original caller.
     uint256 balance = baseToken.myBalance();
     require(
       balance >= minBaseToken,
-      "PancakeswapV2StrategyLiquidate::execute:: insufficient baseToken received"
+      "PancakeswapStrategyLiquidate->execute: insufficient baseToken received"
     );
     SafeToken.safeTransfer(baseToken, msg.sender, balance);
     // 6. Reset approve for safety reason
     require(
       lpToken.approve(address(router), 0),
-      "PancakeswapV2StrategyLiquidate::execute:: unable to reset LP token approval"
+      "PancakeswapStrategyLiquidate->execute: unable to reset LP token approval"
     );
-    farmingToken.safeApprove(address(router), 0);
+  }
+
+  // Swap all tokens to base token using pancakeswap router
+  function _convertTokenToBaseToken(address token, address baseToken) internal {
+    token.safeApprove(address(router), uint256(-1));
+
+    address[] memory path = new address[](2);
+    path[0] = token;
+    path[1] = baseToken;
+    router.swapExactTokensForTokens(token.myBalance(), 0, path, address(this), block.timestamp);
+
+    token.safeApprove(address(router), 0);
   }
 }

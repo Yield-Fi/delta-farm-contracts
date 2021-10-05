@@ -198,6 +198,7 @@ describe("Client contract", async () => {
       [cake.address, mockWBNB.address, baseToken.address],
       0,
       REINVEST_BOUNTY_BPS,
+      ethers.constants.AddressZero,
       deployer
     );
 
@@ -210,6 +211,7 @@ describe("Client contract", async () => {
       [cake.address, mockWBNB.address, baseToken.address],
       0,
       REINVEST_BOUNTY_BPS,
+      ethers.constants.AddressZero,
       deployer
     );
 

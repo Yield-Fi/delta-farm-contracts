@@ -180,6 +180,7 @@ describe("PancakeswapWorker", () => {
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
+      ethers.constants.AddressZero,
     ])) as PancakeswapWorker;
 
     await WorkerBUSD_TOK0.deployed();
@@ -193,6 +194,7 @@ describe("PancakeswapWorker", () => {
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
+      ethers.constants.AddressZero,
     ])) as PancakeswapWorker;
 
     await WorkerTOK0_TOK1.deployed();
@@ -230,8 +232,14 @@ describe("PancakeswapWorker", () => {
         amount1desired: ethers.utils.parseEther("1000"),
       },
       {
+        token0: Token0,
+        token1: Token1,
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
+      },
+      {
         token0: BaseToken,
-        token1: Token0,
+        token1: Token1,
         amount0desired: ethers.utils.parseEther("1000"),
         amount1desired: ethers.utils.parseEther("1000"),
       },
@@ -345,8 +353,8 @@ describe("PancakeswapWorker", () => {
               [
                 LiquidateStrategy.address,
                 ethers.utils.defaultAbiCoder.encode(
-                  ["address", "address", "uint256"],
-                  [BaseToken.address, Token0.address, "0"]
+                  ["address", "address", "address", "uint256"],
+                  [BaseToken.address, BaseToken.address, Token0.address, "0"]
                 ),
               ]
             ),
@@ -374,7 +382,104 @@ describe("PancakeswapWorker", () => {
       expect(result).to.include(Token1.address.toLowerCase());
     });
 
-    it("TODO: should add, remove liquidity via strategies and harvest funds", () => true);
+    it("should add, remove liquidity via strategies and harvest funds", async () => {
+      const worker__deployer = PancakeswapWorker__factory.connect(
+        WorkerTOK0_TOK1.address,
+        deployer
+      );
+
+      await worker__deployer.setHarvestersOk([deployerAddress], true);
+      await worker__deployer.setStrategies([
+        AddToPoolWithBaseToken.address,
+        AddToPoolWithoutBaseToken.address,
+        LiquidateStrategy.address,
+      ]);
+
+      /// send 0.1 base token to the worker
+      await BaseToken__account1.transfer(WorkerTOK0_TOK1.address, parseEther("0.1"));
+
+      /// Initially the amount of tokens to receive from a given position should equal 0
+      expect((await WorkerTOK0_TOK1.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
+
+      /// add liquidity to the pool via add base token only strategy
+      await MockVaultToRegisterRewards.executeTransaction(
+        WorkerTOK0_TOK1.address,
+        0,
+        "work(uint256,bytes)",
+        ethers.utils.defaultAbiCoder.encode(
+          ["uint256", "bytes"],
+          [
+            1,
+            ethers.utils.defaultAbiCoder.encode(
+              ["address", "bytes"],
+              [
+                AddToPoolWithoutBaseToken.address,
+                ethers.utils.defaultAbiCoder.encode(
+                  ["address", "address", "address", "uint256"],
+                  [BaseToken.address, Token0.address, Token1.address, "0"]
+                ),
+              ]
+            ),
+          ]
+        )
+      );
+
+      /// expected ~ 0.1 Base Token (minus some trading fee) ~ 0.099 BASE TOKEN
+      assertAlmostEqual(
+        (await WorkerTOK0_TOK1.tokensToReceive(1)).toString(),
+        parseEther("0.099508212960711623").toString()
+      );
+
+      const latestBlock = await time.latestBlockNumber();
+
+      await time.advanceBlockTo(latestBlock.add(1).toNumber()); /// + 1 BLOCK
+
+      // Harvest rewards and send them to the operating vault in Base token
+      await worker__deployer.harvestRewards(); /// + 1 BLOCK
+
+      /*
+      There are two positions in pancakeMasterChef with the same alloc points, so 0.5 CAKE per block is generated for the given position.
+      2 BLOCK = 2 * 0.5 CAKE = 1 CAKE
+      1 CAKE ~ 10 BASE TOKEN (without trading fee)
+      10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
+      */
+      assertAlmostEqual(
+        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        parseEther("9.755679966928919588").toString()
+      );
+
+      /// Withdraw all funds from pool via LiquidateStrategy
+      await MockVaultToRegisterRewards.executeTransaction(
+        WorkerTOK0_TOK1.address,
+        0,
+        "work(uint256,bytes)",
+        ethers.utils.defaultAbiCoder.encode(
+          ["uint256", "bytes"],
+          [
+            1,
+            ethers.utils.defaultAbiCoder.encode(
+              ["address", "bytes"],
+              [
+                LiquidateStrategy.address,
+                ethers.utils.defaultAbiCoder.encode(
+                  ["address", "address", "address", "uint256"],
+                  [BaseToken.address, Token0.address, Token1.address, "0"]
+                ),
+              ]
+            ),
+          ]
+        )
+      );
+
+      /*
+      9.75 BASE TOKEN + 0.099 BASE TOKEN ~= 9.85 BASE TOKEN
+      */
+
+      assertAlmostEqual(
+        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        parseEther("9.855429985630498983").toString()
+      );
+    });
   });
 
   it("should give rewards out when you stake LP tokens", async () => {

@@ -145,14 +145,17 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     IVault vault = IVault(worker.operatingVault());
 
     // Enter the protocol using resolved worker strategy
-    /// @dev encoded: (address strategy, (address baseToken, address farmingToken, uint256 minLPAmount))
+    /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
     /// worker.getStrategies()[2] = Liquidate
     vault.work(
       pid,
       designatedWorker,
       0,
       recipient,
-      abi.encode(worker.getStrategies()[2], abi.encode(worker.token1(), worker.token0(), 0))
+      abi.encode(
+        worker.getStrategies()[2],
+        abi.encode(worker.baseToken(), worker.token1(), worker.token0(), 0)
+      )
     );
   }
 }

@@ -6,7 +6,7 @@ import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.so
 
 interface IWorker {
   /// @dev Work on a (potentially new) position. Optionally send token back to Vault.
-  function work(uint256 id, bytes calldata data) external;
+  function work(uint256 positionId, bytes calldata data) external;
 
   /// @dev Harvest reward tokens, swap them on base token and send to the Vault.
   function harvestRewards() external;
@@ -42,7 +42,7 @@ interface IWorker {
   function getClientFee(address clientAccount) external view returns (uint256);
 
   /// @dev Set fee in bps for specific client
-  function setClientFee(address clientAccount, uint256 clientFeeBps) external;
+  function setClientFee(uint256 clientFeeBps) external;
 
   /// @dev Get operating vault address.
   function operatingVault() external view returns (address);

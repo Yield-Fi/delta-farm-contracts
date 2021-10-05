@@ -18,6 +18,7 @@ export const deployPancakeWorker = async (
   reinvestPath: string[],
   reinvestThreshold: BigNumberish,
   treasuryFeeBps: BigNumberish,
+  protocolManager: string,
   deployer: Signer
 ): Promise<PancakeswapWorker> => {
   const PancakeswapWorker = (await ethers.getContractFactory(
@@ -33,6 +34,7 @@ export const deployPancakeWorker = async (
     reinvestPath,
     reinvestThreshold,
     treasuryFeeBps,
+    protocolManager,
   ])) as PancakeswapWorker;
 
   await pancakeswapWorker.deployed();

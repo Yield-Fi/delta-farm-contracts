@@ -170,17 +170,17 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     await expect(
       strat.execute(
         ethers.utils.defaultAbiCoder.encode(
-          ["address", "address", "uint256"],
-          [baseToken.address, farmingToken.address, ethers.utils.parseEther("2")]
+          ["address", "address", "address", "uint256"],
+          [baseToken.address, baseToken.address, farmingToken.address, ethers.utils.parseEther("2")]
         )
       )
-    ).to.be.revertedWith("insufficient baseToken received");
+    ).to.be.revertedWith("PancakeswapStrategyLiquidate->execute: insufficient baseToken received");
 
     // Bob uses liquidate strategy to turn all LPs back to BTOKEN with a same minimum value
     await strat.execute(
       ethers.utils.defaultAbiCoder.encode(
-        ["address", "address", "uint256"],
-        [baseToken.address, farmingToken.address, ethers.utils.parseEther("1")]
+        ["address", "address", "address", "uint256"],
+        [baseToken.address, baseToken.address, farmingToken.address, ethers.utils.parseEther("1")]
       )
     );
 
