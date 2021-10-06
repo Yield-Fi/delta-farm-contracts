@@ -9,11 +9,13 @@ const upgradeFunc: DeployFunction = async () => {
   const [deployer] = await ethers.getSigners();
   const config = getConfig();
 
-  logger("--> Deploying pancakeswap workers... <--");
-  config.vaults.forEach((vault) => {
-    logger(`- Workers for ${vault.name}`);
-    vault.workers.forEach(async (worker, index) => {
-      logger(`  ${index + 1}. Upgrading ${worker.name}...`);
+  logger("--> Upgrading implementation of pancakeswap workers... <--");
+
+  for (const vault of config.vaults) {
+    logger(`  -> Workers for ${vault.name}`);
+
+    for (const worker of vault.workers) {
+      logger(`  -> Upgrading ${worker.name}...`);
       const PancakeswapWorkerFactory = await ethers.getContractFactory(
         "PancakeswapWorker",
         deployer
@@ -27,8 +29,8 @@ const upgradeFunc: DeployFunction = async () => {
       await PancakeswapWorker.deployed();
 
       logger(`  New implementation of ${worker.name} deployed at ${PancakeswapWorker.address}`);
-    });
-  });
+    }
+  }
 };
 
 export default upgradeFunc;

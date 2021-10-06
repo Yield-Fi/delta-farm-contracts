@@ -5,24 +5,23 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { logger } from "../../utils/logger";
 
 const deployFunc: DeployFunction = async () => {
-  // The array of vaults' names to deploy. To deploy all vaults pass an empty array.
-  const vaultsToDeploy: VaultConfigType["name"][] = [];
+  // The array of vaults' names to deploy.
+  const vaultsToDeploy: VaultConfigType["name"][] = ["BUSD Vault"];
 
-  const vaultsFilter = (vault: VaultConfigType) =>
-    vaultsToDeploy.includes(vault.name) || vaultsToDeploy.length === 0;
+  const vaultsFilter = (vault: VaultConfigType) => vaultsToDeploy.includes(vault.name);
 
   const [deployer] = await ethers.getSigners();
   const config = getConfig();
 
   logger("---> Deploying vaults... <---");
   for (const vault of config.vaults.filter(vaultsFilter)) {
-    logger(`-> ${vault.name}`);
+    logger(`  -> ${vault.name}`);
     const VaultConfigFactory = await ethers.getContractFactory("VaultConfig", deployer);
 
     const VaultConfig = await upgrades.deployProxy(VaultConfigFactory, [
       config.tokens.WBNB,
-      config.WNativeRelayer,
-      config.bountyCollector,
+      config.wrappedNativeTokenRelayer,
+      config.treasuryAccount,
     ]);
 
     await VaultConfig.deployed();
@@ -34,8 +33,8 @@ const deployFunc: DeployFunction = async () => {
     const Vault = await upgrades.deployProxy(VaultFactory, [
       VaultConfig.address,
       vault.baseToken,
-      vault.tokenName,
-      vault.tokenSymbol,
+      config.protocolManager,
+      config.bountyCollector,
     ]);
 
     await Vault.deployed();

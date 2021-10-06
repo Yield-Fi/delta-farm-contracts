@@ -8,16 +8,21 @@ const deployFun: DeployFunction = async function () {
   const [deployer] = await ethers.getSigners();
   const config = getConfig();
 
-  logger("---> Deploying VNativeRelayer... <---");
+  logger("---> Deploying WrappedNativeTokenRelayer... <---");
 
-  const WNativeRelayerFactory = await ethers.getContractFactory("WNativeRelayer", deployer);
+  const WrappedNativeTokenRelayerFactory = await ethers.getContractFactory(
+    "WrappedNativeTokenRelayer",
+    deployer
+  );
 
-  const WNativeRelayer = await upgrades.deployProxy(WNativeRelayerFactory, [config.tokens.WBNB]);
+  const WrappedNativeTokenRelayer = await upgrades.deployProxy(WrappedNativeTokenRelayerFactory, [
+    config.tokens.WBNB,
+  ]);
 
-  await WNativeRelayer.deployed();
+  await WrappedNativeTokenRelayer.deployed();
 
-  logger(`- WNativeRelayer deployed at ${WNativeRelayer.address}`);
+  logger(`- WrappedNativeTokenRelayer deployed at ${WrappedNativeTokenRelayer.address}`);
 };
 
 export default deployFun;
-deployFun.tags = ["WNativeRelayer"];
+deployFun.tags = ["WrappedNativeTokenRelayer"];

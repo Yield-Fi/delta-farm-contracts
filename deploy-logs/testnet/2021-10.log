@@ -1,0 +1,21 @@
+2021-10-06 14:37:51 ||| ---> Deploying ProtocolManager... <---
+2021-10-06 14:38:36 ||| - ProtocolManager deployed at 0xad3FF8BAB14ADF7AddBbab533bdB7Ef27dA5BF36
+2021-10-06 14:42:41 ||| ---> Deploying bounty collector... <---
+2021-10-06 14:43:24 ||| - BountyCollector deployed at 0x47C2A9B88A3f22EA701478578F05980F4d91eb92
+2021-10-06 14:49:28 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2021-10-06 14:50:17 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0xb38bC11A4D22E914658e6Ea2F72369739f7A79A1
+2021-10-06 14:50:57 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0x08B0FBB3ce6C63bA048B54876C258310825e709C
+2021-10-06 14:51:44 ||| - LiquidateStrategy deployed at 0xc7104E49861209899D8f49C75fCB75B362c3Fc4A
+2021-10-06 14:59:10 ||| ---> Deploying VNativeRelayer... <---
+2021-10-06 14:59:58 ||| - WNativeRelayer deployed at 0x988052AFA52E4cEcbF50923Cdbc1EE7207663ccc
+2021-10-06 15:58:09 ||| ---> Deploying vaults... <---
+2021-10-06 15:58:09 ||| -> BUSD Vault
+2021-10-06 15:59:02 |||   - Vault Config deployed at 0xFc15C9b5FcdD460A9db22AD4Ae7b3838e18cc1E3
+2021-10-06 15:59:50 |||   - Vault deployed at 0xaefb2f96619a411Ce49a75E4537F7bF6A7c23520
+2021-10-06 16:05:15 ||| ---> Deploying pancakeswap workers... <---
+2021-10-06 16:05:15 ||| -> Deploying workers for BUSD Vault
+2021-10-06 16:05:15 |||   - Deploying BUSD-USDT PancakeswapWorker...
+2021-10-06 16:06:13 |||   - BUSD-USDT PancakeswapWorker deployed at 0x88406f07500c6fA5f6C0eacEf519618868E8D24a
+2021-10-06 17:06:31 ||| ---> Deploying Client contracts... <---
+2021-10-06 17:06:31 |||   -> Contract of Client A
+2021-10-06 17:07:29 |||   - Contract of Client A deployed at 0x352e669Cc1Cdae58dA56a40eb868C14079bAEc47

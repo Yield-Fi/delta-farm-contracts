@@ -1,15 +1,57 @@
-# Basic Sample Hardhat Project
+## Deploy steps:
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+NOTE: After each steps you should update the config file in the `configs` folder with new addresses
 
-Try running some of the following tasks:
+1. Deploy ProtocolManager:
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
-npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
+```bash
+   npm run deploy:[network]:protocolManager
 ```
+
+2. Deploy BountyCollector:
+
+```bash
+   npm run deploy:[network]:bountyCollector
+```
+
+3. Deploy WrappedNativeTokenRelayer
+
+```bash
+   npm run deploy:[network]:nativeRelayer
+```
+
+4. Deploy vaults:
+
+   4.1. Check configuration variables in the `deploy/vault/deploy/vault.ts` file
+
+   4.2. Run deploy:
+
+   ```bash
+   npm run deploy:[network]:vaults
+   ```
+
+5. Deploy workers:
+
+   5.1. Check configuration variables in the `deploy/workers/deploy/pancake.ts` file
+
+   5.2. Run deploy:
+
+   ```bash
+   npm run deploy:[network]:strategies:pancake
+   ```
+
+6. Deploy pancake strategies:
+
+```bash
+npm run deploy:[network]:workers:pancake
+```
+
+7. Deploy clients's contracts:
+
+   7.1. Check configuration variables in the `deploy/client/deploy/client.ts` file
+
+   7.2. Run deploy:
+
+   ```bash
+   npm run deploy:[network]:clients
+   ```

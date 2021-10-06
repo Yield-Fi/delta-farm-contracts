@@ -13,7 +13,6 @@ import {
   SyrupBar,
   Vault,
   VaultConfig,
-  WNativeRelayer,
   MockToken,
   PancakeswapWorker,
   ProtocolManager,
@@ -25,6 +24,7 @@ import { deployPancakeV2, deployProxyContract } from "./helpers";
 import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
+import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -60,7 +60,7 @@ describe("ProtocolManager", async () => {
   // Protocol
   let vault: Vault;
   let vaultConfig: VaultConfig;
-  let wNativeRelayer: WNativeRelayer;
+  let wNativeRelayer: WrappedNativeTokenRelayer;
 
   // Connected entities (signer to target entity)
   let protocolManager: ProtocolManager;
@@ -103,12 +103,19 @@ describe("ProtocolManager", async () => {
       deployer
     )) as BountyCollector;
 
+    protocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [],
+      deployer
+    )) as ProtocolManager;
+
     // Treasury acc = yieldFi protocol owner
     [vault, vaultConfig, wNativeRelayer] = await deployVault(
       mockWBNB,
+      baseToken,
+      protocolManager.address,
       bountyCollector.address,
       deployerAddress,
-      baseToken,
       deployer
     );
 
@@ -121,12 +128,6 @@ describe("ProtocolManager", async () => {
     );
 
     await masterChef.add(1, lp.address, true);
-
-    protocolManager = (await deployProxyContract(
-      "ProtocolManager",
-      [],
-      deployer
-    )) as ProtocolManager;
 
     /// Setup PancakeswapWorker
     pancakeswapWorker01 = await deployPancakeWorker(

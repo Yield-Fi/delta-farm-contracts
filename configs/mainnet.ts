@@ -46,8 +46,9 @@ const tokens = {
 };
 
 export const mainnetConfig = {
-  WNativeRelayer: "",
+  wrappedNativeTokenRelayer: "",
   bountyCollector: "",
+  treasuryAccount: "",
   protocolManager: "",
   bountyThreshold: 500,
   defaultTreasuryFeeBps: 1000,
@@ -399,8 +400,16 @@ export const mainnetConfig = {
           positionId: "",
           token0: tokens.BUSD,
           token1: tokens.USDT,
+          defaultHarvestThresshold: "1",
         },
       ],
+    },
+  ],
+  clients: [
+    {
+      address: "",
+      kind: "",
+      name: "",
     },
   ],
 };

@@ -1,5 +1,3 @@
-// SPDX-License-Identifier: UNLICENSED
-
 pragma solidity 0.6.6;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
@@ -9,26 +7,30 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IWBNB.sol";
-import "./interfaces/IWNativeRelayer.sol";
+import "./interfaces/IWrappedNativeTokenRelayer.sol";
 
-contract WNativeRelayer is
+contract WrappedNativeTokenRelayer is
   Initializable,
   OwnableUpgradeSafe,
   ReentrancyGuardUpgradeSafe,
-  IWNativeRelayer
+  IWrappedNativeTokenRelayer
 {
   address wnative;
 
+  /// @dev Function to initialize smart contract
+  /// @param _wnative Address of wrapped native token
   function initialize(address _wnative) external initializer {
     __Ownable_init();
     __ReentrancyGuard_init();
     wnative = _wnative;
   }
 
+  /// @dev Convert wrapped native token and withdraw native token
+  /// @param _amount Amount of native token to withdraw
   function withdraw(uint256 _amount) external override nonReentrant {
     IWBNB(wnative).withdraw(_amount);
     (bool success, ) = msg.sender.call{ value: _amount }("");
-    require(success, "WNativeRelayer::onlyWhitelistedCaller:: can't withdraw");
+    require(success, "WrappedNativeTokenRelayer->withdraw: can't withdraw");
   }
 
   receive() external payable {}
