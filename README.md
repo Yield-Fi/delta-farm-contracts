@@ -45,3 +45,13 @@ NOTE: After each steps you should update the config file in the `configs` folder
 ```bash
 npm run deploy:[network]:workers:pancake
 ```
+
+7. Deploy clients's contracts:
+
+   7.1. Check configuration variables in the `deploy/client/deploy/client.ts` file
+
+   7.2. Run deploy:
+
+   ```bash
+   npm run deploy:[network]:clients
+   ```

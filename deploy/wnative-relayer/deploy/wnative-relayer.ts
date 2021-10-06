@@ -8,7 +8,7 @@ const deployFun: DeployFunction = async function () {
   const [deployer] = await ethers.getSigners();
   const config = getConfig();
 
-  logger("---> Deploying VNativeRelayer... <---");
+  logger("---> Deploying WrappedNativeTokenRelayer... <---");
 
   const WrappedNativeTokenRelayerFactory = await ethers.getContractFactory(
     "WrappedNativeTokenRelayer",

@@ -405,4 +405,11 @@ export const mainnetConfig = {
       ],
     },
   ],
+  clients: [
+    {
+      address: "",
+      kind: "",
+      name: "",
+    },
+  ],
 };

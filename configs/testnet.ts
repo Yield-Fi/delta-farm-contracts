@@ -407,4 +407,11 @@ export const testnetConfig: ProjectConfigType = {
       ],
     },
   ],
+  clients: [
+    {
+      address: "0x352e669Cc1Cdae58dA56a40eb868C14079bAEc47",
+      kind: "kind",
+      name: "Client A",
+    },
+  ],
 };

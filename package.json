@@ -38,7 +38,11 @@
     "deploy:testnet:workers:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapWorkers",
     "upgrade:testnet:workers:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapWorkersUpgrade",
     "deploy:mainnet:workers:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapWorkers",
-    "upgrade:mainnet:workers:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapWorkersUpgrade"
+    "upgrade:mainnet:workers:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapWorkersUpgrade",
+    "deploy:testnet:clients": "hardhat --network testnet deploy --reset --tags Client",
+    "upgrade:testnet:clients": "hardhat --network testnet deploy --reset --tags ClientUpgrade",
+    "deploy:mainnet:clients": "hardhat --network mainnet deploy --reset --tags Client",
+    "upgrade:mainnet:clients": "hardhat --network mainnet deploy --reset --tags ClientUpgrade"
   },
   "repository": {
     "type": "git",

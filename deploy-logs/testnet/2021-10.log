@@ -16,3 +16,6 @@
 2021-10-06 16:05:15 ||| -> Deploying workers for BUSD Vault
 2021-10-06 16:05:15 |||   - Deploying BUSD-USDT PancakeswapWorker...
 2021-10-06 16:06:13 |||   - BUSD-USDT PancakeswapWorker deployed at 0x88406f07500c6fA5f6C0eacEf519618868E8D24a
+2021-10-06 17:06:31 ||| ---> Deploying Client contracts... <---
+2021-10-06 17:06:31 |||   -> Contract of Client A
+2021-10-06 17:07:29 |||   - Contract of Client A deployed at 0x352e669Cc1Cdae58dA56a40eb868C14079bAEc47

@@ -9,3 +9,7 @@ export type VaultConfigType = typeof vault;
 const worker = vault.workers[0];
 
 export type WorkerConfigType = typeof worker;
+
+const client = mainnetConfig.clients[0];
+
+export type ClientConfigType = typeof client;
