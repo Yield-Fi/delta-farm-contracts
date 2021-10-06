@@ -27,6 +27,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @notice Events
   event Work(uint256 indexed id, uint256 loan);
   event RewardCollect(address indexed caller, address indexed rewardOwner, uint256 indexed reward);
+  event RewardsRegister(address indexed caller, uint256[] indexed pids, uint256[] indexed amounts);
 
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;
@@ -210,53 +211,74 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     require(length == amounts.length, "Vault: invalid input data");
 
     for (uint256 i = 0; i < length; i++) {
-      rewards[pids[i]] = rewards[pids[i]].add(amounts[i]);
+      uint256 pid = pids[i];
+      uint256 baseReward = amounts[i];
+
+      Position memory position = positions[pid];
+
+      IWorker worker = IWorker(position.worker);
+
+      uint256 yieldFiBps = worker.treasuryFeeBps();
+      uint256 clientBps = worker.getClientFee(position.client);
+
+      // Fee amounts
+      uint256 yieldFiFee = baseReward.mul(yieldFiBps).div(10000);
+      uint256 clientFee = baseReward.mul(clientBps).div(10000);
+      uint256 feeSum = yieldFiFee.add(clientFee);
+
+      // Part of reward that user will receive
+      uint256 userReward = baseReward.sub(feeSum);
+
+      // Static array to dynamic array cast
+      uint256[] memory fees = new uint256[](2);
+      address[] memory addresses = new address[](2);
+
+      fees[0] = yieldFiFee;
+      fees[1] = clientFee;
+
+      addresses[0] = config.treasuryAccount();
+      addresses[1] = positions[pid].client;
+
+      // Transfer assets to bounty collector and register the amounts
+      bountyCollector.registerBounties(addresses, fees);
+      token.safeTransfer(address(bountyCollector), feeSum);
+
+      // Assign final reward to the user
+      rewards[pid] = rewards[pid].add(userReward);
     }
+
+    emit RewardsRegister(msg.sender, pids, amounts);
   }
 
+  /// @dev Collect accumulated rewards
+  /// @param pid Position ID
   function collectReward(uint256 pid) external override {
     Position memory position = positions[pid];
 
-    IWorker worker = IWorker(position.worker);
-
-    uint256 yieldFiBps = worker.treasuryFeeBps();
-    uint256 clientBps = worker.getClientFee(position.client);
-
-    // Gas savings
-    uint256 baseReward = rewards[pid];
+    uint256 reward = rewards[pid];
 
     require(
-      (baseReward * 10000) / 10000 == baseReward,
-      "Vault: Too little amout to collect (precision loss)"
+      (reward * 10000) / 10000 == reward,
+      "Vault: Too little amount to collect (precision loss)"
     );
-
-    // Fee amounts
-    uint256 yieldFiFee = baseReward.mul(yieldFiBps).div(10000);
-    uint256 clientFee = baseReward.mul(clientBps).div(10000);
-    uint256 feeSum = yieldFiFee.add(clientFee);
-
-    // Part of reward that user will receive
-    uint256 userReward = baseReward.sub(feeSum);
-
-    // Static array to dynamic array cast
-    uint256[] memory fees = new uint256[](2);
-    address[] memory addresses = new address[](2);
-
-    fees[0] = yieldFiFee;
-    fees[1] = clientFee;
-
-    addresses[0] = config.treasuryAccount();
-    addresses[1] = positions[pid].client;
-
-    // Transfer assets to bounty collector and register the amounts
-    bountyCollector.registerBounties(addresses, fees);
-    token.safeTransfer(address(bountyCollector), feeSum);
-
     // Finally transfer assets to the end user
-    token.safeTransfer(position.owner, userReward);
+    token.safeTransfer(position.owner, reward);
 
     // Emit
-    emit RewardCollect(msg.sender, position.owner, userReward);
+    emit RewardCollect(msg.sender, position.owner, reward);
+  }
+
+  /// @dev Contract health component
+  /// @notice Check if contract is able to payout all the rewards on demand
+  /// @return bool - true if amount of operating token is greater than or equal to total rewards value, false if not
+  function checkRewardsToBalanceStability() external view returns (bool) {
+    uint256 acc = 0;
+
+    for (uint256 i = 1; i < nextPositionID - 1; i++) {
+      acc += rewards[i];
+    }
+
+    return acc >= token.balanceOf(address(this));
   }
 
   /// @dev Fallback function to accept BNB.
