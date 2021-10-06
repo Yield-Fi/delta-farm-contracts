@@ -25,6 +25,7 @@ const deployFun: DeployFunction = async function () {
       client.kind,
       client.name,
       config.protocolManager,
+      client.operators,
     ]);
 
     await Client.deployed();

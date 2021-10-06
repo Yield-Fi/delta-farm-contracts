@@ -410,6 +410,7 @@ export const mainnetConfig = {
       address: "",
       kind: "",
       name: "",
+      operators: [""],
     },
   ],
 };
