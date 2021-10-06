@@ -64,7 +64,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   }
 
   /// @dev Whitelist methods - operators
-  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
+  function _whitelistOperators(address[] memory operators, bool isOk) internal {
     for (uint256 i = 0; i < operators.length; i++) {
       whitelistedOperators[operators[i]] = isOk;
     }
@@ -72,17 +72,25 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit WhitelistOperators(msg.sender, operators, isOk);
   }
 
+  /// @dev External interface for function above
+  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
+    _whitelistOperators(operators, isOk);
+  }
+
   function initialize(
-    string memory kind,
-    string memory clientName,
-    address protocolManager
-  ) public initializer {
+    string calldata kind,
+    string calldata clientName,
+    address protocolManager,
+    address[] calldata initialOperators
+  ) external initializer {
     _KIND_ = kind;
     _CLIENT_NAME_ = clientName;
 
     _protocolManager = IProtocolManager(protocolManager);
 
     __Ownable_init();
+
+    _whitelistOperators(initialOperators, true);
   }
 
   /// @notice Deposit function for client's end user. a.k.a protocol entry point
