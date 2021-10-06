@@ -15,16 +15,11 @@ import "./interfaces/IBountyCollector.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWBNB.sol";
-import "./interfaces/IWNativeRelayer.sol";
+import "./interfaces/IWrappedNativeTokenRelayer.sol";
+import "./interfaces/IProtocolManager.sol";
 import "./utils/SafeToken.sol";
 
-contract Vault is
-  IVault,
-  Initializable,
-  OwnableUpgradeSafe,
-  ERC20UpgradeSafe,
-  ReentrancyGuardUpgradeSafe
-{
+contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe {
   /// @notice Libraries
   using SafeToken for address;
   using SafeMath for uint256;
@@ -61,6 +56,8 @@ contract Vault is
   /// Reward-related stuff
   IBountyCollector public bountyCollector;
 
+  IProtocolManager public protocolManager;
+
   /// @dev Position ID => Native Token Amount
   mapping(uint256 => uint256) public rewards;
   mapping(address => bool) public okRewardAssigners;
@@ -70,20 +67,17 @@ contract Vault is
     _;
   }
 
-  /// @dev Require that the caller must be an EOA account if not whitelisted.
-  modifier onlyEOAorWhitelisted() {
-    if (!config.whitelistedCallers(msg.sender)) {
-      require(msg.sender == tx.origin, "Vault: Not EOA");
-    }
+  modifier onlyClientContract() {
+    require(protocolManager.approvedClients(msg.sender), "Vault: not client contract");
     _;
   }
 
   /// @dev Get token from msg.sender
   modifier transferTokenToVault(uint256 value) {
     if (msg.value != 0) {
-      require(token == config.wNativeRelayer(), "baseToken is not wNative");
+      require(token == config.wrappedNativeToken(), "baseToken is not wNative");
       require(value == msg.value, "value != msg.value");
-      IWBNB(config.nativeTokenAddr()).deposit{ value: msg.value }();
+      IWBNB(config.wrappedNativeToken()).deposit{ value: msg.value }();
     } else {
       SafeToken.safeTransferFrom(token, msg.sender, address(this), value);
     }
@@ -103,19 +97,17 @@ contract Vault is
   function initialize(
     IVaultConfig _config,
     address _token,
-    IBountyCollector _bountyCollector,
-    string calldata _name,
-    string calldata _symbol
+    IProtocolManager _protocolManager,
+    IBountyCollector _bountyCollector
   ) external initializer {
     __Ownable_init();
     __ReentrancyGuard_init();
-    __ERC20_init(_name, _symbol);
 
     nextPositionID = 1;
     config = _config;
     token = _token;
-
     bountyCollector = _bountyCollector;
+    protocolManager = _protocolManager;
 
     // free-up execution scope
     _IN_EXEC_LOCK = _NOT_ENTERED;
@@ -127,6 +119,7 @@ contract Vault is
   /// @param id The position ID to query.
   function positionInfo(uint256 id) external view returns (uint256) {
     Position storage pos = positions[id];
+    // TODO: Uwzględnić również zarobione rewardsy - fee
     return (IWorker(pos.worker).tokensToReceive(id));
   }
 
@@ -144,9 +137,9 @@ contract Vault is
   /// @param to The address of the receiver
   /// @param amount The amount to be withdrawn
   function _safeUnwrap(address to, uint256 amount) internal {
-    if (token == config.nativeTokenAddr()) {
-      SafeToken.safeTransfer(token, config.wNativeRelayer(), amount);
-      IWNativeRelayer(config.wNativeRelayer()).withdraw(amount);
+    if (token == config.wrappedNativeToken()) {
+      SafeToken.safeTransfer(token, config.wrappedNativeTokenRelayer(), amount);
+      IWrappedNativeTokenRelayer(config.wrappedNativeTokenRelayer()).withdraw(amount);
       SafeToken.safeTransferETH(to, amount);
     } else {
       SafeToken.safeTransfer(token, to, amount);
@@ -164,7 +157,7 @@ contract Vault is
     uint256 amount,
     address endUser,
     bytes calldata data
-  ) external payable override onlyEOAorWhitelisted transferTokenToVault(amount) nonReentrant {
+  ) external payable override onlyClientContract transferTokenToVault(amount) nonReentrant {
     // 1. Sanity check the input position, or add a new position of ID is 0.
     Position storage pos;
     if (id == 0) {
@@ -184,9 +177,9 @@ contract Vault is
     // Update execution scope variables
     POSITION_ID = id;
     (STRATEGY, ) = abi.decode(data, (address, bytes));
-    require(config.isWorker(worker), "not a worker");
 
     require(amount <= SafeToken.myBalance(token), "insufficient funds in the vault");
+
     SafeToken.safeTransfer(token, worker, amount);
     IWorker(worker).work(id, data);
     // 5. Release execution scope
@@ -252,7 +245,7 @@ contract Vault is
     fees[0] = yieldFiFee;
     fees[1] = clientFee;
 
-    addresses[0] = config.getTreasuryAddr();
+    addresses[0] = config.treasuryAccount();
     addresses[1] = positions[pid].client;
 
     // Transfer assets to bounty collector and register the amounts

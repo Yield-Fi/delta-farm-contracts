@@ -5,24 +5,25 @@ import {
   VaultConfig,
   VaultConfig__factory,
   Vault__factory,
-  WNativeRelayer,
-  WNativeRelayer__factory,
 } from "../../typechain";
 import { ethers, upgrades } from "hardhat";
 
 import { Signer } from "@ethersproject/abstract-signer";
+import { WrappedNativeTokenRelayer } from "../../typechain/WrappedNativeTokenRelayer";
+import { WrappedNativeTokenRelayer__factory } from "../../typechain/factories/WrappedNativeTokenRelayer__factory";
 
 export const deployVault = async (
   mockBNB: MockWBNB,
-  treasuryAccountAddress: string,
-  bountyCollectorAddress: string,
   baseToken: MockToken,
+  protocolManagerAddress: string,
+  bountyCollectorAddress: string,
+  treasuryAccountAddress: string,
   deployer: Signer
-): Promise<[Vault, VaultConfig, WNativeRelayer]> => {
+): Promise<[Vault, VaultConfig, WrappedNativeTokenRelayer]> => {
   const WNativeRelayer = (await ethers.getContractFactory(
-    "WNativeRelayer",
+    "WrappedNativeTokenRelayer",
     deployer
-  )) as WNativeRelayer__factory;
+  )) as WrappedNativeTokenRelayer__factory;
   const wNativeRelayer = await upgrades.deployProxy(WNativeRelayer, [mockBNB.address]);
   await wNativeRelayer.deployed();
 
@@ -38,18 +39,14 @@ export const deployVault = async (
   await vaultConfig.deployed();
 
   const Vault = (await ethers.getContractFactory("Vault", deployer)) as Vault__factory;
-  const baseTokenSymbol = await baseToken.symbol();
+
   const vault = (await upgrades.deployProxy(Vault, [
     vaultConfig.address,
     baseToken.address,
+    protocolManagerAddress,
     bountyCollectorAddress,
-    `Deficentral ${baseTokenSymbol}}`,
-    `defin${baseTokenSymbol}`,
   ])) as Vault;
   await vault.deployed();
 
-  // TODO: Contract restrictions
-  // await wNativeRelayer.setCallerOk([vault.address], true);
-
-  return [vault, vaultConfig, wNativeRelayer as WNativeRelayer];
+  return [vault, vaultConfig, wNativeRelayer as WrappedNativeTokenRelayer];
 };

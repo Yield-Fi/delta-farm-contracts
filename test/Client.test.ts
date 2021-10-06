@@ -13,7 +13,6 @@ import {
   SyrupBar,
   Vault,
   VaultConfig,
-  WNativeRelayer,
   Client,
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken,
@@ -32,6 +31,7 @@ import { deployPancakeV2, deployProxyContract } from "./helpers";
 import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
+import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -79,7 +79,7 @@ describe("Client contract", async () => {
   // Protocol
   let vault: Vault;
   let vaultConfig: VaultConfig;
-  let wNativeRelayer: WNativeRelayer;
+  let wNativeRelayer: WrappedNativeTokenRelayer;
 
   // Strats
   let addStrat: PancakeswapStrategyAddToPoolWithBaseToken;
@@ -145,12 +145,20 @@ describe("Client contract", async () => {
       deployer
     )) as BountyCollector;
 
+    // Setup general protocol manager
+    protocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [],
+      deployer
+    )) as ProtocolManager;
+
     // Treasury acc = yieldFi protocol owner
     [vault, vaultConfig, wNativeRelayer] = await deployVault(
       mockWBNB,
+      baseToken,
+      protocolManager.address,
       bountyCollector.address,
       yieldFiAddress,
-      baseToken,
       deployer
     );
 
@@ -173,13 +181,6 @@ describe("Client contract", async () => {
 
     await masterChef.add(1, lp.address, true);
     await masterChef.add(2, lpExt.address, true);
-
-    // Setup general protocol manager
-    protocolManager = (await deployProxyContract(
-      "ProtocolManager",
-      [],
-      deployer
-    )) as ProtocolManager;
 
     /// Setup PancakeswapWorker
     pancakeswapWorker01 = await deployPancakeWorker(
@@ -218,12 +219,6 @@ describe("Client contract", async () => {
       addStratNoBase.address,
       liqStrat.address,
     ]);
-
-    // Whitelist workers
-    await vaultConfig.setWorkers(
-      [pancakeswapWorker01.address, pancakeswapWorker02.address], // Workers
-      [pancakeswapWorker01.address, pancakeswapWorker02.address] // Config (same pointers)
-    );
 
     swapHelper = new SwapHelper(
       factory.address,
@@ -291,9 +286,6 @@ describe("Client contract", async () => {
       ["Binance", "Binance Client", protocolManager.address],
       deployer
     )) as Client;
-
-    // Whitelist clients within vault config
-    await vaultConfig.setWhitelistedCallers([exampleClient.address], true);
 
     // Whitelist deployer as client contract operator
     await exampleClient.whitelistOperators([deployerAddress], true);

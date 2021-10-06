@@ -4,10 +4,11 @@ import { ethers, upgrades } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { PancakeswapWorker } from "../../../typechain";
 import { logger } from "../../utils/logger";
+import { parseEther } from "@ethersproject/units";
 
 const deployFunc: DeployFunction = async () => {
-  // The array of workers' names to deploy. To deploy all workers pass an empty array.
-  const workersToDeploy: Array<WorkerConfigType["name"]> = [];
+  // The array of workers' names to deploy.
+  const workersToDeploy: Array<WorkerConfigType["name"]> = ["BUSD-USDT PancakeswapWorker"];
 
   const [deployer] = await ethers.getSigners();
   const config = getConfig();
@@ -34,8 +35,9 @@ const deployFunc: DeployFunction = async () => {
         config.dex.pancakeswap.RouterV2,
         worker.positionId,
         [config.tokens.CAKE, config.baseToken],
-        config.defaultReinvestThreshold,
+        parseEther(worker.defaultHarvestThresshold),
         config.defaultTreasuryFeeBps,
+        config.protocolManager,
       ])) as PancakeswapWorker;
 
       await PancakeswapWorker.deployed();

@@ -48,9 +48,10 @@ const tokens = {
 };
 
 export const testnetConfig: ProjectConfigType = {
-  WNativeRelayer: "0x49D5cCd9f978712b53d3F7f1B54bEb5F0C60fF7D",
-  bountyCollector: "0x4051E70f3Fe8969eA7BeCAA58bADf655742659a3",
-  protocolManager: "",
+  wrappedNativeTokenRelayer: "0x988052AFA52E4cEcbF50923Cdbc1EE7207663ccc",
+  bountyCollector: "0x47C2A9B88A3f22EA701478578F05980F4d91eb92",
+  protocolManager: "0xad3FF8BAB14ADF7AddBbab533bdB7Ef27dA5BF36",
+  treasuryAccount: "0x94FC2d635D65e6f657b7617843915a41c87B7852",
   baseToken: tokens.BUSD,
   bountyThreshold: 500,
   defaultTreasuryFeeBps: 1000,
@@ -381,26 +382,27 @@ export const testnetConfig: ProjectConfigType = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "0x73d6950d37Cf17f6d38da5291FC2783EE7d2431b",
-      AddToPoolWithoutBaseToken: "",
-      Liquidate: "0x85ff4165f2ce8dbB342461279277B3acD71BE713",
+      AddToPoolWithBaseToken: "0xb38bC11A4D22E914658e6Ea2F72369739f7A79A1",
+      AddToPoolWithoutBaseToken: "0x08B0FBB3ce6C63bA048B54876C258310825e709C",
+      Liquidate: "0xc7104E49861209899D8f49C75fCB75B362c3Fc4A",
     },
   },
   vaults: [
     {
       name: "BUSD Vault",
-      address: "0x990AcD6aA0A36afCCD55acCCC1273cE80c8e3253",
+      address: "0xaefb2f96619a411Ce49a75E4537F7bF6A7c23520",
       tokenName: "deficental BUSD",
       tokenSymbol: "defiBUSD",
       baseToken: tokens.BUSD,
-      config: "0x44F7018deE64221FA9D8a06B8024e6319c1e94FB",
+      config: "0xFc15C9b5FcdD460A9db22AD4Ae7b3838e18cc1E3",
       workers: [
         {
           name: "BUSD-USDT PancakeswapWorker",
-          address: "0x023ba0C241B4BA5a8aDCAb3614C6b28666038085",
+          address: "0x88406f07500c6fA5f6C0eacEf519618868E8D24a",
           positionId: "24",
           token0: tokens.BUSD,
           token1: tokens.USDT,
+          defaultHarvestThresshold: "1",
         },
       ],
     },
