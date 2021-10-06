@@ -18,6 +18,13 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   using SafeMath for uint256;
   using SafeToken for address;
 
+  /// @dev Events
+  event WhitelistOperators(address indexed caller, address[] indexed operators, bool indexed isOk);
+  event WhitelistCallers(address indexed caller, address[] indexed callers, bool indexed isOk);
+  event Deposit(address indexed recipient, address indexed worker, uint256 indexed amount);
+  event SetWorkerFee(address indexed caller, address indexed worker, uint256 indexed feeBps);
+  event ToggleWorkers(address indexed caller, address[] indexed workers, bool indexed isEnabled);
+
   /// @dev Enabled farms
   mapping(address => bool) enabledWorkers;
 
@@ -52,61 +59,62 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     for (uint256 i = 0; i < callers.length; i++) {
       whitelistedCallers[callers[i]] = isOk;
     }
+
+    emit WhitelistCallers(msg.sender, callers, isOk);
   }
 
   /// @dev Whitelist methods - operators
-  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
+  function _whitelistOperators(address[] memory operators, bool isOk) internal {
     for (uint256 i = 0; i < operators.length; i++) {
       whitelistedOperators[operators[i]] = isOk;
     }
+
+    emit WhitelistOperators(msg.sender, operators, isOk);
+  }
+
+  /// @dev External interface for function above
+  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
+    _whitelistOperators(operators, isOk);
   }
 
   function initialize(
-    string memory kind,
-    string memory clientName,
-    address protocolManager
-  ) public initializer {
+    string calldata kind,
+    string calldata clientName,
+    address protocolManager,
+    address[] calldata initialOperators
+  ) external initializer {
     _KIND_ = kind;
     _CLIENT_NAME_ = clientName;
 
     _protocolManager = IProtocolManager(protocolManager);
 
     __Ownable_init();
+
+    _whitelistOperators(initialOperators, true);
   }
 
   /// @notice Deposit function for client's end user. a.k.a protocol entry point
   /// @param recipient Address for which protocol should open new position, reward will be sent there later on
-  /// @param token0 Address of token0 pair
-  /// @param token1 Address of token1 pair
+  /// @param worker Address of target worker
   /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
   /// @dev Vault native token in which assets should have been provided will be resolved on-the-fly using
   /// internal ProtocolManager.
-  /// Flow: ProtocolManager.protocolWorkers(token0, token1) returns worker's address (target farming protocol pool)
-  /// or address(0) if no proper mapping was found (mapping = worker in this case)
-  /// From worker's operating vault we are getting vault native token in which asset should have been provided
   function deposit(
     address recipient,
-    address token0,
-    address token1,
+    address worker,
     uint256 amount
   ) external onlyWhitelistedCallers {
-    // Find proper worker
-    address designatedWorker = _protocolManager.protocolWorkers(token0, token1);
-
-    // Check for worker existence
-    require(designatedWorker != address(0), "ClientContract: Target pool hasn't been found");
-
     // Cast worker for further methods' usage
-    IWorker worker = IWorker(designatedWorker);
+    IWorker _worker = IWorker(worker);
 
     // Check for worker outage due to client-assigned pause
     require(
-      enabledWorkers[designatedWorker],
+      enabledWorkers[worker],
       "ClientContract: Target pool hasn't been enabled by the client"
     );
 
     // Cast vault for further method's usage
-    IVault vault = IVault(worker.operatingVault());
+    IVault vault = IVault(_worker.operatingVault());
 
     // Get native vault token
     address vaultToken = vault.token();
@@ -121,50 +129,45 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     /// @notice Strategy 0: Vault<BUSD> -> Worker<BUSD, USDT> (convert some portion of BUSD to USDT)
     /// @notice Strategy 1: Vault<BUSD> -> Worker<USDC, USDT> (do a split conversion)
 
-    bytes memory payload = worker.token0() == vaultToken || worker.token1() == vaultToken
-      ? abi.encode(worker.getStrategies()[0], abi.encode(worker.token0(), worker.token1(), 0))
+    bytes memory payload = _worker.token0() == vaultToken || _worker.token1() == vaultToken
+      ? abi.encode(_worker.getStrategies()[0], abi.encode(_worker.token0(), _worker.token1(), 0))
       : abi.encode(
-        worker.getStrategies()[1],
-        abi.encode(vaultToken, worker.token0(), worker.token1(), 0)
+        _worker.getStrategies()[1],
+        abi.encode(vaultToken, _worker.token0(), _worker.token1(), 0)
       );
 
     // Enter the protocol using resolved worker strategy
     /// @dev encoded: (address strategy, (address baseToken, address farmingToken, uint256 minLPAmount))
-    vault.work(0, designatedWorker, amount, recipient, payload);
+    vault.work(0, worker, amount, recipient, payload);
 
     // Reset approvals
     vaultToken.safeApprove(address(vault), 0);
+
+    emit Deposit(recipient, worker, amount);
   }
 
   function withdraw(
     uint256 pid,
     address recipient,
-    address token0,
-    address token1
+    address worker
   ) external onlyWhitelistedCallers {
-    // Find proper worker
-    address designatedWorker = _protocolManager.protocolWorkers(token0, token1);
-
-    // Check for worker existence
-    require(designatedWorker != address(0), "ClientContract: Target pool hasn't been found");
-
     // Cast worker for further methods' usage
-    IWorker worker = IWorker(designatedWorker);
+    IWorker _worker = IWorker(worker);
 
     // Cast vault for further method's usage
-    IVault vault = IVault(worker.operatingVault());
+    IVault vault = IVault(_worker.operatingVault());
 
     // Enter the protocol using resolved worker strategy
     /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
     /// worker.getStrategies()[2] = Liquidate
     vault.work(
       pid,
-      designatedWorker,
+      worker,
       0,
       recipient,
       abi.encode(
-        worker.getStrategies()[2],
-        abi.encode(worker.baseToken(), worker.token1(), worker.token0(), 0)
+        _worker.getStrategies()[2],
+        abi.encode(_worker.baseToken(), _worker.token1(), _worker.token0(), 0)
       )
     );
   }
@@ -176,6 +179,8 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     require(0 <= feeBps && feeBps < 10000, "ClientContract: Invalid fee amount given");
 
     IWorker(worker).setClientFee(feeBps);
+
+    emit SetWorkerFee(msg.sender, worker, feeBps);
   }
 
   /// @dev Enable or disabled given array of workers
@@ -188,5 +193,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     for (uint256 i = 0; i < workers.length; i++) {
       enabledWorkers[workers[i]] = isEnabled;
     }
+
+    emit ToggleWorkers(msg.sender, workers, isEnabled);
   }
 }

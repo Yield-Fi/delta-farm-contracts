@@ -277,13 +277,15 @@ describe("Client contract", async () => {
     await protocolManager.whitelistOperators([deployerAddress], true);
 
     // Add worker to the register
-    await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
-    await protocolManager["addWorker(address,bool)"](pancakeswapWorker02.address, false);
+    await protocolManager.toggleWorkers(
+      [pancakeswapWorker01.address, pancakeswapWorker02.address],
+      true
+    );
 
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["Binance", "Binance Client", protocolManager.address],
+      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
       deployer
     )) as Client;
 
@@ -326,12 +328,7 @@ describe("Client contract", async () => {
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
 
       // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
-      await exampleClientAsAlice.deposit(
-        aliceAddress,
-        baseToken.address,
-        targetToken.address,
-        DEPOSIT_AMOUNT
-      );
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 
       // ID 1 = first position within the vault
       const position = await vault.positions(1);
@@ -359,12 +356,7 @@ describe("Client contract", async () => {
       await exampleClient.whitelistCallers([aliceAddress], true);
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
       await expect(
-        exampleClientAsAlice.deposit(
-          aliceAddress,
-          baseToken.address,
-          targetToken.address,
-          DEPOSIT_AMOUNT
-        )
+        exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT)
       ).to.be.revertedWith("ClientContract: Target pool hasn't been enabled by the client");
     });
   });
@@ -387,12 +379,7 @@ describe("Client contract", async () => {
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
 
       // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
-      await exampleClientAsAlice.deposit(
-        aliceAddress,
-        testToken.address,
-        targetToken.address,
-        DEPOSIT_AMOUNT
-      );
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT);
 
       // ID 1 = first position within the vault
       const position = await vault.positions(1);
@@ -418,12 +405,7 @@ describe("Client contract", async () => {
       await exampleClient.whitelistOperators([deployerAddress], true);
       await exampleClient.whitelistCallers([aliceAddress], true);
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
-      await exampleClientAsAlice.deposit(
-        aliceAddress,
-        baseToken.address,
-        targetToken.address,
-        DEPOSIT_AMOUNT
-      );
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 
       // Alice entered protocol with 1 BASE TOKEN and now her wallet is empty
       expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.is.eql(
@@ -431,7 +413,7 @@ describe("Client contract", async () => {
       );
 
       // Execute withdrawal flow
-      await exampleClientAsAlice.withdraw(1, aliceAddress, baseToken.address, targetToken.address);
+      await exampleClientAsAlice.withdraw(1, aliceAddress, pancakeswapWorker01.address);
 
       console.log(
         "TODO: Aktualnie strategia likwidacji wyplaca asset na callera - w przypadku wyplaty przy aktualnej logice, callerem jest Vault. Do zmiany"

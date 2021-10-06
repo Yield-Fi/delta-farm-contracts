@@ -185,177 +185,45 @@ describe("ProtocolManager", async () => {
   });
 
   context("called by whitelisted operator", async () => {
-    it("should add new worker properly - manual", async () => {
-      await protocolManager["addWorker(address,address,address,bool)"](
-        baseToken.address,
-        targetToken.address,
-        pancakeswapWorker01.address,
-        false
-      );
+    it("should add new worker properly", async () => {
+      await protocolManager.toggleWorkers([pancakeswapWorker01.address], true);
 
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker01.address);
-    });
-
-    it("should add new worker properly - auto discover", async () => {
-      await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
-
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker01.address);
-    });
-
-    it("should reject worker addition if slot has already been occupied - manual", async () => {
-      // First addition - ok
-      await protocolManager["addWorker(address,address,address,bool)"](
-        baseToken.address,
-        targetToken.address,
-        pancakeswapWorker01.address,
-        false
-      );
-
-      await expect(
-        protocolManager["addWorker(address,address,address,bool)"](
-          baseToken.address,
-          targetToken.address,
-          pancakeswapWorker01.address,
-          false
-        )
-      ).to.be.revertedWith(
-        "ProtocolManager: Slot already occupied, set 'overwrite' flag to 'true' to overwrite current mapping"
-      );
-    });
-
-    it("should reject worker addition if slot has already been occupied - auto discover", async () => {
-      await protocolManager["addWorker(address,address,address,bool)"](
-        baseToken.address,
-        targetToken.address,
-        pancakeswapWorker01.address,
-        false
-      );
-
-      await expect(
-        protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false)
-      ).to.be.revertedWith(
-        "ProtocolManager: Slot already occupied, set 'overwrite' flag to 'true' to overwrite current mapping"
-      );
-    });
-
-    it("should overwrite worker if proper flag has been set - manual", async () => {
-      await protocolManager["addWorker(address,address,address,bool)"](
-        baseToken.address,
-        targetToken.address,
-        pancakeswapWorker01.address,
-        false
-      );
-
-      await protocolManager["addWorker(address,address,address,bool)"](
-        baseToken.address,
-        targetToken.address,
-        pancakeswapWorker02.address,
-        true
-      );
-
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker02.address);
-    });
-
-    it("should overwrite worker if proper flag has been set - auto discover", async () => {
-      await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
-
-      await protocolManager["addWorker(address,bool)"](pancakeswapWorker02.address, true);
-
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker02.address);
+      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(true);
     });
 
     /**
      * @notice No matter by which method worker has been added.
      */
-    it("should remove worker from the register - manual", async () => {
-      await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
+    it("should remove worker from the register", async () => {
+      await protocolManager.toggleWorkers([pancakeswapWorker01.address], true);
 
       // Check if set properly
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker01.address);
+      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(true);
 
-      await protocolManager["removeWorker(address,address)"](
-        baseToken.address,
-        targetToken.address
-      );
+      await protocolManager.toggleWorkers([pancakeswapWorker01.address], false);
 
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(ethers.constants.AddressZero);
-    });
-
-    it("should remove worker from the register - auto discover", async () => {
-      await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
-
-      // Check if set properly
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker01.address);
-
-      await protocolManager["removeWorker(address)"](pancakeswapWorker01.address);
-
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(ethers.constants.AddressZero);
+      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(false);
     });
   });
 
   context("called by not whitelisted operator", async () => {
-    it("should revert upon worker addition - manual", async () => {
+    it("should revert upon worker addition", async () => {
       await expect(
-        protocolManagerAsEvilUser["addWorker(address,address,address,bool)"](
-          baseToken.address,
-          targetToken.address,
-          pancakeswapWorker01.address,
-          false
-        )
-      ).to.be.revertedWith("ProtocolManager: Operator not whitelisted");
-    });
-
-    it("should revert upon worker addition - auto discover", async () => {
-      await expect(
-        protocolManagerAsEvilUser["addWorker(address,bool)"](pancakeswapWorker01.address, false)
+        protocolManagerAsEvilUser.toggleWorkers([pancakeswapWorker01.address], true)
       ).to.be.revertedWith("ProtocolManager: Operator not whitelisted");
     });
 
     /**
      * @notice No matter by which method worker has been added.
      */
-    it("should remove worker from the register - manual", async () => {
-      await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
+    it("should revert upon worker removal", async () => {
+      await protocolManager.toggleWorkers([pancakeswapWorker01.address], true);
 
       // Check if set properly
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker01.address);
+      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(true);
 
       await expect(
-        protocolManagerAsEvilUser["removeWorker(address,address)"](
-          baseToken.address,
-          targetToken.address
-        )
-      ).to.be.revertedWith("ProtocolManager: Operator not whitelisted");
-    });
-
-    it("should remove worker from the register - auto discover", async () => {
-      await protocolManager["addWorker(address,bool)"](pancakeswapWorker01.address, false);
-
-      // Check if set properly
-      expect(
-        await protocolManager.protocolWorkers(baseToken.address, targetToken.address)
-      ).to.be.eql(pancakeswapWorker01.address);
-
-      await expect(
-        protocolManagerAsEvilUser["removeWorker(address)"](pancakeswapWorker01.address)
+        protocolManagerAsEvilUser.toggleWorkers([pancakeswapWorker01.address], false)
       ).to.be.revertedWith("ProtocolManager: Operator not whitelisted");
     });
   });
