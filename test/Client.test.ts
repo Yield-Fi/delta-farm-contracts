@@ -290,15 +290,12 @@ describe("Client contract", async () => {
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["Binance", "Binance Client", protocolManager.address],
+      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
       deployer
     )) as Client;
 
     // Whitelist clients within vault config
     await vaultConfig.setWhitelistedCallers([exampleClient.address], true);
-
-    // Whitelist deployer as client contract operator
-    await exampleClient.whitelistOperators([deployerAddress], true);
 
     // Enable workers on the client side
     await exampleClient.toggleWorkers(
