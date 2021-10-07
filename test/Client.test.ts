@@ -148,7 +148,7 @@ describe("Client contract", async () => {
     // Setup general protocol manager
     protocolManager = (await deployProxyContract(
       "ProtocolManager",
-      [],
+      [[deployerAddress]],
       deployer
     )) as ProtocolManager;
 
@@ -273,11 +273,8 @@ describe("Client contract", async () => {
       },
     ]);
 
-    // Whitelist deployer so we can add workers to the register
-    await protocolManager.whitelistOperators([deployerAddress], true);
-
     // Add worker to the register
-    await protocolManager.toggleWorkers(
+    await protocolManager.approveWorkers(
       [pancakeswapWorker01.address, pancakeswapWorker02.address],
       true
     );
@@ -299,7 +296,7 @@ describe("Client contract", async () => {
     );
 
     // Whitelist client
-    await protocolManager.approveClientContract(exampleClient.address, true);
+    await protocolManager.approveClients([exampleClient.address], true);
 
     // Signers
     baseTokenAsAlice = baseToken.connect(alice);

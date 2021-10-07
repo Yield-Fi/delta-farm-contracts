@@ -35,7 +35,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   address public override approvedNativeRelayer;
 
   /// @dev Array of valid and registered protocol workers set by whitelisted operators
-  mapping(address => bool) public override protocolWorkers;
+  mapping(address => bool) public override approvedWorkers;
   /// address[] public approvedProtocolWorkers
 
   /// @notice ACL - mapping of valid operators' addresses
@@ -114,7 +114,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     uint256 length = workers.length;
 
     for (uint256 i = 0; i < length; i++) {
-      protocolWorkers[workers[i]] = isEnabled;
+      approvedWorkers[workers[i]] = isEnabled;
     }
 
     emit ApproveWorkers(msg.sender, workers, isEnabled);

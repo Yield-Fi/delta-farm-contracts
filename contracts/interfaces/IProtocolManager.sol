@@ -2,7 +2,7 @@ pragma solidity 0.6.6;
 
 interface IProtocolManager {
   /// @dev Worker getter, maps to internal mapping
-  function protocolWorkers(address worker) external returns (bool);
+  function approvedWorkers(address worker) external returns (bool);
 
   /// @dev Vault getter, maps to internal mapping
   function approvedVaults(address vault) external returns (bool);
@@ -23,22 +23,22 @@ interface IProtocolManager {
   function approvedClients(address client) external returns (bool);
 
   /// @dev Protocol ACL
-  function approveWorkers(address[] calldata workers, bool isEnabled) external;
+  function approveWorkers(address[] calldata workers, bool isApproved) external;
 
   /// @dev Protocol ACL
-  function approveClients(address[] calldata workers, bool isEnabled) external;
+  function approveClients(address[] calldata clients, bool isApproved) external;
 
   /// @dev Protocol ACL
-  function approveVaults(address[] calldata workers, bool isEnabled) external;
+  function approveVaults(address[] calldata vaults, bool isApproved) external;
 
   /// @dev Protocol ACL
-  function approveVaultConfigs(address[] calldata workers, bool isEnabled) external;
+  function approveVaultConfigs(address[] calldata vaultConfigs, bool isApproved) external;
 
   /// @dev Protocol ACL
-  function approveBountyCollectors(address[] calldata workers, bool isEnabled) external;
+  function approveBountyCollectors(address[] calldata bountyCollectors, bool isApproved) external;
 
   /// @dev Protocol ACL
-  function approveStrategies(address[] calldata workers, bool isEnabled) external;
+  function approveStrategies(address[] calldata strategies, bool isEnabled) external;
 
   /// @dev Protocol Info
   function setNativeRelayer(address nativeRelayer) external;
