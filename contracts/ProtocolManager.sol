@@ -33,6 +33,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
   /// @dev Relayer
   address public override approvedNativeRelayer;
+
   /// @dev Array of valid and registered protocol workers set by whitelisted operators
   mapping(address => bool) public override protocolWorkers;
   /// address[] public approvedProtocolWorkers
@@ -42,55 +43,52 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
   /// @dev Events
   event WhitelistOperators(address indexed caller, address[] indexed operators, bool indexed isOk);
-  event ToggleWorkers(address indexed caller, address[] indexed workers, bool indexed isEnabled);
-  event ApproveClientContract(
+  event ApproveWorkers(address indexed caller, address[] indexed workers, bool indexed isEnabled);
+  event ApproveClients(address indexed caller, address[] indexed entities, bool indexed isApproved);
+  event ApproveVaults(address indexed caller, address[] indexed entities, bool indexed isApproved);
+  event ApproveStrategies(
     address indexed caller,
-    address indexed callEntity,
+    address[] indexed entities,
     bool indexed isApproved
   );
-  event ApproveVault(address indexed caller, address indexed callEntity, bool indexed isApproved);
-  event ApproveVaultConfig(
+  event ApproveVaultConfigs(
     address indexed caller,
-    address indexed callEntity,
+    address[] indexed entities,
     bool indexed isApproved
   );
-  event ApproveBountyCollector(
+  event ApproveBountyCollectors(
     address indexed caller,
-    address indexed callEntity,
+    address[] indexed entities,
     bool indexed isApproved
   );
-  event UpdateNativeRelayer(address indexed caller, address indexed newAddress);
+  event SetNativeRelayer(
+    address indexed caller,
+    address indexed oldAddress,
+    address indexed newAddress
+  );
 
-  //@dev initialize the owner and operators of Protocol
+  /// @dev initialize the owner and operators of Protocol
   function initialize(address[] calldata initialOperators) external initializer {
     __Ownable_init();
-
     _whitelistOperators(initialOperators, true);
   }
 
-  /// @dev Set new client contact as approved
-  /// @param clientContract New client contact's address
-  /// @param isApproved Client contract approval - true or false
-  function approveClientContract(address clientContract, bool isApproved) external onlyOwner {
-    approvedClients[clientContract] = isApproved;
-
-    emit ApproveClientContract(msg.sender, clientContract, isApproved);
-  }
-
-  /// @notice ACL modifier
+  /// @notice Internal ACL modifier
   /// @dev Only set operators can call decorated method
   modifier onlyWhitelistedOperators() {
     require(whitelistedOperators[msg.sender], "ProtocolManager: Operator not whitelisted");
     _;
   }
 
-  /// @notice ACL - external method
+  /// @notice Internal ACL - external method
   /// @notice External-internal methods bridge
+  /// @param operators Array of operators' public addresses to enable/disable
+  /// @param isOk Are operators going to be enabled or disabled?
   function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
     _whitelistOperators(operators, isOk);
   }
 
-  /// @notice ACL
+  /// @notice Internal ACL
   /// @dev Enable/Disable given array of operators making them
   /// able or unable to perform restricted set of actions
   /// @param operators Array of operators' public addresses to enable/disable
@@ -105,10 +103,10 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     emit WhitelistOperators(msg.sender, operators, isOk);
   }
 
-  /// @dev Toggle workers within protocol register
-  /// @param workers addresses of target workers
-  /// @param isEnabled new workers' state
-  function toggleWorkers(address[] calldata workers, bool isEnabled)
+  /// @dev Protocol ACL
+  /// @param workers array of addresses
+  /// @param isEnabled true | false
+  function approveWorkers(address[] calldata workers, bool isEnabled)
     external
     override
     onlyWhitelistedOperators
@@ -119,6 +117,101 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
       protocolWorkers[workers[i]] = isEnabled;
     }
 
-    emit ToggleWorkers(msg.sender, workers, isEnabled);
+    emit ApproveWorkers(msg.sender, workers, isEnabled);
+  }
+
+  /// @dev Protocol ACL
+  /// @param clients array of addresses
+  /// @param isApproved true | false
+  function approveClients(address[] calldata clients, bool isApproved)
+    external
+    override
+    onlyWhitelistedOperators
+  {
+    uint256 length = clients.length;
+
+    for (uint256 i = 0; i < length; i++) {
+      approvedClients[clients[i]] = isApproved;
+    }
+
+    emit ApproveClients(msg.sender, clients, isApproved);
+  }
+
+  /// @dev Protocol ACL
+  /// @param vaults array of addresses
+  /// @param isApproved true | false
+  function approveVaults(address[] calldata vaults, bool isApproved)
+    external
+    override
+    onlyWhitelistedOperators
+  {
+    uint256 length = vaults.length;
+
+    for (uint256 i = 0; i < length; i++) {
+      approvedVaults[vaults[i]] = isApproved;
+    }
+
+    emit ApproveVaults(msg.sender, vaults, isApproved);
+  }
+
+  /// @dev Protocol ACL
+  /// @param vaultConfigs array of addresses
+  /// @param isApproved true | false
+  function approveVaultConfigs(address[] calldata vaultConfigs, bool isApproved)
+    external
+    override
+    onlyWhitelistedOperators
+  {
+    uint256 length = vaultConfigs.length;
+
+    for (uint256 i = 0; i < length; i++) {
+      approvedVaultConfigs[vaultConfigs[i]] = isApproved;
+    }
+
+    emit ApproveVaults(msg.sender, vaultConfigs, isApproved);
+  }
+
+  /// @dev Protocol ACL
+  /// @param bountyCollectors array of addresses
+  /// @param isApproved true | false
+  function approveBountyCollectors(address[] calldata bountyCollectors, bool isApproved)
+    external
+    override
+    onlyWhitelistedOperators
+  {
+    uint256 length = bountyCollectors.length;
+
+    for (uint256 i = 0; i < length; i++) {
+      approvedBountyCollectors[bountyCollectors[i]] = isApproved;
+    }
+
+    emit ApproveBountyCollectors(msg.sender, bountyCollectors, isApproved);
+  }
+
+  /// @dev Protocol ACL
+  /// @param strategies array of addresses
+  /// @param isApproved true | false
+  function approveStrategies(address[] calldata strategies, bool isApproved)
+    external
+    override
+    onlyWhitelistedOperators
+  {
+    uint256 length = strategies.length;
+
+    for (uint256 i = 0; i < length; i++) {
+      approvedStrategies[strategies[i]] = isApproved;
+    }
+
+    emit ApproveStrategies(msg.sender, strategies, isApproved);
+  }
+
+  /// @dev Protocol Information
+  /// @param nativeRelayer addresses
+  function setNativeRelayer(address nativeRelayer) external override onlyWhitelistedOperators {
+    address old = approvedNativeRelayer;
+
+    approvedNativeRelayer = nativeRelayer;
+
+    emit SetNativeRelayer(msg.sender, old, nativeRelayer);
   }
 }

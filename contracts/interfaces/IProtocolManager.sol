@@ -22,6 +22,24 @@ interface IProtocolManager {
   /// @dev Client getter, maps to internal mapping
   function approvedClients(address client) external returns (bool);
 
-  /// @dev Automatically assign new worker to token pair resolved from the worker itself
-  function toggleWorkers(address[] calldata workers, bool isOk) external;
+  /// @dev Protocol ACL
+  function approveWorkers(address[] calldata workers, bool isEnabled) external;
+
+  /// @dev Protocol ACL
+  function approveClients(address[] calldata workers, bool isEnabled) external;
+
+  /// @dev Protocol ACL
+  function approveVaults(address[] calldata workers, bool isEnabled) external;
+
+  /// @dev Protocol ACL
+  function approveVaultConfigs(address[] calldata workers, bool isEnabled) external;
+
+  /// @dev Protocol ACL
+  function approveBountyCollectors(address[] calldata workers, bool isEnabled) external;
+
+  /// @dev Protocol ACL
+  function approveStrategies(address[] calldata workers, bool isEnabled) external;
+
+  /// @dev Protocol Info
+  function setNativeRelayer(address nativeRelayer) external;
 }
