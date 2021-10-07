@@ -9,25 +9,33 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
 import { IWorker } from "./interfaces/IWorker.sol";
 
-//@dev Contains information about addresses used in application, help manage operators and owner
+/// @dev Contains information about addresses used within the protocol, acts as semi-central protocol point
 contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// @dev Contains info about client contract's approvals
   mapping(address => bool) public override approvedClients;
+  /// address[] public approvedClientsList;
 
-  /// @dev Vault - show where is the Valult
-  // mapping(address => bool) public override whereIsVault;
-  /// @dev  Vault Config - show where is the  Vault Config
-  // mapping(address => bool) public override whereIsVaultConfig;
-  /// @dev  BountyCollector - show where is the  BountyCollector
-  // mapping(address => bool) public override BountyCollectorAdr;
+  /// @dev Vault(s)
+  mapping(address => bool) public override approvedVaults;
+  /// address[] public approvedVaultsList;
 
-  /// @dev  Strategies  - show where are  Strategies
-  // mapping(address => bool) public override StrategiesAdr; // raczej podwójny mapping jeszcze na typ strategiii
+  /// @dev Vault config(s)
+  mapping(address => bool) public override approvedVaultConfigs;
+  /// address[] public approvedVaultConfigsList;
+
+  /// @dev BountyCollectors
+  mapping(address => bool) public override approvedBountyCollectors;
+  /// address[] public approvedVBountyCollectorsList;
+
+  /// @dev  Strategies
+  mapping(address => bool) public override approvedStrategies;
+  /// address[] public approvedStrategiesList;
 
   /// @dev Relayer
-  // mapping(address => bool) public override NativeRelayerAdr;
+  address public override approvedNativeRelayer;
   /// @dev Array of valid and registered protocol workers set by whitelisted operators
   mapping(address => bool) public override protocolWorkers;
+  /// address[] public approvedProtocolWorkers
 
   /// @notice ACL - mapping of valid operators' addresses
   mapping(address => bool) whitelistedOperators;
@@ -37,14 +45,27 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   event ToggleWorkers(address indexed caller, address[] indexed workers, bool indexed isEnabled);
   event ApproveClientContract(
     address indexed caller,
-    address indexed client,
+    address indexed callEntity,
     bool indexed isApproved
   );
+  event ApproveVault(address indexed caller, address indexed callEntity, bool indexed isApproved);
+  event ApproveVaultConfig(
+    address indexed caller,
+    address indexed callEntity,
+    bool indexed isApproved
+  );
+  event ApproveBountyCollector(
+    address indexed caller,
+    address indexed callEntity,
+    bool indexed isApproved
+  );
+  event UpdateNativeRelayer(address indexed caller, address indexed newAddress);
 
   //@dev initialize the owner and operators of Protocol
-  function initialize() external initializer {
+  function initialize(address[] calldata initialOperators) external initializer {
     __Ownable_init();
-    // czy tu nie powinno być coś o operatorach , czy w Panelu admina dla Y.F. jest opcja zmiany operatorów ?
+
+    _whitelistOperators(initialOperators, true);
   }
 
   /// @dev Set new client contact as approved
@@ -63,12 +84,18 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     _;
   }
 
+  /// @notice ACL - external method
+  /// @notice External-internal methods bridge
+  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
+    _whitelistOperators(operators, isOk);
+  }
+
   /// @notice ACL
   /// @dev Enable/Disable given array of operators making them
   /// able or unable to perform restricted set of actions
   /// @param operators Array of operators' public addresses to enable/disable
   /// @param isOk Are operators going to be enabled or disabled?
-  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
+  function _whitelistOperators(address[] memory operators, bool isOk) internal {
     uint256 length = operators.length;
 
     for (uint256 i = 0; i < length; i++) {
@@ -78,7 +105,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     emit WhitelistOperators(msg.sender, operators, isOk);
   }
 
-  /// @dev Toggle workers within protocol registerer
+  /// @dev Toggle workers within protocol register
   /// @param workers addresses of target workers
   /// @param isEnabled new workers' state
   function toggleWorkers(address[] calldata workers, bool isEnabled)
@@ -95,23 +122,3 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     emit ToggleWorkers(msg.sender, workers, isEnabled);
   }
 }
-
-// showMe functions :
-// operators - public addresses of key pairs
-// function getListOfAllOperators public view{} // returns all
-
-// function getListOfActivOperators public view{} // returns where 1
-
-// function getListOfBannedOperators public view{} // returns where 0
-// contract addresses on blockchain
-
-// function VaultAddress public view{} // returns all
-
-// function VaultConfigAddress public view{} // returns all
-
-// function BountyCollector public view{} // returns all
-
-// update functions
-// function updateVaultConfigAddress public view onlyowner{} // writes address
-// pytanie czy zostawiać stare //adresy bo migracje itp taki backtrack by sie przydał,
-// a wtedy view by wskazywało na ostatni albo listowało całość jak jest lista a nie pointer ...
