@@ -99,6 +99,56 @@
       "address": "0x120ed46d34205Ff4D09aE62E66FDD2Bcfd5B9D26",
       "txHash": "0x2d92c885dafe75672ac48f7fd375809f9c493e088a238f173f10595509bc4450",
       "kind": "transparent"
+    },
+    {
+      "address": "0x40510c6D3611933135cC573A5064a985bD6850E7",
+      "txHash": "0x72a2e5bd53ac4ace0825fbc16c9449a10e4feb35858a11893af31fd3a2703a2d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xF87e29a30aD4Acb6ffBA9d644C479376E645F1cf",
+      "txHash": "0x8c4a95e712fa9d98e9a260dd67f75a27490f77394628d9b189a1af4d1c4b96a4",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1153C1694146cD99B632b04910D45B95c99012C8",
+      "txHash": "0x28de60688ececfc4eae0047bedc054fd6f4340c8c0280d2695c820f9e4b4f458",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7ACBb870B182c82D3eAbfBc1A52CE0FD16cdDbE6",
+      "txHash": "0xb4acd5415a5fe80a8ef91804508c72ee63f3de38948d94147af82faa3624cecc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x19e4880Ae8E166E9076e701b23Ba67F475a751f3",
+      "txHash": "0xf6acd3d4c223248f6aea8241b534dfd155fdbbc3d48b01c6d65dfa99789f4464",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x67AaE37C5d0Be414606e173fB58106eEf5f9288D",
+      "txHash": "0x8bcefc5e7a6e7cc0f66b27b92859fc0e66a3f3158ea59843ea41bf15f956b463",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x4B12F272d2284Ec7A6710C07564720e04645eAbB",
+      "txHash": "0x41606b09f63a7dcf7384d595d552781a33d14983e8c6e3b5203d66f905ccb54c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x08A435c2a53517f64149525f82eE855A63c75bef",
+      "txHash": "0xa1e223dde3181a7bd51befc21d0376c0b5a9f9be412f0e5058b42b6e4323cf7c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xBB029872759Fc40b87C6E14b137dD09D18Bdbf02",
+      "txHash": "0x8c973a961112d2aca9d22ba80aa2d5cc6f7bc9b533faacddb46fbc565a729262",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x1e1660aE9Eb53b4AE0Ac1f9eAE8a8d972c05ceb5",
+      "txHash": "0x8dd0728855729c7d4a4445265f428e6720388929eee298a95e6ccfd8b572d8bd",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -1724,6 +1774,341 @@
           },
           "t_uint256": {
             "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "3d972fc4a051ed2393fd1de23e96fa17e7b0c78c65191ac755e6c10e6b097434": {
+      "address": "0x4b9099b9E8116AE1D4ac6a728E40a91b845b27C8",
+      "txHash": "0x90901ceaeba7853677b9be205d16627845604538acaeed8e0e8f1d535b4c41b5",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\GSN\\Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:78"
+          },
+          {
+            "contract": "ProtocolManager",
+            "label": "approvedClients",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\ProtocolManager.sol:14"
+          },
+          {
+            "contract": "ProtocolManager",
+            "label": "protocolWorkers",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\ProtocolManager.sol:17"
+          },
+          {
+            "contract": "ProtocolManager",
+            "label": "whitelistedOperators",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\ProtocolManager.sol:20"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "170978604f49decbab927011c0f4c1ac8ec139d74ee1b8bf19a5216f5779bf35": {
+      "address": "0xC38614FE935f35146268aDc38CA94622709d907B",
+      "txHash": "0x6a18c5b982709f6ad52ff2cc3502fb0d97a44ccba19f53c63be1cf14caaa1d17",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\GSN\\Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "WrappedNativeTokenRelayer",
+            "label": "wnative",
+            "type": "t_address",
+            "src": "contracts\\WrappedNativeTokenRelayer.sol:18"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "9bcf3b0833d6aa24d03c87fad716aa5c3fb0bbbd9801e3c46a5f88bdfd39473b": {
+      "address": "0x8dc8EC89f012d81ADC6e170abd311D0627C315DB",
+      "txHash": "0xa41ae68e43a443c1ec4319ab8b87d0ff0cf5b46ad5558dff56840f2c37defc2f",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\GSN\\Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "Vault",
+            "label": "_IN_EXEC_LOCK",
+            "type": "t_uint256",
+            "src": "contracts\\Vault.sol:39"
+          },
+          {
+            "contract": "Vault",
+            "label": "POSITION_ID",
+            "type": "t_uint256",
+            "src": "contracts\\Vault.sol:40"
+          },
+          {
+            "contract": "Vault",
+            "label": "STRATEGY",
+            "type": "t_address",
+            "src": "contracts\\Vault.sol:41"
+          },
+          {
+            "contract": "Vault",
+            "label": "token",
+            "type": "t_address",
+            "src": "contracts\\Vault.sol:45"
+          },
+          {
+            "contract": "Vault",
+            "label": "config",
+            "type": "t_contract(IVaultConfig)3976",
+            "src": "contracts\\Vault.sol:53"
+          },
+          {
+            "contract": "Vault",
+            "label": "positions",
+            "type": "t_mapping(t_uint256,t_struct(Position)2863_storage)",
+            "src": "contracts\\Vault.sol:54"
+          },
+          {
+            "contract": "Vault",
+            "label": "nextPositionID",
+            "type": "t_uint256",
+            "src": "contracts\\Vault.sol:55"
+          },
+          {
+            "contract": "Vault",
+            "label": "bountyCollector",
+            "type": "t_contract(IBountyCollector)3851",
+            "src": "contracts\\Vault.sol:58"
+          },
+          {
+            "contract": "Vault",
+            "label": "protocolManager",
+            "type": "t_contract(IProtocolManager)3894",
+            "src": "contracts\\Vault.sol:60"
+          },
+          {
+            "contract": "Vault",
+            "label": "rewards",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts\\Vault.sol:63"
+          },
+          {
+            "contract": "Vault",
+            "label": "okRewardAssigners",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Vault.sol:64"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_contract(IVaultConfig)3976": {
+            "label": "contract IVaultConfig"
+          },
+          "t_mapping(t_uint256,t_struct(Position)2863_storage)": {
+            "label": "mapping(uint256 => struct Vault.Position)"
+          },
+          "t_struct(Position)2863_storage": {
+            "label": "struct Vault.Position",
+            "members": [
+              {
+                "label": "worker",
+                "type": "t_address"
+              },
+              {
+                "label": "owner",
+                "type": "t_address"
+              },
+              {
+                "label": "client",
+                "type": "t_address"
+              }
+            ]
+          },
+          "t_contract(IBountyCollector)3851": {
+            "label": "contract IBountyCollector"
+          },
+          "t_contract(IProtocolManager)3894": {
+            "label": "contract IProtocolManager"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"

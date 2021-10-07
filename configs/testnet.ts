@@ -48,9 +48,9 @@ const tokens = {
 };
 
 export const testnetConfig: ProjectConfigType = {
-  wrappedNativeTokenRelayer: "0x988052AFA52E4cEcbF50923Cdbc1EE7207663ccc",
-  bountyCollector: "0x47C2A9B88A3f22EA701478578F05980F4d91eb92",
-  protocolManager: "0xad3FF8BAB14ADF7AddBbab533bdB7Ef27dA5BF36",
+  wrappedNativeTokenRelayer: "0x1153C1694146cD99B632b04910D45B95c99012C8",
+  bountyCollector: "0xF87e29a30aD4Acb6ffBA9d644C479376E645F1cf",
+  protocolManager: "0x40510c6D3611933135cC573A5064a985bD6850E7",
   treasuryAccount: "0x94FC2d635D65e6f657b7617843915a41c87B7852",
   baseToken: tokens.BUSD,
   bountyThreshold: 500,
@@ -382,23 +382,23 @@ export const testnetConfig: ProjectConfigType = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "0xb38bC11A4D22E914658e6Ea2F72369739f7A79A1",
-      AddToPoolWithoutBaseToken: "0x08B0FBB3ce6C63bA048B54876C258310825e709C",
-      Liquidate: "0xc7104E49861209899D8f49C75fCB75B362c3Fc4A",
+      AddToPoolWithBaseToken: "0x67AaE37C5d0Be414606e173fB58106eEf5f9288D",
+      AddToPoolWithoutBaseToken: "0x4B12F272d2284Ec7A6710C07564720e04645eAbB",
+      Liquidate: "0x08A435c2a53517f64149525f82eE855A63c75bef",
     },
   },
   vaults: [
     {
       name: "BUSD Vault",
-      address: "0xaefb2f96619a411Ce49a75E4537F7bF6A7c23520",
+      address: "0x19e4880Ae8E166E9076e701b23Ba67F475a751f3",
       tokenName: "deficental BUSD",
       tokenSymbol: "defiBUSD",
       baseToken: tokens.BUSD,
-      config: "0xFc15C9b5FcdD460A9db22AD4Ae7b3838e18cc1E3",
+      config: "0x7ACBb870B182c82D3eAbfBc1A52CE0FD16cdDbE6",
       workers: [
         {
           name: "BUSD-USDT PancakeswapWorker",
-          address: "0x88406f07500c6fA5f6C0eacEf519618868E8D24a",
+          address: "0xBB029872759Fc40b87C6E14b137dD09D18Bdbf02",
           positionId: "24",
           token0: tokens.BUSD,
           token1: tokens.USDT,
@@ -409,10 +409,10 @@ export const testnetConfig: ProjectConfigType = {
   ],
   clients: [
     {
-      address: "0x120ed46d34205Ff4D09aE62E66FDD2Bcfd5B9D26",
+      address: "0x1e1660aE9Eb53b4AE0Ac1f9eAE8a8d972c05ceb5",
       kind: "kind",
       name: "Client A",
-      operators: ["0x94FC2d635D65e6f657b7617843915a41c87B7852"],
+      operators: ["0x07661882d1C4b7F703Ca0A8898afE4D402dFdeF2"],
     },
   ],
 };
