@@ -145,6 +145,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Return the entitied LP token balance for the given shares.
   /// @param share The number of shares to be converted to LP balance.
+  /// @return uint256 LP token balance
   function shareToBalance(uint256 share) public view returns (uint256) {
     if (totalShare == 0) return share; // When there's no share, 1 share = 1 balance.
     (uint256 totalBalance, ) = masterChef.userInfo(pid, address(this));
@@ -153,6 +154,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Return the number of shares to receive if staking the given LP tokens.
   /// @param balance the number of LP tokens to be converted to shares.
+  /// @return uint256 Number of shares
   function balanceToShare(uint256 balance) public view returns (uint256) {
     if (totalShare == 0) return balance; // When there's no share, 1 share = 1 balance.
     (uint256 totalBalance, ) = masterChef.userInfo(pid, address(this));

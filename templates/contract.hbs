@@ -1,0 +1,67 @@
+# {{name}}
+
+{{{natspec.userdoc}}}
+
+{{#if natspec.userdoc}}
+> **NOTE:** {{{natspec.userdoc}}}
+{{/if}}
+
+___
+
+## Functions
+
+{{#each ownFunctions}}
+### {{name}}
+
+```solidity
+  function {{name}}({{args}}){{#if outputs}} {{visibility}} returns({{outputs}}){{/if}}
+```
+
+{{#if natspec.devdoc}}
+{{{natspec.devdoc}}}
+{{/if}}
+
+{{#if natspec.userdoc}}
+> **NOTE:** {{{natspec.userdoc}}}
+{{/if}}
+
+{{#if natspec.params}}
+#### Parameters:
+
+{{#each natspec.params}}
+- `{{param}}`: {{description}}
+{{/each}}
+{{/if}}
+
+{{#if natspec.returns}}
+#### Return Values:
+
+{{#each natspec.returns}}
+- `{{param}}`: {{description}}
+{{/each}}
+{{/if}}
+{{/each}}
+
+___
+
+## Events
+
+{{#each ownEvents}}
+### {{name}}
+
+```solidity
+  event {{name}}({{args}})
+```
+{{#if natspec.devdoc}}
+{{{natspec.devdoc}}}
+{{/if}}
+
+{{#if natspec.params}}
+#### Parameters:
+
+{{#each natspec.params}}
+- `{{param}}`: {{description}}
+{{/each}}
+{{/if}}
+
+{{/each}}
