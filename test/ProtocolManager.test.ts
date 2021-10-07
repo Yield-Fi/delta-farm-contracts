@@ -16,6 +16,7 @@ import {
   MockToken,
   PancakeswapWorker,
   ProtocolManager,
+  Client,
 } from "../typechain";
 import { ethers, waffle } from "hardhat";
 import { deployToken, deployWBNB } from "./helpers/deployToken";
@@ -50,6 +51,9 @@ describe("ProtocolManager", async () => {
 
   // BC
   let bountyCollector: BountyCollector;
+
+  // Client
+  let exampleClient: Client;
 
   // Signers
   let deployer: Signer;
@@ -105,7 +109,7 @@ describe("ProtocolManager", async () => {
 
     protocolManager = (await deployProxyContract(
       "ProtocolManager",
-      [],
+      [[deployerAddress]],
       deployer
     )) as ProtocolManager;
 
@@ -156,13 +160,12 @@ describe("ProtocolManager", async () => {
       deployer
     );
 
-    protocolManager = (await deployProxyContract(
-      "ProtocolManager",
-      [],
+    // Clients
+    exampleClient = (await deployProxyContract(
+      "Client",
+      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
       deployer
-    )) as ProtocolManager;
-
-    await protocolManager.whitelistOperators([deployerAddress], true);
+    )) as Client;
 
     protocolManager = protocolManager.connect(deployer);
     protocolManagerAsEvilUser = protocolManager.connect(evilUser);
@@ -174,42 +177,42 @@ describe("ProtocolManager", async () => {
 
   context("client contracts approval", async () => {
     it("should manage client contract's approval", async () => {
-      await protocolManager.approveClientContract(ethers.constants.AddressZero, true);
+      await protocolManager.approveClients([exampleClient.address], true);
 
-      expect(await protocolManager.approvedClients(ethers.constants.AddressZero)).to.be.eq(true);
+      expect(await protocolManager.approvedClients(exampleClient.address)).to.be.eq(true);
 
-      await protocolManager.approveClientContract(ethers.constants.AddressZero, false);
+      await protocolManager.approveClients([exampleClient.address], false);
 
-      expect(await protocolManager.approvedClients(ethers.constants.AddressZero)).to.be.eq(false);
+      expect(await protocolManager.approvedClients(exampleClient.address)).to.be.eq(false);
     });
   });
 
   context("called by whitelisted operator", async () => {
     it("should add new worker properly", async () => {
-      await protocolManager.toggleWorkers([pancakeswapWorker01.address], true);
+      await protocolManager.approveWorkers([pancakeswapWorker01.address], true);
 
-      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(true);
+      expect(await protocolManager.approvedWorkers(pancakeswapWorker01.address)).to.be.eql(true);
     });
 
     /**
      * @notice No matter by which method worker has been added.
      */
     it("should remove worker from the register", async () => {
-      await protocolManager.toggleWorkers([pancakeswapWorker01.address], true);
+      await protocolManager.approveWorkers([pancakeswapWorker01.address], true);
 
       // Check if set properly
-      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(true);
+      expect(await protocolManager.approvedWorkers(pancakeswapWorker01.address)).to.be.eql(true);
 
-      await protocolManager.toggleWorkers([pancakeswapWorker01.address], false);
+      await protocolManager.approveWorkers([pancakeswapWorker01.address], false);
 
-      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(false);
+      expect(await protocolManager.approvedWorkers(pancakeswapWorker01.address)).to.be.eql(false);
     });
   });
 
   context("called by not whitelisted operator", async () => {
     it("should revert upon worker addition", async () => {
       await expect(
-        protocolManagerAsEvilUser.toggleWorkers([pancakeswapWorker01.address], true)
+        protocolManagerAsEvilUser.approveWorkers([pancakeswapWorker01.address], true)
       ).to.be.revertedWith("ProtocolManager: Operator not whitelisted");
     });
 
@@ -217,13 +220,13 @@ describe("ProtocolManager", async () => {
      * @notice No matter by which method worker has been added.
      */
     it("should revert upon worker removal", async () => {
-      await protocolManager.toggleWorkers([pancakeswapWorker01.address], true);
+      await protocolManager.approveWorkers([pancakeswapWorker01.address], true);
 
       // Check if set properly
-      expect(await protocolManager.protocolWorkers(pancakeswapWorker01.address)).to.be.eql(true);
+      expect(await protocolManager.approvedWorkers(pancakeswapWorker01.address)).to.be.eql(true);
 
       await expect(
-        protocolManagerAsEvilUser.toggleWorkers([pancakeswapWorker01.address], false)
+        protocolManagerAsEvilUser.approveWorkers([pancakeswapWorker01.address], false)
       ).to.be.revertedWith("ProtocolManager: Operator not whitelisted");
     });
   });
