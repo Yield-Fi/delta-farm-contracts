@@ -9,8 +9,6 @@ ___
 
 ### getPriorVotes
 
-
-
 ```solidity
   function getPriorVotes(address account, uint256 blockNumber) external returns(uint256)
 ```

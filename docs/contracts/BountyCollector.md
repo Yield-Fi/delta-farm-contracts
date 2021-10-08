@@ -9,8 +9,6 @@ ___
 
 ### collectAll
 
-
-
 ```solidity
   function collectAll()
 ```

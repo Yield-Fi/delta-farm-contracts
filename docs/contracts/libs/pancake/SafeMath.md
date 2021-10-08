@@ -19,8 +19,6 @@ ___
 
 ### add
 
-
-
 ```solidity
   function add(uint256 a, uint256 b) internal returns(uint256)
 ```
@@ -37,8 +35,6 @@ Requirements:
 
 
 ### sub
-
-
 
 ```solidity
   function sub(uint256 a, uint256 b) internal returns(uint256)
@@ -57,8 +53,6 @@ Requirements:
 
 ### sub
 
-
-
 ```solidity
   function sub(uint256 a, uint256 b, string errorMessage) internal returns(uint256)
 ```
@@ -76,8 +70,6 @@ Requirements:
 
 ### mul
 
-
-
 ```solidity
   function mul(uint256 a, uint256 b) internal returns(uint256)
 ```
@@ -94,8 +86,6 @@ Requirements:
 
 
 ### div
-
-
 
 ```solidity
   function div(uint256 a, uint256 b) internal returns(uint256)
@@ -116,8 +106,6 @@ Requirements:
 
 ### div
 
-
-
 ```solidity
   function div(uint256 a, uint256 b, string errorMessage) internal returns(uint256)
 ```
@@ -137,8 +125,6 @@ Requirements:
 
 ### mod
 
-
-
 ```solidity
   function mod(uint256 a, uint256 b) internal returns(uint256)
 ```
@@ -157,8 +143,6 @@ Requirements:
 
 
 ### mod
-
-
 
 ```solidity
   function mod(uint256 a, uint256 b, string errorMessage) internal returns(uint256)

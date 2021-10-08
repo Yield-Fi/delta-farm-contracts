@@ -14,8 +14,6 @@ ___
 
 ### safeApprove
 
-
-
 ```solidity
   function safeApprove(contract IBEP20 token, address spender, uint256 value)
 ```

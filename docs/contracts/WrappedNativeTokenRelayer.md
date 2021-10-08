@@ -9,8 +9,6 @@ ___
 
 ### initialize
 
-
-
 ```solidity
   function initialize(address _wnative)
 ```
@@ -24,8 +22,6 @@ Function to initialize smart contract
 - `_wnative`: Address of wrapped native token
 
 ### withdraw
-
-
 
 ```solidity
   function withdraw(uint256 _amount)

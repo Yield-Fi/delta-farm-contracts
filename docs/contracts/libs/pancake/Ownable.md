@@ -18,8 +18,6 @@ ___
 
 ### constructor
 
-
-
 ```solidity
   function constructor()
 ```
@@ -30,8 +28,6 @@ Initializes the contract setting the deployer as the initial owner.
 
 ### owner
 
-
-
 ```solidity
   function owner() public returns(address)
 ```
@@ -41,8 +37,6 @@ Returns the address of the current owner.
 
 
 ### renounceOwnership
-
-
 
 ```solidity
   function renounceOwnership()
@@ -58,8 +52,6 @@ thereby removing any functionality that is only available to the owner.
 
 ### transferOwnership
 
-
-
 ```solidity
   function transferOwnership(address newOwner)
 ```
@@ -70,8 +62,6 @@ Can only be called by the current owner.
 
 
 ### _transferOwnership
-
-
 
 ```solidity
   function _transferOwnership(address newOwner)

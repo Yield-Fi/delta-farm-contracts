@@ -9,8 +9,6 @@ ___
 
 ### positionInfo
 
-
-
 ```solidity
   function positionInfo(uint256 id) external returns(uint256)
 ```
@@ -25,8 +23,6 @@ Return Token value of the given position.
 
 ### totalToken
 
-
-
 ```solidity
   function totalToken() public returns(uint256)
 ```
@@ -38,8 +34,6 @@ Return the total token entitled to the token holders. Be careful of unaccrued in
 
 ### requestFunds
 
-
-
 ```solidity
   function requestFunds(address targetedToken, uint256 amount)
 ```
@@ -50,8 +44,6 @@ Request Funds from user through Vault
 
 
 ### _safeUnwrap
-
-
 
 ```solidity
   function _safeUnwrap(address to, uint256 amount)
@@ -69,8 +61,6 @@ Transfer to "to". Automatically unwrap if BTOKEN is WBNB
   f
 
 ### work
-
-
 
 ```solidity
   function work(uint256 id, address worker, uint256 amount, address endUser, bytes data)
@@ -93,8 +83,6 @@ Create a new farming position to unlock your yield farming potential.
 
 ### updateConfig
 
-
-
 ```solidity
   function updateConfig(contract IVaultConfig _config)
 ```
@@ -109,8 +97,6 @@ Update bank configuration to a new address. Must only be called by owner.
   f
 
 ### withdrawReserve
-
-
 
 ```solidity
   function withdrawReserve(address to, uint256 value)
@@ -129,8 +115,6 @@ Withdraw BaseToken reserve for underwater positions to the given address.
 
 ### collectReward
 
-
-
 ```solidity
   function collectReward(uint256 pid)
 ```
@@ -145,8 +129,6 @@ Collect accumulated rewards
   f
 
 ### checkRewardsToBalanceStability
-
-
 
 ```solidity
   function checkRewardsToBalanceStability() external returns(bool)
@@ -164,8 +146,6 @@ Contract health component
 - `bool`: - true if amount of operating token is greater than or equal to total rewards value, false if not
   f
 ### receive
-
-
 
 ```solidity
   function receive()

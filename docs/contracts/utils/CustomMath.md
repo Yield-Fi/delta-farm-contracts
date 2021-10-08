@@ -9,8 +9,6 @@ ___
 
 ### sqrt
 
-
-
 ```solidity
   function sqrt(uint256 x) internal returns(uint256 result)
 ```

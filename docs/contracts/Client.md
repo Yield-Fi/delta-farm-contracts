@@ -9,8 +9,6 @@ ___
 
 ### whitelistCallers
 
-
-
 ```solidity
   function whitelistCallers(address[] callers, bool isOk)
 ```
@@ -20,8 +18,6 @@ Whitelist methods - callers
 
 
 ### _whitelistOperators
-
-
 
 ```solidity
   function _whitelistOperators(address[] operators, bool isOk)
@@ -33,8 +29,6 @@ Whitelist methods - operators
 
 ### whitelistOperators
 
-
-
 ```solidity
   function whitelistOperators(address[] operators, bool isOk)
 ```
@@ -44,8 +38,6 @@ External interface for function above
 
 
 ### deposit
-
-
 
 ```solidity
   function deposit(address recipient, address worker, uint256 amount)
@@ -68,8 +60,6 @@ internal ProtocolManager.
 
 ### setWorkerFee
 
-
-
 ```solidity
   function setWorkerFee(address worker, uint256 feeBps)
 ```
@@ -85,8 +75,6 @@ Set client-side fee for given worker
 - `feeBps`: new fee denominator (0 < feeBps < 10000)
 
 ### toggleWorkers
-
-
 
 ```solidity
   function toggleWorkers(address[] workers, bool isEnabled)

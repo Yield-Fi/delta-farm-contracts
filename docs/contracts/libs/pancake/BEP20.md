@@ -30,8 +30,6 @@ ___
 
 ### constructor
 
-
-
 ```solidity
   function constructor(string name, string symbol)
 ```
@@ -48,8 +46,6 @@ construction.
 
 ### getOwner
 
-
-
 ```solidity
   function getOwner() external returns(address)
 ```
@@ -59,8 +55,6 @@ Returns the bep token owner.
 
 
 ### name
-
-
 
 ```solidity
   function name() public returns(string)
@@ -72,8 +66,6 @@ Returns the token name.
 
 ### decimals
 
-
-
 ```solidity
   function decimals() public returns(uint8)
 ```
@@ -83,8 +75,6 @@ Returns the token decimals.
 
 
 ### symbol
-
-
 
 ```solidity
   function symbol() public returns(string)
@@ -96,8 +86,6 @@ Returns the token symbol.
 
 ### totalSupply
 
-
-
 ```solidity
   function totalSupply() public returns(uint256)
 ```
@@ -108,8 +96,6 @@ See {BEP20-totalSupply}.
 
 ### balanceOf
 
-
-
 ```solidity
   function balanceOf(address account) public returns(uint256)
 ```
@@ -119,8 +105,6 @@ See {BEP20-balanceOf}.
 
 
 ### transfer
-
-
 
 ```solidity
   function transfer(address recipient, uint256 amount) public returns(bool)
@@ -137,8 +121,6 @@ Requirements:
 
 ### allowance
 
-
-
 ```solidity
   function allowance(address owner, address spender) public returns(uint256)
 ```
@@ -148,8 +130,6 @@ See {BEP20-allowance}.
 
 
 ### approve
-
-
 
 ```solidity
   function approve(address spender, uint256 amount) public returns(bool)
@@ -164,8 +144,6 @@ Requirements:
 
 
 ### transferFrom
-
-
 
 ```solidity
   function transferFrom(address sender, address recipient, uint256 amount) public returns(bool)
@@ -186,8 +164,6 @@ Requirements:
 
 ### increaseAllowance
 
-
-
 ```solidity
   function increaseAllowance(address spender, uint256 addedValue) public returns(bool)
 ```
@@ -206,8 +182,6 @@ Requirements:
 
 
 ### decreaseAllowance
-
-
 
 ```solidity
   function decreaseAllowance(address spender, uint256 subtractedValue) public returns(bool)
@@ -230,8 +204,6 @@ Requirements:
 
 ### mint
 
-
-
 ```solidity
   function mint(uint256 amount) public returns(bool)
 ```
@@ -246,8 +218,6 @@ Requirements
 
 
 ### _transfer
-
-
 
 ```solidity
   function _transfer(address sender, address recipient, uint256 amount)
@@ -270,8 +240,6 @@ Requirements:
 
 ### _mint
 
-
-
 ```solidity
   function _mint(address account, uint256 amount)
 ```
@@ -288,8 +256,6 @@ Requirements
 
 
 ### _burn
-
-
 
 ```solidity
   function _burn(address account, uint256 amount)
@@ -308,8 +274,6 @@ Requirements
 
 
 ### _approve
-
-
 
 ```solidity
   function _approve(address owner, address spender, uint256 amount)
@@ -330,8 +294,6 @@ Requirements:
 
 
 ### _burnFrom
-
-
 
 ```solidity
   function _burnFrom(address account, uint256 amount)

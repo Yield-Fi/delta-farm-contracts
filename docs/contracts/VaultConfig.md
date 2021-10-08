@@ -9,8 +9,6 @@ ___
 
 ### setParams
 
-
-
 ```solidity
   function setParams(address _wrappedNativeToken, address _wrappedNativeTokenRelayer, address _treasuryAccount)
 ```

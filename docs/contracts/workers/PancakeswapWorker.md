@@ -10,8 +10,6 @@ ___
 
 ### shareToBalance
 
-
-
 ```solidity
   function shareToBalance(uint256 share) public returns(uint256)
 ```
@@ -29,8 +27,6 @@ Return the entitied LP token balance for the given shares.
 
 - `uint256`: LP token balance
 ### balanceToShare
-
-
 
 ```solidity
   function balanceToShare(uint256 balance) public returns(uint256)
@@ -50,8 +46,6 @@ Return the number of shares to receive if staking the given LP tokens.
 - `uint256`: Number of shares
 ### harvestRewards
 
-
-
 ```solidity
   function harvestRewards()
 ```
@@ -63,8 +57,6 @@ Harvest reward tokens, swap them on base token and send to the Vault.
 
 
 ### work
-
-
 
 ```solidity
   function work(uint256 positionId, bytes data)
@@ -82,8 +74,6 @@ Work on the given position. Must be called by the operatingVault.
 
 ### tokensToReceive
 
-
-
 ```solidity
   function tokensToReceive(uint256 id) external returns(uint256)
 ```
@@ -97,8 +87,6 @@ Return the amount of BaseToken to receive if we are to liquidate the given posit
 - `id`: The position ID.
 
 ### setStrategies
-
-
 
 ```solidity
   function setStrategies(address[] supportedStrategies)
@@ -115,8 +103,6 @@ expect [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
 
 ### getStrategies
 
-
-
 ```solidity
   function getStrategies() external returns(address[])
 ```
@@ -131,8 +117,6 @@ Get addresses of the supported strategies
 - `Array`: of strategies: [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
 ### getHarvestPath
 
-
-
 ```solidity
   function getHarvestPath() public returns(address[])
 ```
@@ -146,8 +130,6 @@ Function to get harvest path. Return route through WBNB if harvestPath not set.
 
 - `Array`: of tokens' addresses which create harvest path
 ### setHarvestConfig
-
-
 
 ```solidity
   function setHarvestConfig(uint256 _harvestThreshold, address[] _harvestPath)
@@ -165,8 +147,6 @@ Set the harvest configuration.
 
 ### setHarvestersOk
 
-
-
 ```solidity
   function setHarvestersOk(address[] harvesters, bool isApprove)
 ```
@@ -183,8 +163,6 @@ Set the given address's to be harvestor.
 
 ### setTreasuryFee
 
-
-
 ```solidity
   function setTreasuryFee(uint256 _treasuryFeeBps)
 ```
@@ -199,8 +177,6 @@ Set treasury fee.
 
 ### getClientFee
 
-
-
 ```solidity
   function getClientFee(address clientAccount) external returns(uint256)
 ```
@@ -214,8 +190,6 @@ Get fee in bps for given client
 - `clientAccount`: address of client account
 
 ### setClientFee
-
-
 
 ```solidity
   function setClientFee(uint256 clientFeeBps)
