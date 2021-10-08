@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
 import { IWorker } from "./interfaces/IWorker.sol";
+import { IVault } from "./interfaces/IVault.sol";
 
 /// @dev Contains information about addresses used within the protocol, acts as semi-central protocol point
 contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
@@ -17,6 +18,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
   /// @dev Vault(s)
   mapping(address => bool) public override approvedVaults;
+  mapping(address => address) public override tokenToVault;
   /// address[] public approvedVaultsList;
 
   /// @dev Vault config(s)
@@ -148,7 +150,12 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     uint256 length = vaults.length;
 
     for (uint256 i = 0; i < length; i++) {
-      approvedVaults[vaults[i]] = isApproved;
+      address vault = vaults[i];
+
+      approvedVaults[vault] = isApproved;
+
+      /// @notice Provide token-to-vault mapping (Vault enabled = map token, Vault disabled = assign zero address)
+      tokenToVault[IVault(vault).token()] = isApproved ? vault : address(0);
     }
 
     emit ApproveVaults(msg.sender, vaults, isApproved);
@@ -168,7 +175,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
       approvedVaultConfigs[vaultConfigs[i]] = isApproved;
     }
 
-    emit ApproveVaults(msg.sender, vaultConfigs, isApproved);
+    emit ApproveVaultConfigs(msg.sender, vaultConfigs, isApproved);
   }
 
   /// @dev Protocol ACL

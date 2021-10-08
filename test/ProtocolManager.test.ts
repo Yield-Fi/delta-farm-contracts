@@ -207,6 +207,22 @@ describe("ProtocolManager", async () => {
 
       expect(await protocolManager.approvedWorkers(pancakeswapWorker01.address)).to.be.eql(false);
     });
+
+    it("should approve and remove new vault properly including token-to-vault mapping", async () => {
+      // Addition
+      await protocolManager.approveVaults([vault.address], true);
+
+      expect(await protocolManager.approvedVaults(vault.address)).to.be.eq(true);
+      expect(await protocolManager.tokenToVault(await vault.token())).to.be.eql(vault.address);
+
+      // Removal
+      await protocolManager.approveVaults([vault.address], false);
+
+      expect(await protocolManager.approvedVaults(vault.address)).to.be.eq(false);
+      expect(await protocolManager.tokenToVault(await vault.token())).to.be.eql(
+        ethers.constants.AddressZero
+      );
+    });
   });
 
   context("called by not whitelisted operator", async () => {

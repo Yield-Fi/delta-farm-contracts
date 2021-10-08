@@ -7,6 +7,9 @@ interface IProtocolManager {
   /// @dev Vault getter, maps to internal mapping
   function approvedVaults(address vault) external returns (bool);
 
+  /// @dev Token to vault mapping
+  function tokenToVault(address token) external returns (address);
+
   /// @dev Vault config getter, maps to internal mapping
   function approvedVaultConfigs(address vaultConfig) external returns (bool);
 
