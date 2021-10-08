@@ -93,6 +93,11 @@
         "internalType": "uint256",
         "name": "bountyThreshold",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protocolManager",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -149,6 +154,11 @@
         "internalType": "uint256",
         "name": "bountyThreshold",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "protocolManager",
+        "type": "address"
       }
     ],
     "name": "setConfig",
@@ -183,24 +193,6 @@
       }
     ],
     "name": "whitelistCollectors",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "vaults",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "ok",
-        "type": "bool"
-      }
-    ],
-    "name": "whitelistVaults",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
