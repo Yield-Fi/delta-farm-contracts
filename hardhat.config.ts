@@ -5,6 +5,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "hardhat-deploy";
 import "solidity-coverage";
 import "hardhat-contract-sizer";
+import "hardhat-abi-exporter";
 
 import { config as dotEnvConfig } from "dotenv";
 import { task } from "hardhat/config";
@@ -67,5 +68,8 @@ export default {
   },
   mocha: {
     timeout: 50000,
+  },
+  abiExporter: {
+    clear: true,
   },
 };

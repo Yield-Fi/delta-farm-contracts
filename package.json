@@ -99,6 +99,7 @@
     "@pancakeswap-libs/pancake-swap-core": "^0.1.0",
     "bn.js": "^5.2.0",
     "chai-bn": "^0.3.0",
+    "hardhat-abi-exporter": "^2.3.0",
     "moment": "^2.29.1"
   }
 }
