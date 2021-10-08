@@ -9,6 +9,8 @@ ___
 
 ### initialize
 
+
+
 ```solidity
   function initialize(contract IPancakeRouterV2 _router)
 ```
@@ -22,6 +24,8 @@ Create a new add Token only strategy instance.
 - `_router`: The PancakeSwap Router smart contract.
 
 ### execute
+
+
 
 ```solidity
   function execute(bytes data)

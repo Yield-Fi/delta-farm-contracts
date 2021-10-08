@@ -19,6 +19,8 @@ ___
 
 ### add
 
+
+
 ```solidity
   function add(uint256 a, uint256 b) internal returns(uint256)
 ```
@@ -35,6 +37,8 @@ Requirements:
 
 
 ### sub
+
+
 
 ```solidity
   function sub(uint256 a, uint256 b) internal returns(uint256)
@@ -53,6 +57,8 @@ Requirements:
 
 ### sub
 
+
+
 ```solidity
   function sub(uint256 a, uint256 b, string errorMessage) internal returns(uint256)
 ```
@@ -70,6 +76,8 @@ Requirements:
 
 ### mul
 
+
+
 ```solidity
   function mul(uint256 a, uint256 b) internal returns(uint256)
 ```
@@ -86,6 +94,8 @@ Requirements:
 
 
 ### div
+
+
 
 ```solidity
   function div(uint256 a, uint256 b) internal returns(uint256)
@@ -106,6 +116,8 @@ Requirements:
 
 ### div
 
+
+
 ```solidity
   function div(uint256 a, uint256 b, string errorMessage) internal returns(uint256)
 ```
@@ -124,6 +136,8 @@ Requirements:
 
 
 ### mod
+
+
 
 ```solidity
   function mod(uint256 a, uint256 b) internal returns(uint256)
@@ -144,6 +158,8 @@ Requirements:
 
 ### mod
 
+
+
 ```solidity
   function mod(uint256 a, uint256 b, string errorMessage) internal returns(uint256)
 ```
@@ -158,24 +174,6 @@ invalid opcode to revert (consuming all remaining gas).
 Requirements:
 
 - The divisor cannot be zero.
-
-
-
-### min
-
-```solidity
-  function min(uint256 x, uint256 y) internal returns(uint256 z)
-```
-
-
-
-
-### sqrt
-
-```solidity
-  function sqrt(uint256 y) internal returns(uint256 z)
-```
-
 
 
 

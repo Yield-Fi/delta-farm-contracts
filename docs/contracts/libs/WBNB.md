@@ -7,69 +7,6 @@ ___
 
 ## Functions
 
-### a
-
-```solidity
-  function a()
-```
-
-
-
-
-### deposit
-
-```solidity
-  function deposit()
-```
-
-
-
-
-### withdraw
-
-```solidity
-  function withdraw(uint256 wad)
-```
-
-
-
-
-### totalSupply
-
-```solidity
-  function totalSupply() public returns(uint256)
-```
-
-
-
-
-### approve
-
-```solidity
-  function approve(address guy, uint256 wad) public returns(bool)
-```
-
-
-
-
-### transfer
-
-```solidity
-  function transfer(address dst, uint256 wad) public returns(bool)
-```
-
-
-
-
-### transferFrom
-
-```solidity
-  function transferFrom(address src, address dst, uint256 wad) public returns(bool)
-```
-
-
-
-
 
 ___
 

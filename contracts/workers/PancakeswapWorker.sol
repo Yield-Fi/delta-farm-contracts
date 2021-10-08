@@ -306,7 +306,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
       );
   }
 
-  /// @dev Internal function to estimate swap result on pancakeswap router
+  /// Internal function to estimate swap result on pancakeswap router
   function _estimateSwapOutput(
     address tokenIn,
     address tokenOut,
@@ -333,7 +333,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
       );
   }
 
-  /// @dev Internal function to stake all outstanding LP tokens to the given position ID.
+  /// Internal function to stake all outstanding LP tokens to the given position ID.
   function _addShare(uint256 id) internal {
     uint256 balance = lpToken.balanceOf(address(this));
     if (balance > 0) {
@@ -352,7 +352,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     }
   }
 
-  /// @dev Internal function to remove shares of the ID and convert to outstanding LP tokens.
+  /// Internal function to remove shares of the ID and convert to outstanding LP tokens.
   function _removeShare(uint256 id) internal {
     uint256 share = shares[id];
     if (share > 0) {
@@ -386,7 +386,8 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     return strategies;
   }
 
-  /// @dev Internal function to get harvest path. Return route through WBNB if harvestPath not set.
+  /// @dev Function to get harvest path. Return route through WBNB if harvestPath not set.
+  /// @return address[] Array of tokens' addresses which create harvest path
   function getHarvestPath() public view returns (address[] memory) {
     if (harvestPath.length != 0) return harvestPath;
     address[] memory path;
@@ -463,7 +464,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     emit SetClientFee(msg.sender, clientFeeBps);
   }
 
-  /// @dev Internal function to add new position id to the array with position ids
+  /// Internal function to add new position id to the array with position ids
   /// @param positionId The position ID to work on
   function addPositionId(uint256 positionId) internal {
     uint256 numberOfPositions = positionIds.length;

@@ -11,15 +11,14 @@ ___
 ## Functions
 
 {{#each ownFunctions}}
+{{#if natspec.devdoc}}
 ### {{name}}
 
 ```solidity
   function {{name}}({{args}}){{#if outputs}} {{visibility}} returns({{outputs}}){{/if}}
 ```
 
-{{#if natspec.devdoc}}
 {{{natspec.devdoc}}}
-{{/if}}
 
 {{#if natspec.userdoc}}
 > **NOTE:** {{{natspec.userdoc}}}
@@ -39,6 +38,7 @@ ___
 {{#each natspec.returns}}
 - `{{param}}`: {{description}}
 {{/each}}
+{{/if}}
 {{/if}}
 {{/each}}
 

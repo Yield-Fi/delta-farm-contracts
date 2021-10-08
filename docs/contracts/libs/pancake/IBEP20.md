@@ -9,6 +9,8 @@ ___
 
 ### totalSupply
 
+
+
 ```solidity
   function totalSupply() external returns(uint256)
 ```
@@ -18,6 +20,8 @@ Returns the amount of tokens in existence.
 
 
 ### decimals
+
+
 
 ```solidity
   function decimals() external returns(uint8)
@@ -29,6 +33,8 @@ Returns the token decimals.
 
 ### symbol
 
+
+
 ```solidity
   function symbol() external returns(string)
 ```
@@ -38,6 +44,8 @@ Returns the token symbol.
 
 
 ### name
+
+
 
 ```solidity
   function name() external returns(string)
@@ -49,6 +57,8 @@ Returns the token name.
 
 ### getOwner
 
+
+
 ```solidity
   function getOwner() external returns(address)
 ```
@@ -59,6 +69,8 @@ Returns the bep token owner.
 
 ### balanceOf
 
+
+
 ```solidity
   function balanceOf(address account) external returns(uint256)
 ```
@@ -68,6 +80,8 @@ Returns the amount of tokens owned by `account`.
 
 
 ### transfer
+
+
 
 ```solidity
   function transfer(address recipient, uint256 amount) external returns(bool)
@@ -83,6 +97,8 @@ Emits a {Transfer} event.
 
 ### allowance
 
+
+
 ```solidity
   function allowance(address _owner, address spender) external returns(uint256)
 ```
@@ -96,6 +112,8 @@ This value changes when {approve} or {transferFrom} are called.
 
 
 ### approve
+
+
 
 ```solidity
   function approve(address spender, uint256 amount) external returns(bool)
@@ -117,6 +135,8 @@ Emits an {Approval} event.
 
 
 ### transferFrom
+
+
 
 ```solidity
   function transferFrom(address sender, address recipient, uint256 amount) external returns(bool)

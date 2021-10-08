@@ -7,25 +7,9 @@ ___
 
 ## Functions
 
-### initialize
-
-```solidity
-  function initialize(address _feeder)
-```
-
-
-
-
-### setFeeder
-
-```solidity
-  function setFeeder(address _feeder)
-```
-
-
-
-
 ### setPrices
+
+
 
 ```solidity
   function setPrices(address[] token0s, address[] token1s, uint256[] prices)
@@ -36,6 +20,8 @@ Set the prices of the token token pairs. Must be called by the feeder.
 
 
 ### getPrice
+
+
 
 ```solidity
   function getPrice(address token0, address token1) external returns(uint256 price, uint256 lastUpdate)

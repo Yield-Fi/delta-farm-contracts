@@ -7,51 +7,6 @@ ___
 
 ## Functions
 
-### constructor
-
-```solidity
-  function constructor(address _feeToSetter)
-```
-
-
-
-
-### allPairsLength
-
-```solidity
-  function allPairsLength() external returns(uint256)
-```
-
-
-
-
-### createPair
-
-```solidity
-  function createPair(address tokenA, address tokenB) external returns(address pair)
-```
-
-
-
-
-### setFeeTo
-
-```solidity
-  function setFeeTo(address _feeTo)
-```
-
-
-
-
-### setFeeToSetter
-
-```solidity
-  function setFeeToSetter(address _feeToSetter)
-```
-
-
-
-
 
 ___
 

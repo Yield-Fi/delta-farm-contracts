@@ -7,16 +7,9 @@ ___
 
 ## Functions
 
-### initialize
-
-```solidity
-  function initialize(address _wrappedNativeToken, address _wrappedNativeTokenRelayer, address _treasuryAccount)
-```
-
-
-
-
 ### setParams
+
+
 
 ```solidity
   function setParams(address _wrappedNativeToken, address _wrappedNativeTokenRelayer, address _treasuryAccount)
