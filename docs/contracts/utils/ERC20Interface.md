@@ -7,15 +7,6 @@ ___
 
 ## Functions
 
-### balanceOf
-
-```solidity
-  function balanceOf(address user) external returns(uint256)
-```
-
-
-
-
 
 ___
 

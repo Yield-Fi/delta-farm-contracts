@@ -9,6 +9,8 @@ ___
 
 ### getInterestRate
 
+
+
 ```solidity
   function getInterestRate(uint256 debt, uint256 floating) external returns(uint256)
 ```

@@ -9,6 +9,8 @@ ___
 
 ### whitelistCallers
 
+
+
 ```solidity
   function whitelistCallers(address[] callers, bool isOk)
 ```
@@ -18,6 +20,8 @@ Whitelist methods - callers
 
 
 ### _whitelistOperators
+
+
 
 ```solidity
   function _whitelistOperators(address[] operators, bool isOk)
@@ -29,6 +33,8 @@ Whitelist methods - operators
 
 ### whitelistOperators
 
+
+
 ```solidity
   function whitelistOperators(address[] operators, bool isOk)
 ```
@@ -37,16 +43,9 @@ External interface for function above
 
 
 
-### initialize
-
-```solidity
-  function initialize(string kind, string clientName, address protocolManager, address[] initialOperators)
-```
-
-
-
-
 ### deposit
+
+
 
 ```solidity
   function deposit(address recipient, address worker, uint256 amount)
@@ -67,16 +66,9 @@ internal ProtocolManager.
 - `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
 
 
-### withdraw
-
-```solidity
-  function withdraw(uint256 pid, address recipient, address worker)
-```
-
-
-
-
 ### setWorkerFee
+
+
 
 ```solidity
   function setWorkerFee(address worker, uint256 feeBps)
@@ -93,6 +85,8 @@ Set client-side fee for given worker
 - `feeBps`: new fee denominator (0 < feeBps < 10000)
 
 ### toggleWorkers
+
+
 
 ```solidity
   function toggleWorkers(address[] workers, bool isEnabled)

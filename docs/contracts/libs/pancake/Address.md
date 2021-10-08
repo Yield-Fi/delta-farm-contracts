@@ -9,6 +9,8 @@ ___
 
 ### isContract
 
+
+
 ```solidity
   function isContract(address account) internal returns(bool)
 ```
@@ -33,6 +35,8 @@ types of addresses:
 
 ### sendValue
 
+
+
 ```solidity
   function sendValue(address payable recipient, uint256 amount)
 ```
@@ -56,6 +60,8 @@ use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern]
 
 
 ### functionCall
+
+
 
 ```solidity
   function functionCall(address target, bytes data) internal returns(bytes)
@@ -83,6 +89,8 @@ _Available since v3.1._
 
 ### functionCall
 
+
+
 ```solidity
   function functionCall(address target, bytes data, string errorMessage) internal returns(bytes)
 ```
@@ -95,6 +103,8 @@ _Available since v3.1._
 
 
 ### functionCallWithValue
+
+
 
 ```solidity
   function functionCallWithValue(address target, bytes data, uint256 value) internal returns(bytes)
@@ -113,6 +123,8 @@ _Available since v3.1._
 
 
 ### functionCallWithValue
+
+
 
 ```solidity
   function functionCallWithValue(address target, bytes data, uint256 value, string errorMessage) internal returns(bytes)

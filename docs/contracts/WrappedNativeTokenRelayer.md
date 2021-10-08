@@ -9,6 +9,8 @@ ___
 
 ### initialize
 
+
+
 ```solidity
   function initialize(address _wnative)
 ```
@@ -23,6 +25,8 @@ Function to initialize smart contract
 
 ### withdraw
 
+
+
 ```solidity
   function withdraw(uint256 _amount)
 ```
@@ -34,15 +38,6 @@ Convert wrapped native token and withdraw native token
 #### Parameters:
 
 - `_amount`: Amount of native token to withdraw
-
-### receive
-
-```solidity
-  function receive()
-```
-
-
-
 
 
 ___

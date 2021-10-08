@@ -7,15 +7,6 @@ ___
 
 ## Functions
 
-### setCompleted
-
-```solidity
-  function setCompleted(uint256 completed)
-```
-
-
-
-
 
 ___
 

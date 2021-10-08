@@ -9,6 +9,8 @@ ___
 
 ### initialize
 
+
+
 ```solidity
   function initialize(address[] initialOperators)
 ```
@@ -17,24 +19,9 @@ initialize the owner and operators of Protocol
 
 
 
-### whitelistOperators
-
-```solidity
-  function whitelistOperators(address[] operators, bool isOk)
-```
-
-
-> **NOTE:** Internal ACL - external method
-External-internal methods bridge
-
-
-#### Parameters:
-
-- `operators`: Array of operators' public addresses to enable/disable
-
-- `isOk`: Are operators going to be enabled or disabled?
-
 ### _whitelistOperators
+
+
 
 ```solidity
   function _whitelistOperators(address[] operators, bool isOk)
@@ -55,6 +42,8 @@ able or unable to perform restricted set of actions
 
 ### approveWorkers
 
+
+
 ```solidity
   function approveWorkers(address[] workers, bool isEnabled)
 ```
@@ -70,6 +59,8 @@ Protocol ACL
 - `isEnabled`: true | false
 
 ### approveClients
+
+
 
 ```solidity
   function approveClients(address[] clients, bool isApproved)
@@ -87,6 +78,8 @@ Protocol ACL
 
 ### approveVaults
 
+
+
 ```solidity
   function approveVaults(address[] vaults, bool isApproved)
 ```
@@ -102,6 +95,8 @@ Protocol ACL
 - `isApproved`: true | false
 
 ### approveVaultConfigs
+
+
 
 ```solidity
   function approveVaultConfigs(address[] vaultConfigs, bool isApproved)
@@ -119,6 +114,8 @@ Protocol ACL
 
 ### approveBountyCollectors
 
+
+
 ```solidity
   function approveBountyCollectors(address[] bountyCollectors, bool isApproved)
 ```
@@ -135,6 +132,8 @@ Protocol ACL
 
 ### approveStrategies
 
+
+
 ```solidity
   function approveStrategies(address[] strategies, bool isApproved)
 ```
@@ -150,6 +149,8 @@ Protocol ACL
 - `isApproved`: true | false
 
 ### setNativeRelayer
+
+
 
 ```solidity
   function setNativeRelayer(address nativeRelayer)
