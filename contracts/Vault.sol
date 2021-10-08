@@ -24,9 +24,24 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   using SafeToken for address;
   using SafeMath for uint256;
 
-  /// @notice Events
-  event Work(uint256 indexed id, uint256 loan);
+  /// @dev It's emitted when client contract perform deposit or withdraw action
+  /// @param id Index of position to perform action on
+  /// @param worker The address of the authorized worker to work for this position.
+  /// @param amount Amount of base token to supply or withdraw
+  /// @param strategy Address of the strategy to execute by worker
+  event Work(uint256 indexed id, address worker, uint256 amount, address strategy);
+
+  /// @dev It's emitted when reward will be collected
+  /// @param caller Address which call collect function
+  /// @param rewardOwner Address of reward owner
+  /// @param reward Amount of collected reward
   event RewardCollect(address indexed caller, address indexed rewardOwner, uint256 indexed reward);
+
+  /// @dev It's emitted when worker will register new harvested rewards
+  /// @param caller Address of worker which will register rewards
+  /// @param pids Array of position ids
+  /// @param amounts Array of reward amounts assign to the specific positions
+  /// @notice The order of values in the amounts array is related to the order in the pids array
   event RewardsRegister(address indexed caller, uint256[] indexed pids, uint256[] indexed amounts);
 
   /// @dev Flags for manage execution scope
@@ -95,6 +110,11 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     _IN_EXEC_LOCK = _NOT_ENTERED;
   }
 
+  /// @dev Function to initialize new contarct instance
+  /// @param _config Address of VaultConfig contract
+  /// @param _token Address of token which will be the base token for this vault
+  /// @param _protocolManager Address of protocol manager contract
+  /// @param _bountyCollector Address of bounty collector contract
   function initialize(
     IVaultConfig _config,
     address _token,
@@ -124,17 +144,20 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     return (IWorker(pos.worker).tokensToReceive(id));
   }
 
-  /// @dev Return the total token entitled to the token holders. Be careful of unaccrued interests.
+  /// @dev Return the total token entitled to the token holders
   function totalToken() public view override returns (uint256) {
     return SafeToken.myBalance(token);
   }
 
   /// @dev Request Funds from user through Vault
+  /// @param targetedToken Address of requested token
+  /// @param amount requested amount
+  /// @notice Function can be called only by strategy
   function requestFunds(address targetedToken, uint256 amount) external override inExec {
     SafeToken.safeTransferFrom(targetedToken, positions[POSITION_ID].owner, msg.sender, amount);
   }
 
-  /// @dev Transfer to "to". Automatically unwrap if BTOKEN is WBNB
+  /// Transfer to "to". Automatically unwrap if BTOKEN is WBNB
   /// @param to The address of the receiver
   /// @param amount The amount to be withdrawn
   function _safeUnwrap(address to, uint256 amount) internal {
@@ -174,10 +197,11 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       require(pos.owner == endUser, "not position owner");
       require(pos.client == msg.sender, "bad source-client address");
     }
-    emit Work(id, amount);
     // Update execution scope variables
     POSITION_ID = id;
     (STRATEGY, ) = abi.decode(data, (address, bytes));
+
+    emit Work(id, worker, amount, STRATEGY);
 
     require(amount <= SafeToken.myBalance(token), "insufficient funds in the vault");
 
@@ -201,6 +225,11 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     SafeToken.safeTransfer(token, to, value);
   }
 
+  /// @dev Function to register new rewards
+  /// @param pids Array of position ids
+  /// @param amounts Array of reward amounts assign to the specific positions
+  /// @notice The order of values in the amounts array is related to the order in the pids array
+  /// @notice Function can be called only by worker
   function registerRewards(uint256[] calldata pids, uint256[] calldata amounts)
     external
     override

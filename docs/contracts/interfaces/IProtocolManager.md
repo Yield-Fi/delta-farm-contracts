@@ -27,6 +27,16 @@ Vault getter, maps to internal mapping
 
 
 
+### tokenToVault
+
+```solidity
+  function tokenToVault(address token) external returns(address)
+```
+
+Token to vault mapping
+
+
+
 ### approvedVaultConfigs
 
 ```solidity
