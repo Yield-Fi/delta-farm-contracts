@@ -1,6 +1,6 @@
 # ProtocolManager
 
-
+Contains information about addresses used within the protocol, acts as semi-central protocol point
 
 
 ___

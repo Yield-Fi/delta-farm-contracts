@@ -1,6 +1,7 @@
 # PancakeswapWorker
 
-
+Contract responsible for Pancakeswap liquidity pool handling.
+Allows execute specific strategies to add, remove liquidity and harvesting rewards.
 
 
 ___
@@ -61,6 +62,8 @@ Return the number of shares to receive if staking the given LP tokens.
 Harvest reward tokens, swap them on base token and send to the Vault.
 
 
+> **NOTE:** Must be called by approved harvester bot
+
 
 ### work
 
@@ -98,8 +101,8 @@ Return the amount of BaseToken to receive if we are to liquidate the given posit
   function _estimateSwapOutput(address tokenIn, address tokenOut, uint256 amountIn, uint256 reserveInToSubtract, uint256 reserveOutToSubtract) internal returns(uint256)
 ```
 
+Internal function to estimate swap result on pancakeswap router
 
-> **NOTE:** Function to estimate swap result on pancakeswap router
 
 
 ### _addShare
@@ -180,7 +183,7 @@ Set the harvest configuration.
 ### setHarvestersOk
 
 ```solidity
-  function setHarvestersOk(address[] harvesters, bool isOk)
+  function setHarvestersOk(address[] harvesters, bool isApprove)
 ```
 
 Set the given address's to be harvestor.
@@ -191,7 +194,7 @@ Set the given address's to be harvestor.
 
 - `harvesters`: - The harvest bot addresses.
 
-- `isOk`: - Whether to approve or unapprove the given strategies.
+- `isApprove`: - Whether to approve or unapprove the given harvesters.
 
 ### setTreasuryFee
 
@@ -241,7 +244,7 @@ Set fee in bps for specific client
   function addPositionId(uint256 positionId)
 ```
 
-add new position id to the array with position ids
+Internal function to add new position id to the array with position ids
 
 
 
@@ -257,63 +260,137 @@ ___
 ### Harvest
 
 ```solidity
-  event Harvest(uint256 reward, address operatingVault)
+  event Harvest(uint256 reward, uint256 rewardInBaseToken, address operatingVault)
 ```
+It's emitted when the rewards is harvesting
 
+
+#### Parameters:
+
+- `reward`: Amount of the harvested CAKE token
+
+- `rewardInBaseToken`: Amount of the reward converted to base token
+
+- `operatingVault`: Address of the operating vault
 
 ### AddShare
 
 ```solidity
   event AddShare(uint256 id, uint256 share)
 ```
+It's emitted during staking LP tokens to the given position
 
+
+#### Parameters:
+
+- `id`: Position id
+
+- `share`: Number of shares for the given position
 
 ### RemoveShare
 
 ```solidity
   event RemoveShare(uint256 id, uint256 share)
 ```
+It's emitted during unstaking LP tokens from the given position
 
+
+#### Parameters:
+
+- `id`: Position id
+
+- `share`: Number of removed share
 
 ### SetHarvestConfig
 
 ```solidity
   event SetHarvestConfig(address caller, uint256 harvestThreshold, address[] harvestPath)
 ```
+It's emitted when the harvest configuration will be changed
 
 
-### SetHarvestersOK
+#### Parameters:
+
+- `caller`: Address which set the new configuration
+
+- `harvestThreshold`: Threshold for harvesting in CAKE
+
+- `harvestPath`: Array of token addresses as path to swap CAKE token to base token
+
+### SetHarvesterApproval
 
 ```solidity
-  event SetHarvestersOK(address caller, address harvestor, bool isOk)
+  event SetHarvesterApproval(address caller, address harvester, bool isApprove)
 ```
+It's emitted when harvester approval will be changed
 
+
+#### Parameters:
+
+- `caller`: Address which change the harvester approval
+
+- `harvester`: Address of harvester
+
+- `isApprove`: Whether is approved or unapproved
 
 ### SetTreasuryFee
 
 ```solidity
   event SetTreasuryFee(address caller, uint256 feeBps)
 ```
+It's emitted when treasury fee will be changed
 
+
+#### Parameters:
+
+- `caller`: Address which change the treasury fee
+
+- `feeBps`: Fee in BPS
 
 ### SetClientFee
 
 ```solidity
   event SetClientFee(address caller, uint256 feeBps)
 ```
+It's emitted when client fee will be changed
 
+
+#### Parameters:
+
+- `caller`: Address of client's smart contract
+
+- `feeBps`: Fee in BPS
 
 ### SetStrategies
 
 ```solidity
   event SetStrategies(address[] strategies, address caller)
 ```
+It's emitted when strategies' addresses will be updated
 
+
+#### Parameters:
+
+- `strategies`: Array of updated addresses
+
+- `caller`: Address which updated strategies' addresses
+[AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
 
 ### Work
 
 ```solidity
-  event Work(address operatingVault, uint256 positionId, address strategy)
+  event Work(address operatingVault, uint256 positionId, address strategy, bytes stratParams)
 ```
+It's emitted when Vault will execute strategy on the worker
 
+
+#### Parameters:
+
+- `operatingVault`: Address of operating vault
+
+- `positionId`: Id of position
+
+- `strategy`: Address of executed strategy
+
+- `stratParams`: Encoded params for strategy
 

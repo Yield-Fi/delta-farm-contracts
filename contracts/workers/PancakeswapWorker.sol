@@ -18,21 +18,72 @@ import "../utils/SafeToken.sol";
 import "../interfaces/IVault.sol";
 import "../interfaces/IProtocolManager.sol";
 
+/// @dev Contract responsible for Pancakeswap liquidity pool handling.
+/// Allows execute specific strategies to add, remove liquidity and harvesting rewards.
 contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWorker {
   /// @notice Libraries
   using SafeToken for address;
   using SafeMath for uint256;
 
-  /// @notice Events
-  event Harvest(uint256 reward, address indexed operatingVault);
+  /// @dev It's emitted when the rewards is harvesting
+  /// @param reward Amount of the harvested CAKE token
+  /// @param rewardInBaseToken Amount of the reward converted to base token
+  /// @param operatingVault Address of the operating vault
+  event Harvest(uint256 reward, uint256 rewardInBaseToken, address indexed operatingVault);
+
+  /// @dev It's emitted during staking LP tokens to the given position
+  /// @param id Position id
+  /// @param share Number of shares for the given position
   event AddShare(uint256 indexed id, uint256 share);
+
+  /// @dev It's emitted during unstaking LP tokens from the given position
+  /// @param id Position id
+  /// @param share Number of removed share
   event RemoveShare(uint256 indexed id, uint256 share);
+
+  /// @dev It's emitted when the harvest configuration will be changed
+  /// @param caller Address which set the new configuration
+  /// @param harvestThreshold Threshold for harvesting in CAKE
+  /// @param harvestPath Array of token addresses as path to swap CAKE token to base token
   event SetHarvestConfig(address indexed caller, uint256 harvestThreshold, address[] harvestPath);
-  event SetHarvestersOK(address indexed caller, address indexed harvestor, bool indexed isOk);
+
+  /// @dev It's emitted when harvester approval will be changed
+  /// @param caller Address which change the harvester approval
+  /// @param harvester Address of harvester
+  /// @param isApprove Whether is approved or unapproved
+  event SetHarvesterApproval(
+    address indexed caller,
+    address indexed harvester,
+    bool indexed isApprove
+  );
+
+  /// @dev It's emitted when treasury fee will be changed
+  /// @param caller Address which change the treasury fee
+  /// @param feeBps Fee in BPS
   event SetTreasuryFee(address indexed caller, uint256 feeBps);
+
+  /// @dev It's emitted when client fee will be changed
+  /// @param caller Address of client's smart contract
+  /// @param feeBps Fee in BPS
   event SetClientFee(address indexed caller, uint256 feeBps);
+
+  /// @dev It's emitted when strategies' addresses will be updated
+  /// @param strategies Array of updated addresses
+  /// @param caller Address which updated strategies' addresses
+  /// [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
   event SetStrategies(address[] strategies, address indexed caller);
-  event Work(address indexed operatingVault, uint256 positionId, address strategy);
+
+  /// @dev It's emitted when Vault will execute strategy on the worker
+  /// @param operatingVault Address of operating vault
+  /// @param positionId Id of position
+  /// @param strategy Address of executed strategy
+  /// @param stratParams Encoded params for strategy
+  event Work(
+    address indexed operatingVault,
+    uint256 positionId,
+    address strategy,
+    bytes stratParams
+  );
 
   /// @notice Configuration variables
   IPancakeFactory public factory;
@@ -162,6 +213,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   }
 
   /// @dev Harvest reward tokens, swap them on base token and send to the Vault.
+  /// @notice Must be called by approved harvester bot
   function harvestRewards() external override onlyHarvester nonReentrant {
     // 1. Withdraw all the rewards. Return if reward <= _harvestThreshold.
     masterChef.withdraw(pid, 0);
@@ -176,7 +228,8 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     router.swapExactTokensForTokens(reward, 0, getHarvestPath(), address(this), block.timestamp);
 
     // 4. Send all base token to the operatingVault
-    baseToken.safeTransfer(operatingVault, baseToken.myBalance());
+    uint256 baseTokenBalance = baseToken.myBalance();
+    baseToken.safeTransfer(operatingVault, baseTokenBalance);
 
     // 5. Calculate the amount of reward for the given positions
     uint256 numberOfPositions = positionIds.length;
@@ -192,7 +245,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     // 7. Reset approval
     cake.safeApprove(address(router), 0);
 
-    emit Harvest(reward, operatingVault);
+    emit Harvest(reward, baseTokenBalance, operatingVault);
   }
 
   /// @dev Work on the given position. Must be called by the operatingVault.
@@ -221,7 +274,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     // 4. Return any remaining BaseToken back to the operatingVault.
     baseToken.safeTransfer(msg.sender, baseToken.myBalance());
 
-    emit Work(operatingVault, positionId, strategy);
+    emit Work(operatingVault, positionId, strategy, stratParams);
   }
 
   /// @dev Return the amount of BaseToken to receive if we are to liquidate the given position.
@@ -253,7 +306,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
       );
   }
 
-  /// Function to estimate swap result on pancakeswap router
+  /// @dev Internal function to estimate swap result on pancakeswap router
   function _estimateSwapOutput(
     address tokenIn,
     address tokenOut,
@@ -374,13 +427,17 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Set the given address's to be harvestor.
   /// @param harvesters - The harvest bot addresses.
-  /// @param isOk - Whether to approve or unapprove the given strategies.
-  function setHarvestersOk(address[] calldata harvesters, bool isOk) external override onlyOwner {
+  /// @param isApprove - Whether to approve or unapprove the given harvesters.
+  function setHarvestersOk(address[] calldata harvesters, bool isApprove)
+    external
+    override
+    onlyOwner
+  {
     uint256 len = harvesters.length;
     for (uint256 idx = 0; idx < len; idx++) {
-      okHarvesters[harvesters[idx]] = isOk;
+      okHarvesters[harvesters[idx]] = isApprove;
 
-      emit SetHarvestersOK(msg.sender, harvesters[idx], isOk);
+      emit SetHarvesterApproval(msg.sender, harvesters[idx], isApprove);
     }
   }
 
@@ -406,7 +463,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     emit SetClientFee(msg.sender, clientFeeBps);
   }
 
-  /// @dev add new position id to the array with position ids
+  /// @dev Internal function to add new position id to the array with position ids
   /// @param positionId The position ID to work on
   function addPositionId(uint256 positionId) internal {
     uint256 numberOfPositions = positionIds.length;
