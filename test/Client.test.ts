@@ -32,6 +32,7 @@ import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
 import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
+import { assertAlmostEqual } from "./helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -388,8 +389,9 @@ describe("Client contract", async () => {
       expect(position.client).to.be.eql(exampleClient.address);
 
       // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 1.971394083659056879 (due to liquidity ratios) [1 BT -> TST -> TT];
-      expect(positionInfo).to.be.bignumber.that.is.eql(
-        ethers.utils.parseEther("1.971394083659056879")
+      assertAlmostEqual(
+        positionInfo.toString(),
+        ethers.utils.parseEther("1.971394083659056879").toString()
       );
     });
   });

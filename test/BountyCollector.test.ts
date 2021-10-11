@@ -50,40 +50,40 @@ describe("BountyCollector", async () => {
       alice.getAddress(),
       bob.getAddress(),
     ]);
-    // Bounty token
-    // bountyToken = (await upgrades.deployProxy(
-    //   await ethers.getContractFactory("MockToken", deployer),
-    //   ["BountyToken", "BTT"]
-    // )) as MockToken;
-    // await bountyToken.deployed();
 
-    // // Setup general protocol manager
-    // protocolManager = (await deployProxyContract(
-    //   "ProtocolManager",
-    //   [[deployerAddress]],
-    //   deployer
-    // )) as ProtocolManager;
-    // // Setup general protocol manager
-    // bountyCollector = (await deployProxyContract(
-    //   "BountyCollector",
-    //   [bountyToken.address, "500", protocolManager.address],
-    //   deployer
-    // )) as BountyCollector;
-    // // Client contract
-    // client = (await deployProxyContract(
-    //   "Client",
-    //   ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
-    //   deployer
-    // )) as Client;
-    // mockWBNB = await deployWBNB(deployer);
-    // [vault] = await deployVault(
-    //   mockWBNB,
-    //   bountyToken,
-    //   protocolManager.address,
-    //   bountyCollector.address,
-    //   deployerAddress,
-    //   deployer
-    // );
+    bountyToken = (await upgrades.deployProxy(
+      await ethers.getContractFactory("MockToken", deployer),
+      ["BountyToken", "BTT"]
+    )) as MockToken;
+    await bountyToken.deployed();
+
+    // Setup general protocol manager
+    protocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [[deployerAddress]],
+      deployer
+    )) as ProtocolManager;
+    // Setup general protocol manager
+    bountyCollector = (await deployProxyContract(
+      "BountyCollector",
+      [bountyToken.address, "500", protocolManager.address],
+      deployer
+    )) as BountyCollector;
+    // Client contract
+    client = (await deployProxyContract(
+      "Client",
+      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
+      deployer
+    )) as Client;
+    mockWBNB = await deployWBNB(deployer);
+    [vault] = await deployVault(
+      mockWBNB,
+      bountyToken,
+      protocolManager.address,
+      bountyCollector.address,
+      deployerAddress,
+      deployer
+    );
   }
 
   beforeEach(async () => {
