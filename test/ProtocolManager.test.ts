@@ -101,17 +101,17 @@ describe("ProtocolManager", async () => {
       deployer
     );
 
-    bountyCollector = (await deployProxyContract(
-      "BountyCollector",
-      [baseToken.address, "500"],
-      deployer
-    )) as BountyCollector;
-
     protocolManager = (await deployProxyContract(
       "ProtocolManager",
       [[deployerAddress]],
       deployer
     )) as ProtocolManager;
+
+    bountyCollector = (await deployProxyContract(
+      "BountyCollector",
+      [baseToken.address, "500", protocolManager.address],
+      deployer
+    )) as BountyCollector;
 
     // Treasury acc = yieldFi protocol owner
     [vault, vaultConfig, wNativeRelayer] = await deployVault(
@@ -167,7 +167,6 @@ describe("ProtocolManager", async () => {
       deployer
     )) as Client;
 
-    protocolManager = protocolManager.connect(deployer);
     protocolManagerAsEvilUser = protocolManager.connect(evilUser);
   }
 

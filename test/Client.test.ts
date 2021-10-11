@@ -139,18 +139,18 @@ describe("Client contract", async () => {
       deployer
     );
 
-    bountyCollector = (await deployProxyContract(
-      "BountyCollector",
-      [baseToken.address, "500"],
-      deployer
-    )) as BountyCollector;
-
     // Setup general protocol manager
     protocolManager = (await deployProxyContract(
       "ProtocolManager",
       [[deployerAddress]],
       deployer
     )) as ProtocolManager;
+
+    bountyCollector = (await deployProxyContract(
+      "BountyCollector",
+      [baseToken.address, "500", protocolManager.address],
+      deployer
+    )) as BountyCollector;
 
     // Treasury acc = yieldFi protocol owner
     [vault, vaultConfig, wNativeRelayer] = await deployVault(
@@ -387,9 +387,9 @@ describe("Client contract", async () => {
       expect(position.owner).to.be.eql(aliceAddress);
       expect(position.client).to.be.eql(exampleClient.address);
 
-      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 1.971394083659056878 (due to liquidity ratios) [1 BT -> TST -> TT];
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 1.971394083659056879 (due to liquidity ratios) [1 BT -> TST -> TT];
       expect(positionInfo).to.be.bignumber.that.is.eql(
-        ethers.utils.parseEther("1.971394083659056878")
+        ethers.utils.parseEther("1.971394083659056879")
       );
     });
   });
