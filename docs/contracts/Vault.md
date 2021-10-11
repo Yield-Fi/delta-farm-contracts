@@ -7,6 +7,26 @@ ___
 
 ## Functions
 
+### initialize
+
+```solidity
+  function initialize(contract IVaultConfig _config, address _token, contract IProtocolManager _protocolManager, contract IBountyCollector _bountyCollector)
+```
+
+Function to initialize new contarct instance
+
+
+
+#### Parameters:
+
+- `_config`: Address of VaultConfig contract
+
+- `_token`: Address of token which will be the base token for this vault
+
+- `_protocolManager`: Address of protocol manager contract
+
+- `_bountyCollector`: Address of bounty collector contract
+
 ### positionInfo
 
 ```solidity
@@ -27,7 +47,7 @@ Return Token value of the given position.
   function totalToken() public returns(uint256)
 ```
 
-Return the total token entitled to the token holders. Be careful of unaccrued interests.
+Return the total token entitled to the token holders
   f
 
 
@@ -39,26 +59,17 @@ Return the total token entitled to the token holders. Be careful of unaccrued in
 ```
 
 Request Funds from user through Vault
+
+
+> **NOTE:** Function can be called only by strategy
   f
-
-
-
-### _safeUnwrap
-
-```solidity
-  function _safeUnwrap(address to, uint256 amount)
-```
-
-Transfer to "to". Automatically unwrap if BTOKEN is WBNB
-
-
 
 #### Parameters:
 
-- `to`: The address of the receiver
+- `targetedToken`: Address of requested token
 
-- `amount`: The amount to be withdrawn
-  f
+- `amount`: requested amount
+
 
 ### work
 
@@ -113,6 +124,26 @@ Withdraw BaseToken reserve for underwater positions to the given address.
 - `value`: The number of BaseToken tokens to withdraw. Must not exceed `reservePool`.
   f
 
+### registerRewards
+
+```solidity
+  function registerRewards(uint256[] pids, uint256[] amounts)
+```
+
+Function to register new rewards
+
+
+> **NOTE:** The order of values in the amounts array is related to the order in the pids array
+Function can be called only by worker
+  f
+
+#### Parameters:
+
+- `pids`: Array of position ids
+
+- `amounts`: Array of reward amounts assign to the specific positions
+
+
 ### collectReward
 
 ```solidity
@@ -164,21 +195,51 @@ ___
 ### Work
 
 ```solidity
-  event Work(uint256 id, uint256 loan)
+  event Work(uint256 id, address worker, uint256 amount, address strategy)
 ```
+It's emitted when client contract perform deposit or withdraw action
 
+
+#### Parameters:
+
+- `id`: Index of position to perform action on
+
+- `worker`: The address of the authorized worker to work for this position.
+
+- `amount`: Amount of base token to supply or withdraw
+
+- `strategy`: Address of the strategy to execute by worker
 
 ### RewardCollect
 
 ```solidity
   event RewardCollect(address caller, address rewardOwner, uint256 reward)
 ```
+It's emitted when reward will be collected
 
+
+#### Parameters:
+
+- `caller`: Address which call collect function
+
+- `rewardOwner`: Address of reward owner
+
+- `reward`: Amount of collected reward
 
 ### RewardsRegister
 
 ```solidity
   event RewardsRegister(address caller, uint256[] pids, uint256[] amounts)
 ```
+It's emitted when worker will register new harvested rewards
+
+
+#### Parameters:
+
+- `caller`: Address of worker which will register rewards
+
+- `pids`: Array of position ids
+
+- `amounts`: Array of reward amounts assign to the specific positions
 
 

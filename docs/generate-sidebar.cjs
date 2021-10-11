@@ -5,7 +5,7 @@ const path = require("path");
 const nanoMd = require("nano-markdown");
 const watch = require("watch");
 
-const PATH_TO_IGNORE = ["_sidebar", "libs", "mock", "interfaces"];
+const PATH_TO_IGNORE = ["_sidebar", "libs", "mock", "interfaces", "utils"];
 const TOP_LEVEL = __dirname;
 
 /**

@@ -1,5 +1,6 @@
 2021-10-07 17:27:08 ||| ---> Deploying ProtocolManager... <---
-2021-10-07 17:27:51 ||| - ProtocolManager deployed at 0x40510c6D3611933135cC573A5064a985bD6850E7
+2021-10-07 17:27:51 ||| - ProtocolManager deployed at  xxx 0x40510c6D3611933135cC573A5064a985bD6850E7 xxx DNU
+UPDATED https://testnet.bscscan.com/address/0x878560ce1f55aefae443e0cb1406246321e8c458
 2021-10-07 17:28:23 ||| ---> Deploying bounty collector... <---
 2021-10-07 17:28:53 ||| - BountyCollector deployed at 0xF87e29a30aD4Acb6ffBA9d644C479376E645F1cf
 2021-10-07 17:29:27 ||| ---> Deploying WrappedNativeTokenRelayer... <---

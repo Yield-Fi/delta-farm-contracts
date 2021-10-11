@@ -10,7 +10,11 @@ import "./interfaces/IVaultConfig.sol";
 import "./interfaces/InterestModel.sol";
 
 contract VaultConfig is Initializable, OwnableUpgradeSafe, IVaultConfig {
-  /// @notice Events
+  /// @dev Event is emitted when configutation parameters will be changed
+  /// @param caller Address which will set new parameters
+  /// @param wrappedNativeToken Address of wrapped native token
+  /// @param wrappedNativeTokenRelayer Address of WrappedNativeTokenRelayer contract
+  /// @param treasuryAccount Address of treasury account
   event SetParams(
     address indexed caller,
     address wrappedNativeToken,
@@ -25,6 +29,10 @@ contract VaultConfig is Initializable, OwnableUpgradeSafe, IVaultConfig {
   /// address of treasury account
   address public override treasuryAccount;
 
+  /// @dev Initialize new contract instance
+  /// @param _wrappedNativeToken Address of wrapped native token
+  /// @param _wrappedNativeTokenRelayer Address of WrappedNativeTokenRelayer contract
+  /// @param _treasuryAccount Address of treasury account
   function initialize(
     address _wrappedNativeToken,
     address _wrappedNativeTokenRelayer,
@@ -36,8 +44,8 @@ contract VaultConfig is Initializable, OwnableUpgradeSafe, IVaultConfig {
   }
 
   /// @dev Set all the basic parameters. Must only be called by the owner.
-  /// @param _wrappedNativeToken Address of WBNB
-  /// @param _wrappedNativeTokenRelayer Address of WNativeRelayer contract
+  /// @param _wrappedNativeToken Address of wrapped native token
+  /// @param _wrappedNativeTokenRelayer Address of WrappedNativeTokenRelayer contract
   /// @param _treasuryAccount Address of treasury account
   function setParams(
     address _wrappedNativeToken,

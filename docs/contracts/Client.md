@@ -37,6 +37,26 @@ External interface for function above
 
 
 
+### initialize
+
+```solidity
+  function initialize(string kind, string clientName, address protocolManager, address[] initialOperators)
+```
+
+Function to initialize new contract instance.
+
+
+
+#### Parameters:
+
+- `kind`: Kind of new client
+
+- `clientName`: Name of new client
+
+- `protocolManager`: Address of protocol manager contract
+
+- `initialOperators`: Initial array of operator's addresses to whitelist
+
 ### deposit
 
 ```solidity
@@ -100,34 +120,78 @@ ___
 ```solidity
   event WhitelistOperators(address caller, address[] operators, bool isOk)
 ```
-Events
+Event is emmitted when new operators are whitelisted
 
+
+#### Parameters:
+
+- `caller`: Address of msg.sender
+
+- `operators`: Array of operators to whitelist
+
+- `isOk`: Whether operators will be whitelisted or not
 
 ### WhitelistCallers
 
 ```solidity
   event WhitelistCallers(address caller, address[] callers, bool isOk)
 ```
+Event is emmitted when new callers are whitelisted
 
+
+#### Parameters:
+
+- `caller`: Address of msg.sender
+
+- `callers`: Array of callers to whitelist
+
+- `isOk`: Whether callers will be whitelisted or not
 
 ### Deposit
 
 ```solidity
   event Deposit(address recipient, address worker, uint256 amount)
 ```
+Event is emmitted when deposit function will be called
 
+
+#### Parameters:
+
+- `recipient`: Address for which protocol should open new position, reward will be sent there later on
+
+- `worker`: Address of target worker
+
+- `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
 
 ### SetWorkerFee
 
 ```solidity
   event SetWorkerFee(address caller, address worker, uint256 feeBps)
 ```
+Event is emmited when fee for given worker(pool) will be changed
 
+
+#### Parameters:
+
+- `caller`: Address of msg.sender
+
+- `worker`: target worker(pool) address
+
+- `feeBps`: new fee denominator (0 < feeBps < 10000)
 
 ### ToggleWorkers
 
 ```solidity
   event ToggleWorkers(address caller, address[] workers, bool isEnabled)
 ```
+Event is emmited when workers will be enabled or disabled
 
+
+#### Parameters:
+
+- `caller`: Address of msg.sender
+
+- `workers`: array of workers' addresses to perform action on
+
+- `isEnabled`: new worker status relative for client end users
 
