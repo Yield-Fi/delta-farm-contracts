@@ -44,6 +44,38 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "vault",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "accounts",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "fees",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "RegisterFees",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "collect",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -51,7 +83,7 @@
         "type": "address"
       }
     ],
-    "name": "bounties",
+    "name": "fees",
     "outputs": [
       {
         "internalType": "uint256",
@@ -66,33 +98,18 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "client",
-        "type": "address"
-      }
-    ],
-    "name": "collect",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "collectAll",
-    "outputs": [],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "bountyToken",
+        "name": "feeToken",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "bountyThreshold",
+        "name": "feeThreshold",
         "type": "uint256"
+      },
+      {
+        "internalType": "contract ProtocolManager",
+        "name": "_protocolManager",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -117,7 +134,7 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "clients",
+        "name": "accounts",
         "type": "address[]"
       },
       {
@@ -126,7 +143,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "registerBounties",
+    "name": "registerFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -142,12 +159,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "bountyToken",
+        "name": "feeToken",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "bountyThreshold",
+        "name": "feeThreshold",
         "type": "uint256"
       }
     ],
@@ -165,42 +182,6 @@
       }
     ],
     "name": "transferOwnership",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "collectors",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "ok",
-        "type": "bool"
-      }
-    ],
-    "name": "whitelistCollectors",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "vaults",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "ok",
-        "type": "bool"
-      }
-    ],
-    "name": "whitelistVaults",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -10,7 +10,7 @@ ___
 ### initialize
 
 ```solidity
-  function initialize(contract IVaultConfig _config, address _token, contract IProtocolManager _protocolManager, contract IBountyCollector _bountyCollector)
+  function initialize(contract IVaultConfig _config, address _token, contract IProtocolManager _protocolManager, contract IFeeCollector _feeCollector)
 ```
 
 Function to initialize new contarct instance
@@ -25,7 +25,7 @@ Function to initialize new contarct instance
 
 - `_protocolManager`: Address of protocol manager contract
 
-- `_bountyCollector`: Address of bounty collector contract
+- `_feeCollector`: Address of fee collector contract
 
 ### positionInfo
 
