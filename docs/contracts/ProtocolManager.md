@@ -323,6 +323,20 @@ Event is Emitted when approved bounty collectors will be updated
 
 - `isApproved`: Whether given bounty collectors are approved or not
 
+### ApproveAdminContract
+
+```solidity
+  event ApproveAdminContract(address caller, address admin)
+```
+Event is emitted when new admin contract will be approved
+
+
+#### Parameters:
+
+- `caller`: Address which aprrove new admin contract
+
+- `admin`: Address of approved admin contact
+
 ### SetNativeRelayer
 
 ```solidity

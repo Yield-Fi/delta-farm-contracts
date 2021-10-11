@@ -14,6 +14,7 @@ import {
   PancakeswapStrategyLiquidate,
   PancakeswapWorker,
   PancakeswapWorker__factory,
+  ProtocolManager,
 } from "../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
@@ -23,6 +24,7 @@ import {
   deployContract,
   deployPancakeStrategies,
   deployPancakeV2,
+  deployProxyContract,
   deployTokens,
   time,
 } from "./helpers";
@@ -45,7 +47,10 @@ describe("PancakeswapWorker", () => {
   let account1Address: string;
   let account2: Signer;
   let account2Address: string;
+  let admin: Signer;
+  let adminAddress: string;
 
+  let ProtocolManager: ProtocolManager;
   let MockVault: MockVault;
   let WorkerBUSD_TOK0: PancakeswapWorker;
   let WorkerTOK0_TOK1: PancakeswapWorker;
@@ -73,12 +78,21 @@ describe("PancakeswapWorker", () => {
   let swapHelper: SwapHelper;
 
   async function fixture() {
-    [deployer, account1, account2] = await ethers.getSigners();
-    [deployerAddress, account1Address, account2Address] = await Promise.all([
+    [deployer, account1, account2, admin] = await ethers.getSigners();
+    [deployerAddress, account1Address, account2Address, adminAddress] = await Promise.all([
       deployer.getAddress(),
       account1.getAddress(),
       account2.getAddress(),
+      admin.getAddress(),
     ]);
+
+    ProtocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [[deployerAddress, adminAddress]],
+      deployer
+    )) as ProtocolManager;
+
+    await ProtocolManager.approveAdminContract(adminAddress);
 
     [BaseToken, Token0, Token1] = await deployTokens(
       [
@@ -176,7 +190,7 @@ describe("PancakeswapWorker", () => {
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
-      ethers.constants.AddressZero,
+      ProtocolManager.address,
     ])) as PancakeswapWorker;
 
     await WorkerBUSD_TOK0.deployed();
@@ -190,7 +204,7 @@ describe("PancakeswapWorker", () => {
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
-      ethers.constants.AddressZero,
+      ProtocolManager.address,
     ])) as PancakeswapWorker;
 
     await WorkerTOK0_TOK1.deployed();
@@ -497,7 +511,9 @@ describe("PancakeswapWorker", () => {
   });
 
   it("should successfully set a treasury config", async () => {
-    await WorkerTOK0_TOK1.setTreasuryFee("500");
+    const worker__admin = WorkerTOK0_TOK1.connect(admin);
+
+    await worker__admin.setTreasuryFee("500");
     expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq("500");
   });
 });

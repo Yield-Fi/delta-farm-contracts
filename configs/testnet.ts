@@ -48,12 +48,13 @@ const tokens = {
 };
 
 export const testnetConfig: ProjectConfigType = {
-  wrappedNativeTokenRelayer: "0x1153C1694146cD99B632b04910D45B95c99012C8",
-  bountyCollector: "0xF87e29a30aD4Acb6ffBA9d644C479376E645F1cf",
-  protocolManager: "0x40510c6D3611933135cC573A5064a985bD6850E7",
+  wrappedNativeTokenRelayer: "0x72c6356334EF96546761c0142F7Ba2F00B7E18D5",
+  feeCollector: "0xEbC7C0663aC2Aa5e50Bc3B3AE8077E40cd42e168",
+  protocolManager: "0xF797e8F2f385E1F96A488267552B37fB3C40CA71",
   treasuryAccount: "0x94FC2d635D65e6f657b7617843915a41c87B7852",
+  adminContract: "0x15df4048478Ef603d01AA63Aa393fC2116E234e3",
   baseToken: tokens.BUSD,
-  bountyThreshold: 500,
+  feeThreshold: 500,
   defaultTreasuryFeeBps: 1000,
   tokens,
   dex: {
@@ -382,23 +383,23 @@ export const testnetConfig: ProjectConfigType = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "0x67AaE37C5d0Be414606e173fB58106eEf5f9288D",
-      AddToPoolWithoutBaseToken: "0x4B12F272d2284Ec7A6710C07564720e04645eAbB",
-      Liquidate: "0x08A435c2a53517f64149525f82eE855A63c75bef",
+      AddToPoolWithBaseToken: "0xE4Aded51f9A50df135f4d5a2E4556129E89802f4",
+      AddToPoolWithoutBaseToken: "0xd6cD177541D877603B365AC5C6C199F571DBB0f6",
+      Liquidate: "0x1bcE142379d227B3dE2A2198bB57E2DE9854Df4E",
     },
   },
   vaults: [
     {
       name: "BUSD Vault",
-      address: "0x19e4880Ae8E166E9076e701b23Ba67F475a751f3",
+      address: "0xcb5574420B19aCd484Fc9D3a6BAa7E4Dbb529Cc6",
       tokenName: "deficental BUSD",
       tokenSymbol: "defiBUSD",
       baseToken: tokens.BUSD,
-      config: "0x7ACBb870B182c82D3eAbfBc1A52CE0FD16cdDbE6",
+      config: "0x888229D7AFa1f627A25971b3848C1bDD86038857",
       workers: [
         {
           name: "BUSD-USDT PancakeswapWorker",
-          address: "0xBB029872759Fc40b87C6E14b137dD09D18Bdbf02",
+          address: "0x945342BAA2FBe1Fe8F40697550e80B6ceE93f855",
           positionId: "24",
           token0: tokens.BUSD,
           token1: tokens.USDT,
@@ -409,7 +410,7 @@ export const testnetConfig: ProjectConfigType = {
   ],
   clients: [
     {
-      address: "0x1e1660aE9Eb53b4AE0Ac1f9eAE8a8d972c05ceb5",
+      address: "0x3Fec471402390B7b6ee32CAc8F88FDD6A5859A72",
       kind: "kind",
       name: "Client A",
       operators: ["0x07661882d1C4b7F703Ca0A8898afE4D402dFdeF2"],

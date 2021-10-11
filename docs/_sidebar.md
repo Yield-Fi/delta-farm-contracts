@@ -1,4 +1,5 @@
 - Contracts
+  - [Admin](contracts\Admin)
   - [Client](contracts\Client)
   - [FeeCollector](contracts\FeeCollector)
   - [ProtocolManager](contracts\ProtocolManager)

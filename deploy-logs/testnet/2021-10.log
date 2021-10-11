@@ -20,3 +20,26 @@ UPDATED https://testnet.bscscan.com/address/0x878560ce1f55aefae443e0cb1406246321
 2021-10-07 17:35:44 ||| ---> Deploying Client contracts... <---
 2021-10-07 17:35:44 |||   -> Contract of Client A
 2021-10-07 17:36:23 |||   - Contract of Client A deployed at 0x1e1660aE9Eb53b4AE0Ac1f9eAE8a8d972c05ceb5
+2021-10-11 21:58:32 ||| ---> Deploying ProtocolManager... <---
+2021-10-11 21:59:02 ||| - ProtocolManager deployed at 0xF797e8F2f385E1F96A488267552B37fB3C40CA71
+2021-10-11 21:59:24 ||| ---> Deploying Admin contract... <---
+2021-10-11 22:00:17 ||| - Admin contract deployed at 0x15df4048478Ef603d01AA63Aa393fC2116E234e3
+2021-10-11 22:06:10 ||| ---> Deploying fee collector... <---
+2021-10-11 22:06:38 ||| - FeeCollector deployed at 0xEbC7C0663aC2Aa5e50Bc3B3AE8077E40cd42e168
+2021-10-11 22:07:35 ||| ---> Deploying WrappedNativeTokenRelayer... <---
+2021-10-11 22:08:02 ||| - WrappedNativeTokenRelayer deployed at 0x72c6356334EF96546761c0142F7Ba2F00B7E18D5
+2021-10-11 22:11:13 ||| ---> Deploying vaults... <---
+2021-10-11 22:11:13 |||   -> BUSD Vault
+2021-10-11 22:11:51 |||   - Vault Config deployed at 0x888229D7AFa1f627A25971b3848C1bDD86038857
+2021-10-11 22:12:18 |||   - Vault deployed at 0xcb5574420B19aCd484Fc9D3a6BAa7E4Dbb529Cc6
+2021-10-11 22:15:22 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2021-10-11 22:15:52 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0xE4Aded51f9A50df135f4d5a2E4556129E89802f4
+2021-10-11 22:16:23 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0xd6cD177541D877603B365AC5C6C199F571DBB0f6
+2021-10-11 22:16:51 ||| - LiquidateStrategy deployed at 0x1bcE142379d227B3dE2A2198bB57E2DE9854Df4E
+2021-10-11 22:17:41 ||| ---> Deploying pancakeswap workers... <---
+2021-10-11 22:17:41 ||| -> Deploying workers for BUSD Vault
+2021-10-11 22:17:41 |||   - Deploying BUSD-USDT PancakeswapWorker...
+2021-10-11 22:18:33 |||   - BUSD-USDT PancakeswapWorker deployed at 0x945342BAA2FBe1Fe8F40697550e80B6ceE93f855
+2021-10-11 22:20:49 ||| ---> Deploying Client contracts... <---
+2021-10-11 22:20:49 |||   -> Contract of Client A
+2021-10-11 22:21:28 |||   - Contract of Client A deployed at 0x3Fec471402390B7b6ee32CAc8F88FDD6A5859A72

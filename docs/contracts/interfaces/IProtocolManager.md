@@ -27,6 +27,16 @@ Vault getter, maps to internal mapping
 
 
 
+### whitelistedOperators
+
+```solidity
+  function whitelistedOperators(address operator) external returns(bool)
+```
+
+Operator getter, maps to internal mapping
+
+
+
 ### tokenToVault
 
 ```solidity

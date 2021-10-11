@@ -66,6 +66,11 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     bool indexed isApproved
   );
 
+  /// @dev Event is emitted when new admin contract will be approved
+  /// @param caller Address which aprrove new admin contract
+  /// @param admin Address of approved admin contact
+  event ApproveAdminContract(address indexed caller, address indexed admin);
+
   event SetNativeRelayer(
     address indexed caller,
     address indexed oldAddress,
@@ -112,7 +117,10 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// address[] public approvedProtocolWorkers
 
   /// @notice ACL - mapping of valid operators' addresses
-  mapping(address => bool) public whitelistedOperators;
+  mapping(address => bool) public override whitelistedOperators;
+
+  /// @dev Approved admin contract's address
+  address private adminContract;
 
   /// @dev initialize the owner and operators of Protocol
   function initialize(address[] calldata initialOperators) external initializer {
@@ -305,5 +313,15 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     approvedNativeRelayer = nativeRelayer;
 
     emit SetNativeRelayer(msg.sender, old, nativeRelayer);
+  }
+
+  function approveAdminContract(address _adminContract) external override onlyWhitelistedOperators {
+    adminContract = _adminContract;
+
+    emit ApproveAdminContract(msg.sender, _adminContract);
+  }
+
+  function isAdminContract(address account) external view override returns (bool) {
+    return adminContract == account;
   }
 }
