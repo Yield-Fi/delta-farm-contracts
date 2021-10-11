@@ -90,6 +90,8 @@ describe("BountyCollector", async () => {
     await fixture();
   });
 
+  console.log("TODO: New BountyCollector test suite");
+
   it("should respect access modifiers", async () => {});
 
   it("should revert the collect when amount is smaller than set threshold", async () => {});

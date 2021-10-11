@@ -239,6 +239,8 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
 
     require(length == amounts.length, "Vault: invalid input data");
 
+    uint256 singleTxAcc = 0;
+
     for (uint256 i = 0; i < length; i++) {
       uint256 pid = pids[i];
       uint256 baseReward = amounts[i];
@@ -270,11 +272,13 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
 
       // Transfer assets to bounty collector and register the amounts
       bountyCollector.registerBounties(addresses, fees);
-      token.safeTransfer(address(bountyCollector), feeSum);
+      singleTxAcc = singleTxAcc.add(feeSum);
 
       // Assign final reward to the user
       rewards[pid] = rewards[pid].add(userReward);
     }
+
+    token.safeTransfer(address(bountyCollector), singleTxAcc);
 
     emit RewardsRegister(msg.sender, pids, amounts);
   }
@@ -298,6 +302,8 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
 
     // Finally transfer assets to the end user
     token.safeTransfer(position.owner, reward);
+
+    rewards[pid] = 0;
 
     // Emit
     emit RewardCollect(msg.sender, position.owner, reward);

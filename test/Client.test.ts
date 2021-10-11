@@ -159,7 +159,7 @@ describe("Client contract", async () => {
       baseToken,
       protocolManager.address,
       bountyCollector.address,
-      yieldFiAddress,
+      deployerAddress,
       deployer
     );
 
@@ -441,7 +441,7 @@ describe("Client contract", async () => {
   });
 
   context("reward collect", async () => {
-    it("should work", async () => {
+    it("should work as intended", async () => {
       // Approvals
       await protocolManager.approveClients([exampleClient.address], true);
       await protocolManager.approveBountyCollectors([bountyCollector.address], true);
@@ -451,8 +451,10 @@ describe("Client contract", async () => {
         true
       );
       await pancakeswapWorker01.setHarvestersOk([deployerAddress], true);
+      await vault.approveRewardAssigners([pancakeswapWorker01.address], true);
       await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
-      await exampleClient.setWorkerFee(pancakeswapWorker01.address, 1000); // 10% for the client
+      await exampleClient.setWorkerFee(pancakeswapWorker01.address, 500); // 10% for the client
+      await exampleClient.whitelistCallers([deployerAddress], true);
 
       // Open some positions
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
@@ -467,13 +469,33 @@ describe("Client contract", async () => {
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
       await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 
+      // Empty positions
+      expect(await vault.rewards(1)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+      expect(await vault.rewards(2)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+
       // Transfer previously minted CAKE to the worker (simulate harvesting CAKE from staking pool)
       await cake.transfer(pancakeswapWorker01.address, ethers.utils.parseEther("10"));
 
-      console.log(await pancakeswapWorker01.shares(1));
-      console.log(await pancakeswapWorker01.shares(2));
-
       await pancakeswapWorker01.harvestRewards();
+
+      // Some cake should have been registered
+      expect(await vault.rewards(1)).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
+      expect(await vault.rewards(2)).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
+
+      expect(await bountyCollector.bounties(exampleClient.address)).to.be.bignumber.that.is.not.eql(
+        ethers.BigNumber.from("0")
+      );
+      expect(
+        await bountyCollector.bounties(await vaultConfig.treasuryAccount())
+      ).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
+
+      // Collect
+      await exampleClient.collectReward(1, aliceAddress, baseToken.address);
+      await exampleClient.collectReward(2, aliceAddress, baseToken.address);
+
+      // Position have been emptied out
+      expect(await vault.rewards(1)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+      expect(await vault.rewards(2)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
     });
   });
 });

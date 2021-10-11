@@ -114,13 +114,12 @@ contract BountyCollector is
   {
     require(clients.length == amounts.length, "YieldFi BountyCollector::BadCollectData");
 
-    address clientAddres;
+    address clientAddress;
     uint256 length = clients.length;
 
     for (uint256 i = 0; i < length; i++) {
-      clientAddres = clients[i];
-
-      bounties[clientAddres] = bounties[clientAddres].add(amounts[i]);
+      clientAddress = clients[i];
+      bounties[clientAddress] = bounties[clientAddress].add(amounts[i]);
     }
   }
 }
