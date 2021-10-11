@@ -163,7 +163,13 @@ describe("ProtocolManager", async () => {
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
+      [
+        "Binance",
+        "Binance Client",
+        protocolManager.address,
+        feeCollector.address,
+        [deployerAddress],
+      ],
       deployer
     )) as Client;
 

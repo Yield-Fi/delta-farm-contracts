@@ -32,6 +32,8 @@ Set new configuration for the fee collector
 Collect all fee for given account
 
 
+> **NOTE:** Can be called only by approved clients or protocol's operators
+
 
 ### registerFees
 
@@ -51,6 +53,32 @@ One function to wrap two calls. They should be called one by one anyway.
 - `accounts`: Array of accounts address
 
 - `amounts`: Array of fee amounts assign to the specific accounts
+
+
+### getFeeToken
+
+```solidity
+  function getFeeToken() external returns(address)
+```
+
+Returns address of fee token
+
+
+
+
+#### Return Values:
+
+- `address`: Address of fee token
+### feeToCollect
+
+```solidity
+  function feeToCollect() external returns(uint256)
+```
+
+Returns amount of fee to collect
+
+
+> **NOTE:** Function can be called only by approved clients or protocol's operators
 
 
 

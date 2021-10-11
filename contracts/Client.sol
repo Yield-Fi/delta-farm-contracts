@@ -3,6 +3,7 @@ pragma solidity 0.6.6;
 import { IWorker } from "./interfaces/IWorker.sol";
 import { IVault } from "./interfaces/IVault.sol";
 import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
+import { IFeeCollector } from "./interfaces/IFeeCollector.sol";
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
@@ -56,7 +57,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   string _CLIENT_NAME_;
 
   /// @dev ProtocolManager responsible for mapping token pairs to proper worker addresses
-  IProtocolManager private _protocolManager;
+  IProtocolManager private protocolManager;
+
+  IFeeCollector private feeCollector;
 
   /// @dev Whitelist mappings
   mapping(address => bool) whitelistedCallers;
@@ -103,18 +106,21 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Function to initialize new contract instance.
   /// @param kind Kind of new client
   /// @param clientName Name of new client
-  /// @param protocolManager Address of protocol manager contract
+  /// @param _protocolManager Address of protocol manager contract
+  /// @param _feeCollector Address of fee collector contract
   /// @param initialOperators Initial array of operator's addresses to whitelist
   function initialize(
     string calldata kind,
     string calldata clientName,
-    address protocolManager,
+    address _protocolManager,
+    address _feeCollector,
     address[] calldata initialOperators
   ) external initializer {
     _KIND_ = kind;
     _CLIENT_NAME_ = clientName;
 
-    _protocolManager = IProtocolManager(protocolManager);
+    protocolManager = IProtocolManager(_protocolManager);
+    feeCollector = IFeeCollector(_feeCollector);
 
     __Ownable_init();
 
@@ -209,6 +215,19 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     IWorker(worker).setClientFee(feeBps);
 
     emit SetWorkerFee(msg.sender, worker, feeBps);
+  }
+
+  /// @dev Withdraw all collected fee
+  /// @param _to Address of fee recipient
+  /// @notice Function can be called by whitelisted operators
+  function collectFee(address _to) external onlyWhitelistedOperators {
+    feeCollector.collect();
+    address feeToken = feeCollector.getFeeToken();
+    feeToken.safeTransfer(_to, feeToken.myBalance());
+  }
+
+  function feeToCollect() external view returns (uint256) {
+    return feeCollector.feeToCollect();
   }
 
   /// @dev Enable or disabled given array of workers

@@ -40,7 +40,7 @@ External interface for function above
 ### initialize
 
 ```solidity
-  function initialize(string kind, string clientName, address protocolManager, address[] initialOperators)
+  function initialize(string kind, string clientName, address _protocolManager, address _feeCollector, address[] initialOperators)
 ```
 
 Function to initialize new contract instance.
@@ -53,7 +53,9 @@ Function to initialize new contract instance.
 
 - `clientName`: Name of new client
 
-- `protocolManager`: Address of protocol manager contract
+- `_protocolManager`: Address of protocol manager contract
+
+- `_feeCollector`: Address of fee collector contract
 
 - `initialOperators`: Initial array of operator's addresses to whitelist
 
@@ -93,6 +95,22 @@ Set client-side fee for given worker
 - `worker`: target worker(pool) address
 
 - `feeBps`: new fee denominator (0 < feeBps < 10000)
+
+### collectFee
+
+```solidity
+  function collectFee(address _to)
+```
+
+Withdraw all collected fee
+
+
+> **NOTE:** Function can be called by whitelisted operators
+
+#### Parameters:
+
+- `_to`: Address of fee recipient
+
 
 ### toggleWorkers
 
