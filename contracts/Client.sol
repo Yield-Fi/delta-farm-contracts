@@ -18,11 +18,34 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   using SafeMath for uint256;
   using SafeToken for address;
 
-  /// @dev Events
+  /// @dev Event is emmitted when new operators are whitelisted
+  /// @param caller Address of msg.sender
+  /// @param operators Array of operators to whitelist
+  /// @param isOk Whether operators will be whitelisted or not
   event WhitelistOperators(address indexed caller, address[] indexed operators, bool indexed isOk);
+
+  /// @dev Event is emmitted when new callers are whitelisted
+  /// @param caller Address of msg.sender
+  /// @param callers Array of callers to whitelist
+  /// @param isOk Whether callers will be whitelisted or not
   event WhitelistCallers(address indexed caller, address[] indexed callers, bool indexed isOk);
+
+  /// @dev Event is emmitted when deposit function will be called
+  /// @param recipient Address for which protocol should open new position, reward will be sent there later on
+  /// @param worker Address of target worker
+  /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
   event Deposit(address indexed recipient, address indexed worker, uint256 indexed amount);
+
+  /// @dev Event is emmited when fee for given worker(pool) will be changed
+  /// @param caller Address of msg.sender
+  /// @param worker target worker(pool) address
+  /// @param feeBps new fee denominator (0 < feeBps < 10000)
   event SetWorkerFee(address indexed caller, address indexed worker, uint256 indexed feeBps);
+
+  /// @dev Event is emmited when workers will be enabled or disabled
+  /// @param caller Address of msg.sender
+  /// @param workers array of workers' addresses to perform action on
+  /// @param isEnabled new worker status relative for client end users
   event ToggleWorkers(address indexed caller, address[] indexed workers, bool indexed isEnabled);
 
   /// @dev Enabled farms
@@ -77,6 +100,11 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     _whitelistOperators(operators, isOk);
   }
 
+  /// @dev Function to initialize new contract instance.
+  /// @param kind Kind of new client
+  /// @param clientName Name of new client
+  /// @param protocolManager Address of protocol manager contract
+  /// @param initialOperators Initial array of operator's addresses to whitelist
   function initialize(
     string calldata kind,
     string calldata clientName,
