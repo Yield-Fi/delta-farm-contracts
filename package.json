@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
+    "pretest": "npm run compile",
     "compile": "hardhat compile",
     "compile:clean": "npm run clean && hardhat compile",
     "coverage": "hardhat coverage",

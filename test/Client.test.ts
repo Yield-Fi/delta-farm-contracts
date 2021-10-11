@@ -308,7 +308,7 @@ describe("Client contract", async () => {
     await waffle.loadFixture(fixture);
   });
 
-  context("# deposit method - base token only", async () => {
+  context("deposit method - base token only", async () => {
     it("should execute deposit flow on behalf of given end user", async () => {
       // Deposit amount
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
@@ -359,7 +359,7 @@ describe("Client contract", async () => {
     });
   });
 
-  context("# deposit method - no common token (Vault <-> Worker)", async () => {
+  context("deposit method - no common token (Vault <-> Worker)", async () => {
     it("should execute deposit flow on behalf of given end user", async () => {
       // Deposit amount
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
@@ -396,7 +396,7 @@ describe("Client contract", async () => {
     });
   });
 
-  context("# withdraw method", async () => {
+  context("withdraw method", async () => {
     it("should execute withdrawal flow on behalf of given end user", async () => {
       // Same stuff above
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
@@ -420,7 +420,7 @@ describe("Client contract", async () => {
     });
   });
 
-  context("# set worker fee", async () => {
+  context("set worker fee", async () => {
     it("should revert upon providing invalid worker address", async () => {
       expect(exampleClient.setWorkerFee(ethers.constants.AddressZero, 100)).to.be.reverted;
     });
@@ -437,6 +437,43 @@ describe("Client contract", async () => {
       expect(
         await pancakeswapWorker01.getClientFee(exampleClient.address)
       ).to.be.bignumber.that.is.eql(ethers.BigNumber.from(500));
+    });
+  });
+
+  context("reward collect", async () => {
+    it("should work", async () => {
+      // Approvals
+      await protocolManager.approveClients([exampleClient.address], true);
+      await protocolManager.approveBountyCollectors([bountyCollector.address], true);
+      await protocolManager.approveVaults([vault.address], true);
+      await protocolManager.approveWorkers(
+        [pancakeswapWorker01.address, pancakeswapWorker02.address],
+        true
+      );
+      await pancakeswapWorker01.setHarvestersOk([deployerAddress], true);
+      await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
+      await exampleClient.setWorkerFee(pancakeswapWorker01.address, 1000); // 10% for the client
+
+      // Open some positions
+      const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
+      await exampleClient.whitelistOperators([deployerAddress], true);
+      await exampleClient.whitelistCallers([aliceAddress], true);
+
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
+
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
+
+      // Transfer previously minted CAKE to the worker (simulate harvesting CAKE from staking pool)
+      await cake.transfer(pancakeswapWorker01.address, ethers.utils.parseEther("10"));
+
+      console.log(await pancakeswapWorker01.shares(1));
+      console.log(await pancakeswapWorker01.shares(2));
+
+      await pancakeswapWorker01.harvestRewards();
     });
   });
 });
