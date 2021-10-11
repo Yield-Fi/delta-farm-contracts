@@ -10,7 +10,9 @@ const deployFunc: DeployFunction = async () => {
 
   const ProtocolManagerFactory = await ethers.getContractFactory("ProtocolManager", deployer);
 
-  const ProtocolManager = (await upgrades.deployProxy(ProtocolManagerFactory)) as ProtocolManager;
+  const ProtocolManager = (await upgrades.deployProxy(ProtocolManagerFactory, [
+    [deployer.address],
+  ])) as ProtocolManager;
 
   await ProtocolManager.deployed();
 

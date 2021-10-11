@@ -4,6 +4,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import {
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken,
+  ProtocolManager__factory,
 } from "../../../typechain";
 import { getConfig } from "../../utils/config";
 import { logger } from "../../utils/logger";
@@ -55,6 +56,17 @@ const deployFunc: DeployFunction = async () => {
 
   await LiquidateStrategy.deployed();
   logger(`- LiquidateStrategy deployed at ${LiquidateStrategy.address}`);
+
+  const ProtocolManager = ProtocolManager__factory.connect(config.protocolManager, deployer);
+
+  await ProtocolManager.approveStrategies(
+    [
+      AddToPoolWithBaseTokenStrategy.address,
+      AddToPoolWithoutBaseTokenStrategy.address,
+      LiquidateStrategy.address,
+    ],
+    true
+  );
 };
 
 export default deployFunc;

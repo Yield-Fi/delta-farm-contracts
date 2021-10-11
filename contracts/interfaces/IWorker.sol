@@ -46,4 +46,6 @@ interface IWorker {
 
   /// @dev Get operating vault address.
   function operatingVault() external view returns (address);
+
+  function setTreasuryFee(uint256 fee) external;
 }
