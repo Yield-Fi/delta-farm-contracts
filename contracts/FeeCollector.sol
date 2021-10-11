@@ -83,6 +83,7 @@ contract FeeCollector is
   }
 
   /// @dev Collect all fee for given account
+  /// @notice Can be called only by approved clients or protocol's operators
   function collect() external override onlyCollector {
     uint256 _fee = fees[msg.sender]; /// Gas savings
 
@@ -117,5 +118,17 @@ contract FeeCollector is
 
       fees[accountAddress] = fees[accountAddress].add(amounts[i]);
     }
+  }
+
+  /// @dev Returns address of fee token
+  /// @return address Address of fee token
+  function getFeeToken() external view override returns (address) {
+    return _feeToken;
+  }
+
+  /// @dev Returns amount of fee to collect
+  /// @notice Function can be called only by approved clients or protocol's operators
+  function feeToCollect() external view override onlyCollector returns (uint256) {
+    return fees[msg.sender];
   }
 }

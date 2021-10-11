@@ -58,7 +58,7 @@ describe("Client contract", async () => {
   let syrup: SyrupBar;
 
   // BC
-  let bountyCollector: FeeCollector;
+  let feeCollector: FeeCollector;
 
   // Signers
   let deployer: Signer;
@@ -146,7 +146,7 @@ describe("Client contract", async () => {
       deployer
     )) as ProtocolManager;
 
-    bountyCollector = (await deployProxyContract(
+    feeCollector = (await deployProxyContract(
       "FeeCollector",
       [baseToken.address, "500", protocolManager.address],
       deployer
@@ -157,7 +157,7 @@ describe("Client contract", async () => {
       mockWBNB,
       baseToken,
       protocolManager.address,
-      bountyCollector.address,
+      feeCollector.address,
       yieldFiAddress,
       deployer
     );
@@ -282,7 +282,13 @@ describe("Client contract", async () => {
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
+      [
+        "Binance",
+        "Binance Client",
+        protocolManager.address,
+        feeCollector.address,
+        [deployerAddress],
+      ],
       deployer
     )) as Client;
 

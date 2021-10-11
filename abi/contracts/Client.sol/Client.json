@@ -147,6 +147,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      }
+    ],
+    "name": "collectFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "recipient",
         "type": "address"
       },
@@ -167,6 +180,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "feeToCollect",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "string",
@@ -180,7 +206,12 @@
       },
       {
         "internalType": "address",
-        "name": "protocolManager",
+        "name": "_protocolManager",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_feeCollector",
         "type": "address"
       },
       {
