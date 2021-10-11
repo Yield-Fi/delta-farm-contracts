@@ -18,6 +18,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
   /// @dev Vault(s)
   mapping(address => bool) public override approvedVaults;
+  /// @dev tokenToVault(s)
   mapping(address => address) public override tokenToVault;
   /// address[] public approvedVaultsList;
 
@@ -25,18 +26,21 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   mapping(address => bool) public override approvedVaultConfigs;
   /// address[] public approvedVaultConfigsList;
 
-  /// @dev BountyCollectors
-  mapping(address => bool) public override approvedBountyCollectors;
+  /// @dev check if address is in BountyCollectors List also provide it status
+  mapping(address => bool) public checkIfApprovedBountyCollectors;
   /// address[] public approvedVBountyCollectorsList;
-
-  /// @dev  Strategies
-  mapping(address => bool) public override approvedStrategies;
+   /// @dev BountyCollectors in form of listing
+  address[] public  approvedBountyCollectors;
+  /// @dev  Strategies checking if address is on list
+  mapping(address => bool) public approvedStrategiesCheck;
   /// address[] public approvedStrategiesList;
-
-  /// @dev Relayer
+    /// @dev  Strategies in form of listing
+  address[] public approvedStrategies;
+  /// @dev Relayer 
   address public override approvedNativeRelayer;
-
-  /// @dev Array of valid and registered protocol workers set by whitelisted operators
+  /// @dev whitelist operators listing
+  address[] public whitelistOperatorsList;
+  /// @dev check in Array of valid and registered protocol workers set by whitelisted operators 
   mapping(address => bool) public override approvedWorkers;
   /// address[] public approvedProtocolWorkers
 
@@ -88,6 +92,49 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// @param isOk Are operators going to be enabled or disabled?
   function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
     _whitelistOperators(operators, isOk);
+    
+  }
+
+
+  
+    // Function to count number 
+    // of values in a mapping
+    function countBounties(
+    ) view public returns (uint) {
+        return approvedBountyCollectors.length;
+    }
+
+  /// @dev Bounty collector getter, maps to internal mapping
+  function ListApprovedBountyCollectors() public view returns(address[] memory)
+  { 
+   return approvedBountyCollectors;   
+  }
+    /// @dev Bounty collector checking if addres present 
+  function checkIfApprovedBountyCollectorsIs(address checker) public view returns(bool )
+  {
+  return checkIfApprovedBountyCollectors[checker];
+  }
+  /// @dev Strategy getter, maps to internal mapping
+  function ListApprovedStrategies() public view returns (address[] memory){
+  /// @dev Strategy list
+  return approvedStrategies;
+  }
+
+  /// @dev whitelistOperatorsList list
+  function  ListwhitelistOperators() public view returns (address[] memory){
+  return  whitelistOperatorsList;
+  }
+
+  /// @dev whitelistOperators checking if addres present
+  function  checkWhitelistOperator(address checker) public view returns(bool )
+  {
+  return  whitelistedOperators[checker];
+  }
+        
+  /// @dev approvedStrategiesCheckIs checking if addres present
+  function approvedStrategiesCheckIs(address checker) public view returns(bool )
+  {
+  return approvedStrategiesCheck[checker];
   }
 
   /// @notice Internal ACL
@@ -100,6 +147,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
     for (uint256 i = 0; i < length; i++) {
       whitelistedOperators[operators[i]] = isOk;
+      whitelistOperatorsList.push(operators[i]);
     }
 
     emit WhitelistOperators(msg.sender, operators, isOk);
@@ -189,7 +237,8 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     uint256 length = bountyCollectors.length;
 
     for (uint256 i = 0; i < length; i++) {
-      approvedBountyCollectors[bountyCollectors[i]] = isApproved;
+     approvedBountyCollectors.push(bountyCollectors[i]);
+      checkIfApprovedBountyCollectors[bountyCollectors[i]] = isApproved;
     }
 
     emit ApproveBountyCollectors(msg.sender, bountyCollectors, isApproved);
@@ -206,7 +255,8 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     uint256 length = strategies.length;
 
     for (uint256 i = 0; i < length; i++) {
-      approvedStrategies[strategies[i]] = isApproved;
+      approvedStrategies.push(strategies[i]);
+     approvedStrategiesCheck[strategies[i]] = isApproved;
     }
 
     emit ApproveStrategies(msg.sender, strategies, isApproved);
