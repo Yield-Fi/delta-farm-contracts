@@ -3,7 +3,7 @@ import "@openzeppelin/test-helpers";
 import { BigNumber, Signer } from "ethers";
 import {
   CakeToken,
-  BountyCollector,
+  FeeCollector,
   MockWBNB,
   PancakeFactory,
   PancakeMasterChef,
@@ -58,7 +58,7 @@ describe("Client contract", async () => {
   let syrup: SyrupBar;
 
   // BC
-  let bountyCollector: BountyCollector;
+  let bountyCollector: FeeCollector;
 
   // Signers
   let deployer: Signer;
@@ -139,18 +139,18 @@ describe("Client contract", async () => {
       deployer
     );
 
-    bountyCollector = (await deployProxyContract(
-      "BountyCollector",
-      [baseToken.address, "500"],
-      deployer
-    )) as BountyCollector;
-
     // Setup general protocol manager
     protocolManager = (await deployProxyContract(
       "ProtocolManager",
       [[deployerAddress]],
       deployer
     )) as ProtocolManager;
+
+    bountyCollector = (await deployProxyContract(
+      "FeeCollector",
+      [baseToken.address, "500", protocolManager.address],
+      deployer
+    )) as FeeCollector;
 
     // Treasury acc = yieldFi protocol owner
     [vault, vaultConfig, wNativeRelayer] = await deployVault(

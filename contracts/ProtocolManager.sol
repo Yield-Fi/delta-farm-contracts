@@ -12,12 +12,73 @@ import { IVault } from "./interfaces/IVault.sol";
 
 /// @dev Contains information about addresses used within the protocol, acts as semi-central protocol point
 contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
+  /// @dev Event is emitted when whitelisted operators will be updated
+  /// @param caller Address which update whitelisted operators
+  /// @param operators Array of operators' addresses
+  /// @param isOk Whether given operators are ok or not
+  event WhitelistOperators(address indexed caller, address[] indexed operators, bool indexed isOk);
+
+  /// @dev Event is Emitted when approved workers will be updated
+  /// @param caller Address which update approved workers
+  /// @param workers Array of workers' addresses
+  /// @param isApproved Whether given workers are approved or not
+  event ApproveWorkers(address indexed caller, address[] indexed workers, bool indexed isApproved);
+
+  /// @dev Event is Emitted when approved client contracts will be updated
+  /// @param caller Address which update approved client contracts
+  /// @param clients Array of client contracts' addresses
+  /// @param isApproved Whether given clients are approved or not
+  event ApproveClients(address indexed caller, address[] indexed clients, bool indexed isApproved);
+
+  /// @dev Event is Emitted when approved vaults will be updated
+  /// @param caller Address which update approved vaults
+  /// @param vaults Array of vaults' addresses
+  /// @param isApproved Whether given vaults are approved or not
+  event ApproveVaults(address indexed caller, address[] indexed vaults, bool indexed isApproved);
+
+  /// @dev Event is Emitted when approved strategies will be updated
+  /// @param caller Address which update approved strategies
+  /// @param strategies Array of strategies' addresses
+  /// @param isApproved Whether given strategies are approved or not
+  event ApproveStrategies(
+    address indexed caller,
+    address[] indexed strategies,
+    bool indexed isApproved
+  );
+
+  /// @dev Event is Emitted when approved vaults' configs will be updated
+  /// @param caller Address which update approved vaults' configs
+  /// @param vaultConfigs Array of vaults' configs addresses
+  /// @param isApproved Whether given vaults' configs are approved or not
+  event ApproveVaultConfigs(
+    address indexed caller,
+    address[] indexed vaultConfigs,
+    bool indexed isApproved
+  );
+
+  /// @dev Event is Emitted when approved bounty collectors will be updated
+  /// @param caller Address which update approved bounty collectors
+  /// @param bountyCollectors Array of bounty collectors' addresses
+  /// @param isApproved Whether given bounty collectors are approved or not
+  event ApproveBountyCollectors(
+    address indexed caller,
+    address[] indexed bountyCollectors,
+    bool indexed isApproved
+  );
+
+  event SetNativeRelayer(
+    address indexed caller,
+    address indexed oldAddress,
+    address indexed newAddress
+  );
+
   /// @dev Contains info about client contract's approvals
   mapping(address => bool) public override approvedClients;
   /// address[] public approvedClientsList;
 
   /// @dev Vault(s)
   mapping(address => bool) public override approvedVaults;
+
   /// @dev tokenToVault(s)
   mapping(address => address) public override tokenToVault;
   /// address[] public approvedVaultsList;
@@ -27,51 +88,31 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// address[] public approvedVaultConfigsList;
 
   /// @dev check if address is in BountyCollectors List also provide it status
-  mapping(address => bool) public checkIfApprovedBountyCollectors;
+  mapping(address => bool) public override checkIfApprovedBountyCollectors;
+
   /// address[] public approvedVBountyCollectorsList;
-   /// @dev BountyCollectors in form of listing
-  address[] public  approvedBountyCollectors;
+  /// @dev BountyCollectors in form of listing
+  address[] public approvedBountyCollectors;
+
   /// @dev  Strategies checking if address is on list
-  mapping(address => bool) public approvedStrategiesCheck;
+  mapping(address => bool) public override approvedStrategiesCheck;
   /// address[] public approvedStrategiesList;
-    /// @dev  Strategies in form of listing
+
+  /// @dev  Strategies in form of listing
   address[] public approvedStrategies;
-  /// @dev Relayer 
+
+  /// @dev Relayer
   address public override approvedNativeRelayer;
+
   /// @dev whitelist operators listing
   address[] public whitelistOperatorsList;
-  /// @dev check in Array of valid and registered protocol workers set by whitelisted operators 
+
+  /// @dev check in Array of valid and registered protocol workers set by whitelisted operators
   mapping(address => bool) public override approvedWorkers;
   /// address[] public approvedProtocolWorkers
 
   /// @notice ACL - mapping of valid operators' addresses
-  mapping(address => bool) whitelistedOperators;
-
-  /// @dev Events
-  event WhitelistOperators(address indexed caller, address[] indexed operators, bool indexed isOk);
-  event ApproveWorkers(address indexed caller, address[] indexed workers, bool indexed isEnabled);
-  event ApproveClients(address indexed caller, address[] indexed entities, bool indexed isApproved);
-  event ApproveVaults(address indexed caller, address[] indexed entities, bool indexed isApproved);
-  event ApproveStrategies(
-    address indexed caller,
-    address[] indexed entities,
-    bool indexed isApproved
-  );
-  event ApproveVaultConfigs(
-    address indexed caller,
-    address[] indexed entities,
-    bool indexed isApproved
-  );
-  event ApproveBountyCollectors(
-    address indexed caller,
-    address[] indexed entities,
-    bool indexed isApproved
-  );
-  event SetNativeRelayer(
-    address indexed caller,
-    address indexed oldAddress,
-    address indexed newAddress
-  );
+  mapping(address => bool) public whitelistedOperators;
 
   /// @dev initialize the owner and operators of Protocol
   function initialize(address[] calldata initialOperators) external initializer {
@@ -92,49 +133,43 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// @param isOk Are operators going to be enabled or disabled?
   function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
     _whitelistOperators(operators, isOk);
-    
   }
 
-
-  
-    // Function to count number 
-    // of values in a mapping
-    function countBounties(
-    ) view public returns (uint) {
-        return approvedBountyCollectors.length;
-    }
+  // Function to count number
+  // of values in a mapping
+  function countBounties() public view returns (uint256) {
+    return approvedBountyCollectors.length;
+  }
 
   /// @dev Bounty collector getter, maps to internal mapping
-  function ListApprovedBountyCollectors() public view returns(address[] memory)
-  { 
-   return approvedBountyCollectors;   
+  function ListApprovedBountyCollectors() public view returns (address[] memory) {
+    return approvedBountyCollectors;
   }
-    /// @dev Bounty collector checking if addres present 
-  function checkIfApprovedBountyCollectorsIs(address checker) public view returns(bool )
-  {
-  return checkIfApprovedBountyCollectors[checker];
+
+  /// @dev Bounty collector checking if addres present
+  function checkIfApprovedBountyCollectorsIs(address checker) public view returns (bool) {
+    return checkIfApprovedBountyCollectors[checker];
   }
+
   /// @dev Strategy getter, maps to internal mapping
-  function ListApprovedStrategies() public view returns (address[] memory){
-  /// @dev Strategy list
-  return approvedStrategies;
+  function ListApprovedStrategies() public view returns (address[] memory) {
+    /// @dev Strategy list
+    return approvedStrategies;
   }
 
   /// @dev whitelistOperatorsList list
-  function  ListwhitelistOperators() public view returns (address[] memory){
-  return  whitelistOperatorsList;
+  function ListwhitelistOperators() public view returns (address[] memory) {
+    return whitelistOperatorsList;
   }
 
   /// @dev whitelistOperators checking if addres present
-  function  checkWhitelistOperator(address checker) public view returns(bool )
-  {
-  return  whitelistedOperators[checker];
+  function checkWhitelistOperator(address checker) public view returns (bool) {
+    return whitelistedOperators[checker];
   }
-        
+
   /// @dev approvedStrategiesCheckIs checking if addres present
-  function approvedStrategiesCheckIs(address checker) public view returns(bool )
-  {
-  return approvedStrategiesCheck[checker];
+  function approvedStrategiesCheckIs(address checker) public view returns (bool) {
+    return approvedStrategiesCheck[checker];
   }
 
   /// @notice Internal ACL
@@ -237,7 +272,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     uint256 length = bountyCollectors.length;
 
     for (uint256 i = 0; i < length; i++) {
-     approvedBountyCollectors.push(bountyCollectors[i]);
+      approvedBountyCollectors.push(bountyCollectors[i]);
       checkIfApprovedBountyCollectors[bountyCollectors[i]] = isApproved;
     }
 
@@ -256,7 +291,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
     for (uint256 i = 0; i < length; i++) {
       approvedStrategies.push(strategies[i]);
-     approvedStrategiesCheck[strategies[i]] = isApproved;
+      approvedStrategiesCheck[strategies[i]] = isApproved;
     }
 
     emit ApproveStrategies(msg.sender, strategies, isApproved);

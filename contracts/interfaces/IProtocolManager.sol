@@ -14,10 +14,10 @@ interface IProtocolManager {
   function approvedVaultConfigs(address vaultConfig) external returns (bool);
 
   /// @dev Bounty collector getter, maps to internal mapping
-  function approvedBountyCollectors(address bountyCollector) external returns (bool);
+  function checkIfApprovedBountyCollectors(address bountyCollector) external returns (bool);
 
   /// @dev Strategy getter, maps to internal mapping
-  function approvedStrategies(address strategy) external returns (bool);
+  function approvedStrategiesCheck(address strategy) external returns (bool);
 
   /// @dev Native relayer getter, maps to internal contract mapping
   function approvedNativeRelayer() external returns (address);

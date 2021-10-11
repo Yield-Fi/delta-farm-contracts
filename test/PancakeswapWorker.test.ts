@@ -30,7 +30,7 @@ import { parseEther } from "@ethersproject/units";
 import { SwapHelper } from "./helpers/swap";
 import { MockWBNB } from "../typechain";
 import { assertAlmostEqual } from "./helpers/assert";
-import { MockVaultToRegisterRewards } from "../typechain/MockVaultToRegisterRewards";
+import { MockVault } from "../typechain/MockVault";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -46,7 +46,7 @@ describe("PancakeswapWorker", () => {
   let account2: Signer;
   let account2Address: string;
 
-  let MockVaultToRegisterRewards: MockVaultToRegisterRewards;
+  let MockVault: MockVault;
   let WorkerBUSD_TOK0: PancakeswapWorker;
   let WorkerTOK0_TOK1: PancakeswapWorker;
   let PancakeFactory: PancakeFactory;
@@ -142,11 +142,7 @@ describe("PancakeswapWorker", () => {
 
     const MockWBNB = (await deployContract("MockWBNB", [], deployer)) as MockWBNB;
 
-    MockVaultToRegisterRewards = (await deployContract(
-      "MockVaultToRegisterRewards",
-      [],
-      deployer
-    )) as MockVaultToRegisterRewards;
+    MockVault = (await deployContract("MockVault", [BaseToken.address], deployer)) as MockVault;
 
     [PancakeFactory, PancakeRouterV2, CakeToken, , PancakeMasterChef] = await deployPancakeV2(
       MockWBNB,
@@ -172,7 +168,7 @@ describe("PancakeswapWorker", () => {
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 
     WorkerBUSD_TOK0 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
-      MockVaultToRegisterRewards.address,
+      MockVault.address,
       BaseToken.address,
       PancakeMasterChef.address,
       PancakeRouterV2.address,
@@ -186,7 +182,7 @@ describe("PancakeswapWorker", () => {
     await WorkerBUSD_TOK0.deployed();
 
     WorkerTOK0_TOK1 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
-      MockVaultToRegisterRewards.address,
+      MockVault.address,
       BaseToken.address,
       PancakeMasterChef.address,
       PancakeRouterV2.address,
@@ -293,7 +289,7 @@ describe("PancakeswapWorker", () => {
       expect((await WorkerBUSD_TOK0.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
 
       /// add liquidity to the pool via add base token only strategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerBUSD_TOK0.address,
         0,
         "work(uint256,bytes)",
@@ -335,12 +331,12 @@ describe("PancakeswapWorker", () => {
       10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
       */
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.755679966928919588").toString()
       );
 
       /// Withdraw all funds from pool via LiquidateStrategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerBUSD_TOK0.address,
         0,
         "work(uint256,bytes)",
@@ -367,7 +363,7 @@ describe("PancakeswapWorker", () => {
       */
 
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.855429985630498983").toString()
       );
     });
@@ -402,7 +398,7 @@ describe("PancakeswapWorker", () => {
       expect((await WorkerTOK0_TOK1.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
 
       /// add liquidity to the pool via add base token only strategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerTOK0_TOK1.address,
         0,
         "work(uint256,bytes)",
@@ -444,12 +440,12 @@ describe("PancakeswapWorker", () => {
       10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
       */
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.755679966928919588").toString()
       );
 
       /// Withdraw all funds from pool via LiquidateStrategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerTOK0_TOK1.address,
         0,
         "work(uint256,bytes)",
@@ -476,7 +472,7 @@ describe("PancakeswapWorker", () => {
       */
 
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.855429985630498983").toString()
       );
     });

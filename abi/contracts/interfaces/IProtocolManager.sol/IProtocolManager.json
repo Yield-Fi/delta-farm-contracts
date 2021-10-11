@@ -111,25 +111,6 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "bountyCollector",
-        "type": "address"
-      }
-    ],
-    "name": "approvedBountyCollectors",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
         "name": "client",
         "type": "address"
       }
@@ -166,7 +147,7 @@
         "type": "address"
       }
     ],
-    "name": "approvedStrategies",
+    "name": "approvedStrategiesCheck",
     "outputs": [
       {
         "internalType": "bool",
@@ -224,6 +205,25 @@
       }
     ],
     "name": "approvedWorkers",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "bountyCollector",
+        "type": "address"
+      }
+    ],
+    "name": "checkIfApprovedBountyCollectors",
     "outputs": [
       {
         "internalType": "bool",
