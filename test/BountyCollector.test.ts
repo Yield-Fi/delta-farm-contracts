@@ -17,7 +17,7 @@ const { expect } = chai;
 
 describe("BountyCollector", async () => {
   // Bounty-related config
-  let baseToken: MockToken;
+  let bountyToken: MockToken;
   let mockWBNB: MockWBNB;
 
   const BOUNTY_THRESHOLD = ethers.utils.parseEther("1");
@@ -30,7 +30,7 @@ describe("BountyCollector", async () => {
   // Addresses
   let deployerAddress: string;
   let aliceAddress: string;
-  let bobAAddress: string;
+  let bobAddress: string;
 
   let bountyCollector: BountyCollector;
   let protocolManager: ProtocolManager;
@@ -45,58 +45,49 @@ describe("BountyCollector", async () => {
 
   async function fixture() {
     [deployer, alice, bob] = await ethers.getSigners();
-
-    [deployerAddress, aliceAddress, bobAAddress] = await Promise.all([
+    [deployerAddress, aliceAddress, bobAddress] = await Promise.all([
       deployer.getAddress(),
       alice.getAddress(),
       bob.getAddress(),
     ]);
-
     // Bounty token
-    baseToken = await deployToken(
-      {
-        name: "Base Token",
-        symbol: "BASETOKEN",
-        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("1000") }],
-      },
-      deployer
-    );
+    // bountyToken = (await upgrades.deployProxy(
+    //   await ethers.getContractFactory("MockToken", deployer),
+    //   ["BountyToken", "BTT"]
+    // )) as MockToken;
+    // await bountyToken.deployed();
 
-    // Setup general protocol manager
-    protocolManager = (await deployProxyContract(
-      "ProtocolManager",
-      [[deployerAddress]],
-      deployer
-    )) as ProtocolManager;
-
-    // Setup general protocol manager
-    bountyCollector = (await deployProxyContract(
-      "BountyCollector",
-      [baseToken.address, "500", protocolManager.address],
-      deployer
-    )) as BountyCollector;
-
-    // Client contract
-    client = (await deployProxyContract(
-      "Client",
-      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
-      deployer
-    )) as Client;
-
-    mockWBNB = await deployWBNB(deployer);
-
-    [vault] = await deployVault(
-      mockWBNB,
-      baseToken,
-      protocolManager.address,
-      bountyCollector.address,
-      deployerAddress,
-      deployer
-    );
+    // // Setup general protocol manager
+    // protocolManager = (await deployProxyContract(
+    //   "ProtocolManager",
+    //   [[deployerAddress]],
+    //   deployer
+    // )) as ProtocolManager;
+    // // Setup general protocol manager
+    // bountyCollector = (await deployProxyContract(
+    //   "BountyCollector",
+    //   [bountyToken.address, "500", protocolManager.address],
+    //   deployer
+    // )) as BountyCollector;
+    // // Client contract
+    // client = (await deployProxyContract(
+    //   "Client",
+    //   ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
+    //   deployer
+    // )) as Client;
+    // mockWBNB = await deployWBNB(deployer);
+    // [vault] = await deployVault(
+    //   mockWBNB,
+    //   bountyToken,
+    //   protocolManager.address,
+    //   bountyCollector.address,
+    //   deployerAddress,
+    //   deployer
+    // );
   }
 
   beforeEach(async () => {
-    await waffle.loadFixture(fixture);
+    await fixture();
   });
 
   it("should respect access modifiers", async () => {});
