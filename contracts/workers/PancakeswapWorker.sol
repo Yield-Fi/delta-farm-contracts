@@ -240,14 +240,17 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
     // 4. Send all base token to the operatingVault
     uint256 baseTokenBalance = baseToken.myBalance();
+
     baseToken.safeTransfer(operatingVault, baseTokenBalance);
 
     // 5. Calculate the amount of reward for the given positions
     uint256 numberOfPositions = positionIds.length;
-    uint256[] storage rewardsPerPosition;
+
+    uint256[] memory rewardsPerPosition = new uint256[](numberOfPositions);
+
     for (uint256 i = 0; i < numberOfPositions; i++) {
       uint256 positionShare = shares[positionIds[i]];
-      rewardsPerPosition[i] = reward.mul(positionShare).div(totalShare);
+      rewardsPerPosition[i] = baseTokenBalance.mul(positionShare).div(totalShare);
     }
 
     // 6. Register rewards

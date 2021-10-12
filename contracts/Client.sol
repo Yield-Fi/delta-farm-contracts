@@ -180,6 +180,33 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit Deposit(recipient, worker, amount);
   }
 
+  /// @dev Collect accumulated rewards
+  /// @param pid Position ID
+  /// @param recipient Position owner
+  /// @param rewardTokenOrVaultAddress Information about asset in which reward will be paid out
+  function collectReward(
+    uint256 pid,
+    address recipient,
+    address rewardTokenOrVaultAddress
+  ) external onlyWhitelistedCallers {
+    // Try to resolve Vault address based on given token address
+    address vaultAddress = protocolManager.tokenToVault(rewardTokenOrVaultAddress);
+
+    if (vaultAddress == address(0)) {
+      // Vault hasn't been resolved from mapping, try direct look up
+
+      // Did caller provide direct vault address?
+      vaultAddress = rewardTokenOrVaultAddress;
+    }
+
+    require(
+      vaultAddress != address(0),
+      "ClientContract: Invalid rewardToken given (no operating Vaults were found)"
+    );
+
+    IVault(vaultAddress).collectReward(pid, recipient);
+  }
+
   function withdraw(
     uint256 pid,
     address recipient,

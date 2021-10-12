@@ -173,7 +173,6 @@ describe("ProtocolManager", async () => {
       deployer
     )) as Client;
 
-    protocolManager = protocolManager.connect(deployer);
     protocolManagerAsEvilUser = protocolManager.connect(evilUser);
   }
 

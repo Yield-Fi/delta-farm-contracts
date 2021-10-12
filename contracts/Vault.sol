@@ -43,6 +43,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @param amounts Array of reward amounts assign to the specific positions
   /// @notice The order of values in the amounts array is related to the order in the pids array
   event RewardsRegister(address indexed caller, uint256[] indexed pids, uint256[] indexed amounts);
+  event ApproveRewardAssigners(address indexed caller, address[] indexed entities, bool isApproved);
 
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;
@@ -75,11 +76,11 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   IProtocolManager public protocolManager;
 
   /// @dev Position ID => Native Token Amount
-  mapping(uint256 => uint256) public rewards;
-  mapping(address => bool) public okRewardAssigners;
+  mapping(uint256 => uint256) public override rewards;
+  mapping(address => bool) public override approvedRewardAssigners;
 
   modifier onlyWhitelistedRewardAssigners() {
-    require(okRewardAssigners[msg.sender], "Vault: Reward assigner not whitelisted");
+    require(approvedRewardAssigners[msg.sender], "Vault: Reward assigner not whitelisted");
     _;
   }
 
@@ -179,7 +180,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     uint256 id,
     address worker,
     uint256 amount,
-    address endUser,
+    address recipient,
     bytes calldata data
   ) external payable override onlyClientContract transferTokenToVault(amount) nonReentrant {
     // 1. Sanity check the input position, or add a new position of ID is 0.
@@ -188,13 +189,13 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       id = nextPositionID++;
       pos = positions[id];
       pos.worker = worker;
-      pos.owner = endUser;
+      pos.owner = recipient;
       pos.client = msg.sender;
     } else {
       pos = positions[id];
       require(id < nextPositionID, "bad position id");
       require(pos.worker == worker, "bad position worker");
-      require(pos.owner == endUser, "not position owner");
+      require(pos.owner == recipient, "not position owner");
       require(pos.client == msg.sender, "bad source-client address");
     }
     // Update execution scope variables
@@ -239,6 +240,8 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
 
     require(length == amounts.length, "Vault: invalid input data");
 
+    uint256 singleTxAcc = 0;
+
     for (uint256 i = 0; i < length; i++) {
       uint256 pid = pids[i];
       uint256 baseReward = amounts[i];
@@ -268,30 +271,40 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       addresses[0] = config.treasuryAccount();
       addresses[1] = positions[pid].client;
 
-      // Transfer assets to fee collector and register the amounts
+      // Transfer assets to bounty collector and register the amounts
       feeCollector.registerFees(addresses, fees);
-      token.safeTransfer(address(feeCollector), feeSum);
+      singleTxAcc = singleTxAcc.add(feeSum);
 
       // Assign final reward to the user
       rewards[pid] = rewards[pid].add(userReward);
     }
+
+    token.safeTransfer(address(feeCollector), singleTxAcc);
 
     emit RewardsRegister(msg.sender, pids, amounts);
   }
 
   /// @dev Collect accumulated rewards
   /// @param pid Position ID
-  function collectReward(uint256 pid) external override {
+  /// @param recipient Recipient address - must match recipient address given during position opening
+  function collectReward(uint256 pid, address recipient) external override onlyClientContract {
     Position memory position = positions[pid];
 
     uint256 reward = rewards[pid];
 
+    // Take precision loss into account
     require(
       (reward * 10000) / 10000 == reward,
-      "Vault: Too little amount to collect (precision loss)"
+      "Vault: Too little amount to collect (precision loss) or invalid position ID"
     );
+
+    // Some kind of safety feature to make sure only valid pid-recipient combination will trigger the collect
+    require(position.owner == recipient, "Vault: Invalid recipient provided");
+
     // Finally transfer assets to the end user
     token.safeTransfer(position.owner, reward);
+
+    rewards[pid] = 0;
 
     // Emit
     emit RewardCollect(msg.sender, position.owner, reward);
@@ -308,6 +321,24 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     }
 
     return acc >= token.balanceOf(address(this));
+  }
+
+  /// @dev Rewards ACL
+  /// @param rewardAssigners array of addresses
+  /// @param isApproved true | false
+  function approveRewardAssigners(address[] calldata rewardAssigners, bool isApproved)
+    external
+    override
+    /// TODO: Change who can use this function
+    onlyOwner
+  {
+    uint256 length = rewardAssigners.length;
+
+    for (uint256 i = 0; i < length; i++) {
+      approvedRewardAssigners[rewardAssigners[i]] = isApproved;
+    }
+
+    emit ApproveRewardAssigners(msg.sender, rewardAssigners, isApproved);
   }
 
   /// @dev Fallback function to accept BNB.
