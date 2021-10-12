@@ -190,7 +190,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     address rewardTokenOrVaultAddress
   ) external onlyWhitelistedCallers {
     // Try to resolve Vault address based on given token address
-    address vaultAddress = _protocolManager.tokenToVault(rewardTokenOrVaultAddress);
+    address vaultAddress = protocolManager.tokenToVault(rewardTokenOrVaultAddress);
 
     if (vaultAddress == address(0)) {
       // Vault hasn't been resolved from mapping, try direct look up

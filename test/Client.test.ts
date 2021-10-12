@@ -456,6 +456,7 @@ describe("Client contract", async () => {
         [pancakeswapWorker01.address, pancakeswapWorker02.address],
         true
       );
+      await protocolManager.approveAdminContract(deployerAddress); // Workaround
       await pancakeswapWorker01.setHarvestersOk([deployerAddress], true);
       await vault.approveRewardAssigners([pancakeswapWorker01.address], true);
       await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
@@ -488,11 +489,11 @@ describe("Client contract", async () => {
       expect(await vault.rewards(1)).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
       expect(await vault.rewards(2)).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
 
-      expect(await feeCollector.bounties(exampleClient.address)).to.be.bignumber.that.is.not.eql(
+      expect(await feeCollector.fees(exampleClient.address)).to.be.bignumber.that.is.not.eql(
         ethers.BigNumber.from("0")
       );
       expect(
-        await feeCollector.bounties(await vaultConfig.treasuryAccount())
+        await feeCollector.fees(await vaultConfig.treasuryAccount())
       ).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
 
       // Collect
