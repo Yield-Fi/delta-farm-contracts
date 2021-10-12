@@ -25,6 +25,7 @@ const deployFun: DeployFunction = async function () {
       client.kind,
       client.name,
       config.protocolManager,
+      config.feeCollector,
       client.operators,
     ]);
 
@@ -32,7 +33,7 @@ const deployFun: DeployFunction = async function () {
 
     const ProtocolManager = ProtocolManager__factory.connect(config.protocolManager, deployer);
 
-    await ProtocolManager.approveClientContract(Client.address, true);
+    await ProtocolManager.approveClients([Client.address], true);
 
     logger(`  - Contract of ${client.name} deployed at ${Client.address}`);
   }

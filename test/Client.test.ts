@@ -3,7 +3,7 @@ import "@openzeppelin/test-helpers";
 import { BigNumber, Signer } from "ethers";
 import {
   CakeToken,
-  BountyCollector,
+  FeeCollector,
   MockWBNB,
   PancakeFactory,
   PancakeMasterChef,
@@ -59,7 +59,7 @@ describe("Client contract", async () => {
   let syrup: SyrupBar;
 
   // BC
-  let bountyCollector: BountyCollector;
+  let feeCollector: FeeCollector;
 
   // Signers
   let deployer: Signer;
@@ -147,19 +147,19 @@ describe("Client contract", async () => {
       deployer
     )) as ProtocolManager;
 
-    bountyCollector = (await deployProxyContract(
-      "BountyCollector",
+    feeCollector = (await deployProxyContract(
+      "FeeCollector",
       [baseToken.address, "500", protocolManager.address],
       deployer
-    )) as BountyCollector;
+    )) as FeeCollector;
 
     // Treasury acc = yieldFi protocol owner
     [vault, vaultConfig, wNativeRelayer] = await deployVault(
       mockWBNB,
       baseToken,
       protocolManager.address,
-      bountyCollector.address,
-      deployerAddress,
+      feeCollector.address,
+      yieldFiAddress,
       deployer
     );
 
@@ -283,7 +283,13 @@ describe("Client contract", async () => {
     // Clients
     exampleClient = (await deployProxyContract(
       "Client",
-      ["Binance", "Binance Client", protocolManager.address, [deployerAddress]],
+      [
+        "Binance",
+        "Binance Client",
+        protocolManager.address,
+        feeCollector.address,
+        [deployerAddress],
+      ],
       deployer
     )) as Client;
 
@@ -444,7 +450,7 @@ describe("Client contract", async () => {
     it("should work as intended", async () => {
       // Approvals
       await protocolManager.approveClients([exampleClient.address], true);
-      await protocolManager.approveBountyCollectors([bountyCollector.address], true);
+      await protocolManager.approveBountyCollectors([feeCollector.address], true);
       await protocolManager.approveVaults([vault.address], true);
       await protocolManager.approveWorkers(
         [pancakeswapWorker01.address, pancakeswapWorker02.address],
@@ -482,11 +488,11 @@ describe("Client contract", async () => {
       expect(await vault.rewards(1)).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
       expect(await vault.rewards(2)).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
 
-      expect(await bountyCollector.bounties(exampleClient.address)).to.be.bignumber.that.is.not.eql(
+      expect(await feeCollector.bounties(exampleClient.address)).to.be.bignumber.that.is.not.eql(
         ethers.BigNumber.from("0")
       );
       expect(
-        await bountyCollector.bounties(await vaultConfig.treasuryAccount())
+        await feeCollector.bounties(await vaultConfig.treasuryAccount())
       ).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
 
       // Collect

@@ -202,19 +202,6 @@
   },
   {
     "inputs": [],
-    "name": "bountyCollector",
-    "outputs": [
-      {
-        "internalType": "contract IBountyCollector",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "checkRewardsToBalanceStability",
     "outputs": [
       {
@@ -258,6 +245,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "feeCollector",
+    "outputs": [
+      {
+        "internalType": "contract IFeeCollector",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "contract IVaultConfig",
@@ -275,8 +275,8 @@
         "type": "address"
       },
       {
-        "internalType": "contract IBountyCollector",
-        "name": "_bountyCollector",
+        "internalType": "contract IFeeCollector",
+        "name": "_feeCollector",
         "type": "address"
       }
     ],

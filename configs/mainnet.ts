@@ -47,10 +47,11 @@ const tokens = {
 
 export const mainnetConfig = {
   wrappedNativeTokenRelayer: "",
-  bountyCollector: "",
+  feeCollector: "",
   treasuryAccount: "",
   protocolManager: "",
-  bountyThreshold: 500,
+  adminContract: "",
+  feeThreshold: 500,
   defaultTreasuryFeeBps: 1000,
   baseToken: tokens.BUSD,
   tokens,

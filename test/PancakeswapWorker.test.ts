@@ -14,6 +14,7 @@ import {
   PancakeswapStrategyLiquidate,
   PancakeswapWorker,
   PancakeswapWorker__factory,
+  ProtocolManager,
 } from "../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
@@ -23,6 +24,7 @@ import {
   deployContract,
   deployPancakeStrategies,
   deployPancakeV2,
+  deployProxyContract,
   deployTokens,
   time,
 } from "./helpers";
@@ -30,7 +32,7 @@ import { parseEther } from "@ethersproject/units";
 import { SwapHelper } from "./helpers/swap";
 import { MockWBNB } from "../typechain";
 import { assertAlmostEqual } from "./helpers/assert";
-import { MockVaultToRegisterRewards } from "../typechain/MockVaultToRegisterRewards";
+import { MockVault } from "../typechain/MockVault";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -45,8 +47,11 @@ describe("PancakeswapWorker", () => {
   let account1Address: string;
   let account2: Signer;
   let account2Address: string;
+  let admin: Signer;
+  let adminAddress: string;
 
-  let MockVaultToRegisterRewards: MockVaultToRegisterRewards;
+  let ProtocolManager: ProtocolManager;
+  let MockVault: MockVault;
   let WorkerBUSD_TOK0: PancakeswapWorker;
   let WorkerTOK0_TOK1: PancakeswapWorker;
   let PancakeFactory: PancakeFactory;
@@ -73,12 +78,21 @@ describe("PancakeswapWorker", () => {
   let swapHelper: SwapHelper;
 
   async function fixture() {
-    [deployer, account1, account2] = await ethers.getSigners();
-    [deployerAddress, account1Address, account2Address] = await Promise.all([
+    [deployer, account1, account2, admin] = await ethers.getSigners();
+    [deployerAddress, account1Address, account2Address, adminAddress] = await Promise.all([
       deployer.getAddress(),
       account1.getAddress(),
       account2.getAddress(),
+      admin.getAddress(),
     ]);
+
+    ProtocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [[deployerAddress, adminAddress]],
+      deployer
+    )) as ProtocolManager;
+
+    await ProtocolManager.approveAdminContract(adminAddress);
 
     [BaseToken, Token0, Token1] = await deployTokens(
       [
@@ -142,11 +156,7 @@ describe("PancakeswapWorker", () => {
 
     const MockWBNB = (await deployContract("MockWBNB", [], deployer)) as MockWBNB;
 
-    MockVaultToRegisterRewards = (await deployContract(
-      "MockVaultToRegisterRewards",
-      [],
-      deployer
-    )) as MockVaultToRegisterRewards;
+    MockVault = (await deployContract("MockVault", [BaseToken.address], deployer)) as MockVault;
 
     [PancakeFactory, PancakeRouterV2, CakeToken, , PancakeMasterChef] = await deployPancakeV2(
       MockWBNB,
@@ -172,7 +182,7 @@ describe("PancakeswapWorker", () => {
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 
     WorkerBUSD_TOK0 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
-      MockVaultToRegisterRewards.address,
+      MockVault.address,
       BaseToken.address,
       PancakeMasterChef.address,
       PancakeRouterV2.address,
@@ -180,13 +190,13 @@ describe("PancakeswapWorker", () => {
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
-      ethers.constants.AddressZero,
+      ProtocolManager.address,
     ])) as PancakeswapWorker;
 
     await WorkerBUSD_TOK0.deployed();
 
     WorkerTOK0_TOK1 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
-      MockVaultToRegisterRewards.address,
+      MockVault.address,
       BaseToken.address,
       PancakeMasterChef.address,
       PancakeRouterV2.address,
@@ -194,7 +204,7 @@ describe("PancakeswapWorker", () => {
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
-      ethers.constants.AddressZero,
+      ProtocolManager.address,
     ])) as PancakeswapWorker;
 
     await WorkerTOK0_TOK1.deployed();
@@ -293,7 +303,7 @@ describe("PancakeswapWorker", () => {
       expect((await WorkerBUSD_TOK0.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
 
       /// add liquidity to the pool via add base token only strategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerBUSD_TOK0.address,
         0,
         "work(uint256,bytes)",
@@ -335,12 +345,12 @@ describe("PancakeswapWorker", () => {
       10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
       */
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.755679966928919588").toString()
       );
 
       /// Withdraw all funds from pool via LiquidateStrategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerBUSD_TOK0.address,
         0,
         "work(uint256,bytes)",
@@ -367,7 +377,7 @@ describe("PancakeswapWorker", () => {
       */
 
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.855429985630498983").toString()
       );
     });
@@ -402,7 +412,7 @@ describe("PancakeswapWorker", () => {
       expect((await WorkerTOK0_TOK1.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
 
       /// add liquidity to the pool via add base token only strategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerTOK0_TOK1.address,
         0,
         "work(uint256,bytes)",
@@ -444,12 +454,12 @@ describe("PancakeswapWorker", () => {
       10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
       */
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.755679966928919588").toString()
       );
 
       /// Withdraw all funds from pool via LiquidateStrategy
-      await MockVaultToRegisterRewards.executeTransaction(
+      await MockVault.executeTransaction(
         WorkerTOK0_TOK1.address,
         0,
         "work(uint256,bytes)",
@@ -476,7 +486,7 @@ describe("PancakeswapWorker", () => {
       */
 
       assertAlmostEqual(
-        (await BaseToken.balanceOf(MockVaultToRegisterRewards.address)).toString(),
+        (await BaseToken.balanceOf(MockVault.address)).toString(),
         parseEther("9.855429985630498983").toString()
       );
     });
@@ -501,7 +511,9 @@ describe("PancakeswapWorker", () => {
   });
 
   it("should successfully set a treasury config", async () => {
-    await WorkerTOK0_TOK1.setTreasuryFee("500");
+    const worker__admin = WorkerTOK0_TOK1.connect(admin);
+
+    await worker__admin.setTreasuryFee("500");
     expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq("500");
   });
 });

@@ -1,12 +1,6 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "client",
-        "type": "address"
-      }
-    ],
+    "inputs": [],
     "name": "collect",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -14,8 +8,27 @@
   },
   {
     "inputs": [],
-    "name": "collectAll",
-    "outputs": [],
+    "name": "feeToCollect",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getFeeToken",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -28,11 +41,11 @@
       },
       {
         "internalType": "uint256[]",
-        "name": "amount",
+        "name": "fees",
         "type": "uint256[]"
       }
     ],
-    "name": "registerBounties",
+    "name": "registerFees",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -41,39 +54,16 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "bountyToken",
+        "name": "feeToken",
         "type": "address"
       },
       {
         "internalType": "uint256",
-        "name": "bountyThreshold",
+        "name": "feeThreshold",
         "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "protocolManager",
-        "type": "address"
       }
     ],
     "name": "setConfig",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "collectors",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "ok",
-        "type": "bool"
-      }
-    ],
-    "name": "whitelistCollectors",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

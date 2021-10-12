@@ -175,8 +175,19 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   }
 
   /// @dev Require that the caller must be the operatingVault.
-  modifier onlyOperator() {
-    require(msg.sender == operatingVault, "PancakeswapWorker->onlyOperator: not operatingVault");
+  modifier onlyOperatingVault() {
+    require(
+      msg.sender == operatingVault,
+      "PancakeswapWorker->onlyOperatingVault: not operatingVault"
+    );
+    _;
+  }
+
+  modifier onlyAdminContract() {
+    require(
+      protocolManager.isAdminContract(msg.sender),
+      "PancakeswapWorker->onlyAdminContract: not admin contract"
+    );
     _;
   }
 
@@ -257,7 +268,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   function work(uint256 positionId, bytes calldata data)
     external
     override
-    onlyOperator
+    onlyOperatingVault
     nonReentrant
   {
     addPositionId(positionId);
@@ -447,7 +458,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Set treasury fee.
   /// @param _treasuryFeeBps - The fee in BPS that will be charged
-  function setTreasuryFee(uint256 _treasuryFeeBps) external onlyOwner {
+  function setTreasuryFee(uint256 _treasuryFeeBps) external override onlyAdminContract {
     treasuryFeeBps = _treasuryFeeBps;
 
     emit SetTreasuryFee(msg.sender, _treasuryFeeBps);

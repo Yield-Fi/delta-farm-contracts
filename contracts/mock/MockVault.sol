@@ -1,6 +1,12 @@
 pragma solidity 0.6.6;
 
-contract MockVaultToRegisterRewards {
+contract MockVault {
+  address public token;
+
+  constructor(address _token) public {
+    token = _token;
+  }
+
   function executeTransaction(
     address target,
     uint256 value,

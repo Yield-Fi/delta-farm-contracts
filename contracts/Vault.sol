@@ -11,7 +11,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
 import "./interfaces/IWorker.sol";
-import "./interfaces/IBountyCollector.sol";
+import "./interfaces/IFeeCollector.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IVaultConfig.sol";
 import "./interfaces/IWBNB.sol";
@@ -71,7 +71,8 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   uint256 public nextPositionID;
 
   /// Reward-related stuff
-  IBountyCollector public bountyCollector;
+  IFeeCollector public feeCollector;
+
   IProtocolManager public protocolManager;
 
   /// @dev Position ID => Native Token Amount
@@ -114,12 +115,12 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @param _config Address of VaultConfig contract
   /// @param _token Address of token which will be the base token for this vault
   /// @param _protocolManager Address of protocol manager contract
-  /// @param _bountyCollector Address of bounty collector contract
+  /// @param _feeCollector Address of fee collector contract
   function initialize(
     IVaultConfig _config,
     address _token,
     IProtocolManager _protocolManager,
-    IBountyCollector _bountyCollector
+    IFeeCollector _feeCollector
   ) external initializer {
     __Ownable_init();
     __ReentrancyGuard_init();
@@ -127,7 +128,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     nextPositionID = 1;
     config = _config;
     token = _token;
-    bountyCollector = _bountyCollector;
+    feeCollector = _feeCollector;
     protocolManager = _protocolManager;
 
     // free-up execution scope
@@ -271,14 +272,14 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       addresses[1] = positions[pid].client;
 
       // Transfer assets to bounty collector and register the amounts
-      bountyCollector.registerBounties(addresses, fees);
+      feeCollector.registerFees(addresses, fees);
       singleTxAcc = singleTxAcc.add(feeSum);
 
       // Assign final reward to the user
       rewards[pid] = rewards[pid].add(userReward);
     }
 
-    token.safeTransfer(address(bountyCollector), singleTxAcc);
+    token.safeTransfer(address(feeCollector), singleTxAcc);
 
     emit RewardsRegister(msg.sender, pids, amounts);
   }

@@ -2,7 +2,7 @@ import { WorkerConfigType, getConfig } from "../../utils/config";
 import { ethers, upgrades } from "hardhat";
 
 import { DeployFunction } from "hardhat-deploy/types";
-import { PancakeswapWorker } from "../../../typechain";
+import { PancakeswapWorker, ProtocolManager__factory } from "../../../typechain";
 import { logger } from "../../utils/logger";
 import { parseEther } from "@ethersproject/units";
 
@@ -52,6 +52,10 @@ const deployFunc: DeployFunction = async () => {
       logger(`  - ${worker.name} deployed at ${PancakeswapWorker.address}`);
     }
   }
+
+  const ProtocolManager = ProtocolManager__factory.connect(config.protocolManager, deployer);
+
+  await ProtocolManager.approveWorkers(deployedWorkers, true);
 };
 
 export default deployFunc;

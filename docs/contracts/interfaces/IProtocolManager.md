@@ -27,6 +27,16 @@ Vault getter, maps to internal mapping
 
 
 
+### whitelistedOperators
+
+```solidity
+  function whitelistedOperators(address operator) external returns(bool)
+```
+
+Operator getter, maps to internal mapping
+
+
+
 ### tokenToVault
 
 ```solidity
@@ -47,20 +57,20 @@ Vault config getter, maps to internal mapping
 
 
 
-### approvedBountyCollectors
+### checkIfApprovedBountyCollectors
 
 ```solidity
-  function approvedBountyCollectors(address bountyCollector) external returns(bool)
+  function checkIfApprovedBountyCollectors(address bountyCollector) external returns(bool)
 ```
 
 Bounty collector getter, maps to internal mapping
 
 
 
-### approvedStrategies
+### approvedStrategiesCheck
 
 ```solidity
-  function approvedStrategies(address strategy) external returns(bool)
+  function approvedStrategiesCheck(address strategy) external returns(bool)
 ```
 
 Strategy getter, maps to internal mapping

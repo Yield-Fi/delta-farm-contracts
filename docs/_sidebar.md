@@ -1,6 +1,7 @@
 - Contracts
-  - [BountyCollector](contracts\BountyCollector)
+  - [Admin](contracts\Admin)
   - [Client](contracts\Client)
+  - [FeeCollector](contracts\FeeCollector)
   - [ProtocolManager](contracts\ProtocolManager)
   - [SimplePriceOracle](contracts\SimplePriceOracle)
   - Strategies
