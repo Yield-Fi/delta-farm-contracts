@@ -253,6 +253,8 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     feeToken.safeTransfer(_to, feeToken.myBalance());
   }
 
+  /// @dev Returns amount of fee to collect
+  /// @return uint256 Amount of fee to collect
   function feeToCollect() external view returns (uint256) {
     return feeCollector.feeToCollect();
   }

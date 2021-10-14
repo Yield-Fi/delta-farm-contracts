@@ -47,7 +47,7 @@ NOTE: After each steps you should update the config file in the `configs` folder
 6. Deploy pancake strategies:
 
 ```bash
-npm run deploy:[network]:workers:pancake
+npm run deploy:[network]:strategies:pancake
 ```
 
 7. Deploy workers:
@@ -57,7 +57,7 @@ npm run deploy:[network]:workers:pancake
    7.2. Run deploy:
 
    ```bash
-   npm run deploy:[network]:strategies:pancake
+   npm run deploy:[network]:workers:pancake
    ```
 
 8. Deploy clients's contracts:

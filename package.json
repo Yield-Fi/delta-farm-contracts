@@ -50,7 +50,10 @@
     "deploy:testnet:clients": "hardhat --network testnet deploy --reset --tags Client",
     "upgrade:testnet:clients": "hardhat --network testnet deploy --reset --tags ClientUpgrade",
     "deploy:mainnet:clients": "hardhat --network mainnet deploy --reset --tags Client",
-    "upgrade:mainnet:clients": "hardhat --network mainnet deploy --reset --tags ClientUpgrade"
+    "upgrade:mainnet:clients": "hardhat --network mainnet deploy --reset --tags ClientUpgrade",
+    "deploy:testnet:tokens": "hardhat --network testnet deploy --reset --tags TestTokens",
+    "deploy:testnet:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapV2",
+    "deploy:testnet:pancake:addFarms": "hardhat --network testnet deploy --reset --tags PancakeAddFarms"
   },
   "repository": {
     "type": "git",

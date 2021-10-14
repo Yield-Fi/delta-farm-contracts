@@ -1,45 +1,55 @@
-2021-10-07 17:27:08 ||| ---> Deploying ProtocolManager... <---
-2021-10-07 17:27:51 ||| - ProtocolManager deployed at  xxx 0x40510c6D3611933135cC573A5064a985bD6850E7 xxx DNU
-UPDATED https://testnet.bscscan.com/address/0x878560ce1f55aefae443e0cb1406246321e8c458
-2021-10-07 17:28:23 ||| ---> Deploying bounty collector... <---
-2021-10-07 17:28:53 ||| - BountyCollector deployed at 0xF87e29a30aD4Acb6ffBA9d644C479376E645F1cf
-2021-10-07 17:29:27 ||| ---> Deploying WrappedNativeTokenRelayer... <---
-2021-10-07 17:30:10 ||| - WrappedNativeTokenRelayer deployed at 0x1153C1694146cD99B632b04910D45B95c99012C8
-2021-10-07 17:30:51 ||| ---> Deploying vaults... <---
-2021-10-07 17:30:51 |||   -> BUSD Vault
-2021-10-07 17:31:19 |||   - Vault Config deployed at 0x7ACBb870B182c82D3eAbfBc1A52CE0FD16cdDbE6
-2021-10-07 17:31:52 |||   - Vault deployed at 0x19e4880Ae8E166E9076e701b23Ba67F475a751f3
-2021-10-07 17:32:35 ||| ---> Deploying strategies for the pancakeswap workers... <---
-2021-10-07 17:33:03 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0x67AaE37C5d0Be414606e173fB58106eEf5f9288D
-2021-10-07 17:33:29 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0x4B12F272d2284Ec7A6710C07564720e04645eAbB
-2021-10-07 17:33:55 ||| - LiquidateStrategy deployed at 0x08A435c2a53517f64149525f82eE855A63c75bef
-2021-10-07 17:34:27 ||| ---> Deploying pancakeswap workers... <---
-2021-10-07 17:34:27 ||| -> Deploying workers for BUSD Vault
-2021-10-07 17:34:27 |||   - Deploying BUSD-USDT PancakeswapWorker...
-2021-10-07 17:35:04 |||   - BUSD-USDT PancakeswapWorker deployed at 0xBB029872759Fc40b87C6E14b137dD09D18Bdbf02
-2021-10-07 17:35:44 ||| ---> Deploying Client contracts... <---
-2021-10-07 17:35:44 |||   -> Contract of Client A
-2021-10-07 17:36:23 |||   - Contract of Client A deployed at 0x1e1660aE9Eb53b4AE0Ac1f9eAE8a8d972c05ceb5
-2021-10-11 21:58:32 ||| ---> Deploying ProtocolManager... <---
-2021-10-11 21:59:02 ||| - ProtocolManager deployed at 0xF797e8F2f385E1F96A488267552B37fB3C40CA71
-2021-10-11 21:59:24 ||| ---> Deploying Admin contract... <---
-2021-10-11 22:00:17 ||| - Admin contract deployed at 0x15df4048478Ef603d01AA63Aa393fC2116E234e3
-2021-10-11 22:06:10 ||| ---> Deploying fee collector... <---
-2021-10-11 22:06:38 ||| - FeeCollector deployed at 0xEbC7C0663aC2Aa5e50Bc3B3AE8077E40cd42e168
-2021-10-11 22:07:35 ||| ---> Deploying WrappedNativeTokenRelayer... <---
-2021-10-11 22:08:02 ||| - WrappedNativeTokenRelayer deployed at 0x72c6356334EF96546761c0142F7Ba2F00B7E18D5
-2021-10-11 22:11:13 ||| ---> Deploying vaults... <---
-2021-10-11 22:11:13 |||   -> BUSD Vault
-2021-10-11 22:11:51 |||   - Vault Config deployed at 0x888229D7AFa1f627A25971b3848C1bDD86038857
-2021-10-11 22:12:18 |||   - Vault deployed at 0xcb5574420B19aCd484Fc9D3a6BAa7E4Dbb529Cc6
-2021-10-11 22:15:22 ||| ---> Deploying strategies for the pancakeswap workers... <---
-2021-10-11 22:15:52 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0xE4Aded51f9A50df135f4d5a2E4556129E89802f4
-2021-10-11 22:16:23 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0xd6cD177541D877603B365AC5C6C199F571DBB0f6
-2021-10-11 22:16:51 ||| - LiquidateStrategy deployed at 0x1bcE142379d227B3dE2A2198bB57E2DE9854Df4E
-2021-10-11 22:17:41 ||| ---> Deploying pancakeswap workers... <---
-2021-10-11 22:17:41 ||| -> Deploying workers for BUSD Vault
-2021-10-11 22:17:41 |||   - Deploying BUSD-USDT PancakeswapWorker...
-2021-10-11 22:18:33 |||   - BUSD-USDT PancakeswapWorker deployed at 0x945342BAA2FBe1Fe8F40697550e80B6ceE93f855
-2021-10-11 22:20:49 ||| ---> Deploying Client contracts... <---
-2021-10-11 22:20:49 |||   -> Contract of Client A
-2021-10-11 22:21:28 |||   - Contract of Client A deployed at 0x3Fec471402390B7b6ee32CAc8F88FDD6A5859A72
+2021-10-14 15:31:49 ||| ---> Deploying test tokens... <---
+2021-10-14 15:33:22 ||| - BUSD: 0x23d92E3Bbb84b6728124F568f16a036f6D104765
+2021-10-14 15:33:55 ||| - USDT: 0x7c2A2E9D3a18eFdA47D49A6c282F408dA1A3c6cC
+2021-10-14 15:34:31 ||| - ETH: 0x6Bb2c5cE8Fe6E7DAC1eaC265be0715d03Fd8f28E
+2021-10-14 15:35:07 ||| - USDC: 0x4727de0f00C7fa69F38B78bC465B59DBe8fD7E3f
+2021-10-14 15:35:41 ||| - ADA: 0xd49635f1D770d715B058df45067aB7bc0B55C43b
+2021-10-14 15:36:17 ||| - DAI: 0x86401c8f5a243036bd47F2B111b6F587074f591C
+2021-10-14 15:36:52 ||| - BTC: 0xe956CaBc1dD0ac3bff4063ff2fa417753db1D23C
+2021-10-14 15:49:13 ||| --> Deploying Pancakeswap v2...
+2021-10-14 15:49:31 |||  - PancakeFactory is deployed at 0xeAa72fA5AD56EC5d6D21210636FfB699F9f3b4e0
+2021-10-14 15:49:47 |||  - PancakeRouter deployed at 0x639972F8315945cC575E3a228c94A2a4B4B319CD
+2021-10-14 15:50:00 |||  - Cake token deployed at 0x688B1909314700c6D759Db7D046a1483FF68800c
+2021-10-14 15:50:09 |||  - Syrup Bar token deployed at 0x549A44C80561A0779c759F20638478b0CdB80FaA
+2021-10-14 15:50:20 |||  - Pancake MasterChef deployed at 0x8E424AfeB695e6D464DF69179155aB03cc4C7D25
+2021-10-14 15:58:42 ||| --> Creating new pairs on Pancakeswap...
+2021-10-14 15:58:51 |||  - BUSD-USDT pair:
+2021-10-14 15:59:33 |||  - Liquidity added: tx hash - 0x68052ab63d1a950cf1b38887d425500c29ef1fb7f0924f5f16e772217cdce6f8
+2021-10-14 15:59:46 |||  - Farm added: pool id - 2, lp token: 0xfb5F520959b86A72FE04AA9ADFF0740acc95711d, tx hash - 0x13dd1fc08e8341a893b1efdb7d6e8bdfac245438952de0be2535ff5c0335c879
+2021-10-14 15:59:53 |||  - BUSD-DAI pair:
+2021-10-14 16:00:33 |||  - Liquidity added: tx hash - 0xb7fb4375aa965cc801425762fecad72cf4c2eca4f9ef6816fa34b3e9f6e61f48
+2021-10-14 16:00:45 |||  - Farm added: pool id - 3, lp token: 0xBA79d73916A0b2DA4D8E142A8eC5b349Ec1C07AB, tx hash - 0x24c0e8d6632a27f810a3751fb55f502d8af355fd56db4e7de0a77df8bcf5db6e
+2021-10-14 16:00:53 |||  - USDT-DAI pair:
+2021-10-14 16:01:33 |||  - Liquidity added: tx hash - 0x113afa1cf8009f1f8dc492a59b8d259b963de62d05b31b203cf0cc8791dd6d07
+2021-10-14 16:01:45 |||  - Farm added: pool id - 4, lp token: 0x8AEfADF6c0C788041e7B28E3Ec0E4fE26BBbD451, tx hash - 0xd97c7deaf4e49438d80ae74f01c595a054e7262756cdc08b2513486cf6fe3ba5
+2021-10-14 16:01:53 |||  - WBNB-BUSD pair:
+2021-10-14 16:02:42 |||  - Liquidity added: tx hash - 0x7cd98ae3bd532408df52c7fc8ce2077e28ff3522a9c4440097a56a7ddd1dfd76
+2021-10-14 16:02:55 |||  - Farm added: pool id - 5, lp token: 0x18842A62973482aF0837f5676547Eea971d88b5a, tx hash - 0x7f630888161d9bcd2eb67645e0d87006ce0f7c546265a3c8ec692e5c8517ce8c
+2021-10-14 16:09:23 ||| ---> Deploying ProtocolManager... <---
+2021-10-14 16:10:08 ||| - ProtocolManager deployed at 0x84378f58c4E5beC1a88374c6306c271795f3D04C
+2021-10-14 16:11:55 ||| ---> Deploying Admin contract... <---
+2021-10-14 16:12:34 ||| - Admin contract deployed at 0x618c9111BcE2dfA273a22623CD26C3db8C8d953c
+2021-10-14 16:13:27 ||| ---> Deploying fee collector... <---
+2021-10-14 16:13:54 ||| - FeeCollector deployed at 0xC11B2efC9E4cCe8E176b81658110c31623985a83
+2021-10-14 16:16:01 ||| ---> Deploying WrappedNativeTokenRelayer... <---
+2021-10-14 16:16:31 ||| - WrappedNativeTokenRelayer deployed at 0x90F4770c309C5550ee5b7d1ae92a075cb7Ec0271
+2021-10-14 16:17:12 ||| ---> Deploying vaults... <---
+2021-10-14 16:17:12 |||   -> BUSD Vault
+2021-10-14 16:17:39 |||   - Vault Config deployed at 0x1484cc3a92C6A834ef33210eb0808A58d5D920F3
+2021-10-14 16:18:18 |||   - Vault deployed at 0xDCA36DFaB06a3fB0Ee7197922365E4C581521628
+2021-10-14 16:19:46 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2021-10-14 16:20:16 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0x65b8584720e15E1a8097204847e1D7F23330aFE9
+2021-10-14 16:20:44 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0xd780253C818FFB28395b280eb81f862eFA39089F
+2021-10-14 16:21:11 ||| - LiquidateStrategy deployed at 0x8e564dFa5636553C51a0917a3d2b995e497Fe8dE
+2021-10-14 16:21:44 ||| ---> Deploying pancakeswap workers... <---
+2021-10-14 16:21:44 ||| -> Deploying workers for BUSD Vault
+2021-10-14 16:21:44 |||   - Deploying BUSD-USDT PancakeswapWorker...
+2021-10-14 16:22:39 |||   - BUSD-USDT PancakeswapWorker deployed at 0x7F91eF26604e3ACE261f2D3D3e37d13EF631bAdD
+2021-10-14 16:22:39 |||   - Deploying BUSD-DAI PancakeswapWorker...
+2021-10-14 16:23:21 |||   - BUSD-DAI PancakeswapWorker deployed at 0x80d311bE84845695f5F18Bd810Ad36910c928Df6
+2021-10-14 16:23:21 |||   - Deploying USDT-DAI PancakeswapWorker...
+2021-10-14 16:23:54 |||   - USDT-DAI PancakeswapWorker deployed at 0xD5E1496C5068CEAf47E5dD2CFB73F418F253E1C8
+2021-10-14 16:23:54 |||   - Deploying WBNB-BUSD PancakeswapWorker...
+2021-10-14 16:25:28 ||| ---> Deploying Client contracts... <---
+2021-10-14 16:25:28 |||   -> Contract of Client A
+2021-10-14 16:26:22 |||   - Contract of Client A deployed at 0x28A59e7820a018a48b7dDDe69579f4A851BcefAC
