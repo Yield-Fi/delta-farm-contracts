@@ -9,7 +9,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "entities",
         "type": "address[]"
@@ -78,13 +78,13 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256[]",
         "name": "pids",
         "type": "uint256[]"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "uint256[]",
         "name": "amounts",
         "type": "uint256[]"

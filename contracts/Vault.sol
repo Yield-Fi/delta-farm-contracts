@@ -42,8 +42,8 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @param pids Array of position ids
   /// @param amounts Array of reward amounts assign to the specific positions
   /// @notice The order of values in the amounts array is related to the order in the pids array
-  event RewardsRegister(address indexed caller, uint256[] indexed pids, uint256[] indexed amounts);
-  event ApproveRewardAssigners(address indexed caller, address[] indexed entities, bool isApproved);
+  event RewardsRegister(address indexed caller, uint256[] pids, uint256[] amounts);
+  event ApproveRewardAssigners(address indexed caller, address[] entities, bool isApproved);
 
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;

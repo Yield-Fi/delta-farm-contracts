@@ -16,35 +16,31 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// @param caller Address which update whitelisted operators
   /// @param operators Array of operators' addresses
   /// @param isOk Whether given operators are ok or not
-  event WhitelistOperators(address indexed caller, address[] indexed operators, bool indexed isOk);
+  event WhitelistOperators(address indexed caller, address[] operators, bool indexed isOk);
 
   /// @dev Event is Emitted when approved workers will be updated
   /// @param caller Address which update approved workers
   /// @param workers Array of workers' addresses
   /// @param isApproved Whether given workers are approved or not
-  event ApproveWorkers(address indexed caller, address[] indexed workers, bool indexed isApproved);
+  event ApproveWorkers(address indexed caller, address[] workers, bool indexed isApproved);
 
   /// @dev Event is Emitted when approved client contracts will be updated
   /// @param caller Address which update approved client contracts
   /// @param clients Array of client contracts' addresses
   /// @param isApproved Whether given clients are approved or not
-  event ApproveClients(address indexed caller, address[] indexed clients, bool indexed isApproved);
+  event ApproveClients(address indexed caller, address[] clients, bool indexed isApproved);
 
   /// @dev Event is Emitted when approved vaults will be updated
   /// @param caller Address which update approved vaults
   /// @param vaults Array of vaults' addresses
   /// @param isApproved Whether given vaults are approved or not
-  event ApproveVaults(address indexed caller, address[] indexed vaults, bool indexed isApproved);
+  event ApproveVaults(address indexed caller, address[] vaults, bool indexed isApproved);
 
   /// @dev Event is Emitted when approved strategies will be updated
   /// @param caller Address which update approved strategies
   /// @param strategies Array of strategies' addresses
   /// @param isApproved Whether given strategies are approved or not
-  event ApproveStrategies(
-    address indexed caller,
-    address[] indexed strategies,
-    bool indexed isApproved
-  );
+  event ApproveStrategies(address indexed caller, address[] strategies, bool indexed isApproved);
 
   /// @dev Event is Emitted when approved vaults' configs will be updated
   /// @param caller Address which update approved vaults' configs
@@ -52,7 +48,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// @param isApproved Whether given vaults' configs are approved or not
   event ApproveVaultConfigs(
     address indexed caller,
-    address[] indexed vaultConfigs,
+    address[] vaultConfigs,
     bool indexed isApproved
   );
 
@@ -62,7 +58,7 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// @param isApproved Whether given bounty collectors are approved or not
   event ApproveBountyCollectors(
     address indexed caller,
-    address[] indexed bountyCollectors,
+    address[] bountyCollectors,
     bool indexed isApproved
   );
 

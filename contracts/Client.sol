@@ -23,13 +23,13 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param caller Address of msg.sender
   /// @param operators Array of operators to whitelist
   /// @param isOk Whether operators will be whitelisted or not
-  event WhitelistOperators(address indexed caller, address[] indexed operators, bool indexed isOk);
+  event WhitelistOperators(address indexed caller, address[] operators, bool indexed isOk);
 
   /// @dev Event is emmitted when new callers are whitelisted
   /// @param caller Address of msg.sender
   /// @param callers Array of callers to whitelist
   /// @param isOk Whether callers will be whitelisted or not
-  event WhitelistCallers(address indexed caller, address[] indexed callers, bool indexed isOk);
+  event WhitelistCallers(address indexed caller, address[] callers, bool indexed isOk);
 
   /// @dev Event is emmitted when deposit function will be called
   /// @param recipient Address for which protocol should open new position, reward will be sent there later on
@@ -47,7 +47,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param caller Address of msg.sender
   /// @param workers array of workers' addresses to perform action on
   /// @param isEnabled new worker status relative for client end users
-  event ToggleWorkers(address indexed caller, address[] indexed workers, bool indexed isEnabled);
+  event ToggleWorkers(address indexed caller, address[] workers, bool indexed isEnabled);
 
   /// @dev Enabled farms
   mapping(address => bool) enabledWorkers;

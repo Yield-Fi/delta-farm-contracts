@@ -28,7 +28,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "bountyCollectors",
         "type": "address[]"
@@ -53,7 +53,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "clients",
         "type": "address[]"
@@ -78,7 +78,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "strategies",
         "type": "address[]"
@@ -103,7 +103,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "vaultConfigs",
         "type": "address[]"
@@ -128,7 +128,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "vaults",
         "type": "address[]"
@@ -153,7 +153,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "workers",
         "type": "address[]"
@@ -222,7 +222,7 @@
         "type": "address"
       },
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "address[]",
         "name": "operators",
         "type": "address[]"
