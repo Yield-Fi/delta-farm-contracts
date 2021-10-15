@@ -356,6 +356,19 @@
   },
   {
     "inputs": [],
+    "name": "getName",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "getStrategies",
     "outputs": [
       {
@@ -408,6 +421,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "string",
+        "name": "_name",
+        "type": "string"
+      },
       {
         "internalType": "address",
         "name": "_operatingVault",

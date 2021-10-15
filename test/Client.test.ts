@@ -186,6 +186,7 @@ describe("Client contract", async () => {
     /// Setup PancakeswapWorker
     pancakeswapWorker01 = await deployPancakeWorker(
       vault,
+      "Worker01",
       baseToken,
       masterChef,
       router,
@@ -199,6 +200,7 @@ describe("Client contract", async () => {
 
     pancakeswapWorker02 = await deployPancakeWorker(
       vault,
+      "Worker02",
       baseToken,
       masterChef,
       router,

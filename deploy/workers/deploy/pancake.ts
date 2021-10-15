@@ -34,6 +34,7 @@ const deployFunc: DeployFunction = async () => {
       );
 
       const PancakeswapWorker = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
+        worker.name,
         vault.address,
         config.baseToken,
         config.dex.pancakeswap.MasterChef,

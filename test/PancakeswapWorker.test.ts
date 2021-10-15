@@ -182,6 +182,7 @@ describe("PancakeswapWorker", () => {
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 
     WorkerBUSD_TOK0 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
+      "WorkerBUSD_TOK0",
       MockVault.address,
       BaseToken.address,
       PancakeMasterChef.address,
@@ -196,6 +197,7 @@ describe("PancakeswapWorker", () => {
     await WorkerBUSD_TOK0.deployed();
 
     WorkerTOK0_TOK1 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
+      "WorkerTOK0_TOK1",
       MockVault.address,
       BaseToken.address,
       PancakeMasterChef.address,

@@ -91,6 +91,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   IPancakeRouterV2 public router;
   IPancakePair public override lpToken;
   address public wNative;
+  string name;
   address public override baseToken;
   address public override token0;
   address public override token1;
@@ -119,6 +120,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   mapping(address => bool) public okHarvesters;
 
   function initialize(
+    string calldata _name,
     address _operatingVault,
     address _baseToken,
     IPancakeMasterChef _masterChef,
@@ -142,6 +144,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     protocolManager = _protocolManager;
 
     // 3. Assign tokens state variables
+    name = _name;
     baseToken = _baseToken;
     pid = _pid;
     (IERC20 _lpToken, , , ) = masterChef.poolInfo(_pid);
@@ -416,6 +419,12 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
       path[2] = address(baseToken);
     }
     return path;
+  }
+
+  /// @dev Returns worker's name
+  /// @return string worker's name
+  function getName() public view returns (string memory) {
+    return name;
   }
 
   /// @dev Set the harvest configuration.

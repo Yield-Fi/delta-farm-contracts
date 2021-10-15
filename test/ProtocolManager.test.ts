@@ -136,6 +136,7 @@ describe("ProtocolManager", async () => {
     /// Setup PancakeswapWorker
     pancakeswapWorker01 = await deployPancakeWorker(
       vault,
+      "pancakeswapWorker01",
       baseToken,
       masterChef,
       router,
@@ -149,6 +150,7 @@ describe("ProtocolManager", async () => {
 
     pancakeswapWorker02 = await deployPancakeWorker(
       vault,
+      "pancakeswapWorker02",
       baseToken,
       masterChef,
       router,

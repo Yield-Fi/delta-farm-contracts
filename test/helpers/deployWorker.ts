@@ -11,6 +11,7 @@ import { ethers, upgrades } from "hardhat";
 
 export const deployPancakeWorker = async (
   vault: Vault,
+  name: string,
   baseToken: MockToken,
   masterChef: PancakeMasterChef,
   router: PancakeRouterV2,
@@ -26,6 +27,7 @@ export const deployPancakeWorker = async (
     deployer
   )) as PancakeswapWorker__factory;
   const pancakeswapWorker = (await upgrades.deployProxy(PancakeswapWorker, [
+    name,
     vault.address,
     baseToken.address,
     masterChef.address,
