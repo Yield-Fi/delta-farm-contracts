@@ -423,7 +423,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   /// @dev Returns worker's name
   /// @return string worker's name
-  function getName() public view returns (string memory) {
+  function getName() public view override returns (string memory) {
     return name;
   }
 

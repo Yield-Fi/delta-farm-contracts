@@ -48,4 +48,8 @@ interface IWorker {
   function operatingVault() external view returns (address);
 
   function setTreasuryFee(uint256 fee) external;
+
+  /// @dev Returns worker's name
+  /// @return string worker's name
+  function getName() external view returns (string memory);
 }
