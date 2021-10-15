@@ -129,6 +129,20 @@ Function to get harvest path. Return route through WBNB if harvestPath not set.
 #### Return Values:
 
 - `Array`: of tokens' addresses which create harvest path
+### getName
+
+```solidity
+  function getName() public returns(string)
+```
+
+Returns worker's name
+
+
+
+
+#### Return Values:
+
+- `string`: worker's name
 ### setHarvestConfig
 
 ```solidity

@@ -212,4 +212,23 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
       "PancakeswapStrategyAddToPoolWithoutBaseToken->execute: insufficient LP tokens received"
     );
   });
+
+  it("Should estimate amounts of base token after split and converting to token0 and token1", async () => {
+    const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
+      await strategy.estimateAmounts(
+        BaseToken.address,
+        Token0.address,
+        Token1.address,
+        parseEther("1")
+      );
+
+    expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("0.5").toString());
+    expect(secondPartOfBaseToken.toString()).to.be.eq(parseEther("0.5").toString());
+    /// 1 BASE TOKEN = 10 TOKEN0
+    /// 0.5 BASE TOKEN ~= 5 TOKEN0 - some trading fee
+    expect(amountOfToken0.toString()).to.be.eq(parseEther("4.987251260843365437").toString());
+    /// 1 BASE TOKEN = 1 TOKEN1
+    /// 0.5 BASE TOKEN ~= 0.5 TOKEN0 - some trading fee
+    expect(amountOfToken1.toString()).to.be.eq(parseEther("0.498747512496781422").toString());
+  });
 });

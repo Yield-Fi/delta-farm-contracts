@@ -80,6 +80,24 @@ internal ProtocolManager.
 - `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
 
 
+### collectReward
+
+```solidity
+  function collectReward(uint256 pid, address recipient, address rewardTokenOrVaultAddress)
+```
+
+Collect accumulated rewards
+
+
+
+#### Parameters:
+
+- `pid`: Position ID
+
+- `recipient`: Position owner
+
+- `rewardTokenOrVaultAddress`: Information about asset in which reward will be paid out
+
 ### setWorkerFee
 
 ```solidity
@@ -112,6 +130,20 @@ Withdraw all collected fee
 - `_to`: Address of fee recipient
 
 
+### feeToCollect
+
+```solidity
+  function feeToCollect() external returns(uint256)
+```
+
+Returns amount of fee to collect
+
+
+
+
+#### Return Values:
+
+- `uint256`: Amount of fee to collect
 ### toggleWorkers
 
 ```solidity
@@ -127,6 +159,36 @@ Enable or disabled given array of workers
 - `workers`: array of workers' addresses to perform action on
 
 - `isEnabled`: new worker status relative for client end users
+
+### getName
+
+```solidity
+  function getName() external returns(string)
+```
+
+Returns client's name
+
+
+
+
+#### Return Values:
+
+- `string`: client's name
+### estimateDeposit
+
+```solidity
+  function estimateDeposit(address worker, uint256 amount) public returns(uint256, uint256, uint256, uint256)
+```
+
+Function to get data about deposit
+
+
+
+#### Parameters:
+
+- `worker`: Address of worker (farm)
+
+- `amount`: Amount of base token to deposit
 
 
 ___

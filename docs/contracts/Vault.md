@@ -74,7 +74,7 @@ Request Funds from user through Vault
 ### work
 
 ```solidity
-  function work(uint256 id, address worker, uint256 amount, address endUser, bytes data)
+  function work(uint256 id, address worker, uint256 amount, address recipient, bytes data)
 ```
 
 Create a new farming position to unlock your yield farming potential.
@@ -147,7 +147,7 @@ Function can be called only by worker
 ### collectReward
 
 ```solidity
-  function collectReward(uint256 pid)
+  function collectReward(uint256 pid, address recipient)
 ```
 
 Collect accumulated rewards
@@ -157,6 +157,8 @@ Collect accumulated rewards
 #### Parameters:
 
 - `pid`: Position ID
+
+- `recipient`: Recipient address - must match recipient address given during position opening
   f
 
 ### checkRewardsToBalanceStability
@@ -176,6 +178,23 @@ Contract health component
 
 - `bool`: - true if amount of operating token is greater than or equal to total rewards value, false if not
   f
+### approveRewardAssigners
+
+```solidity
+  function approveRewardAssigners(address[] rewardAssigners, bool isApproved)
+```
+
+Rewards ACL
+
+
+
+#### Parameters:
+
+- `rewardAssigners`: array of addresses
+
+- `isApproved`: true | false
+  f
+
 ### receive
 
 ```solidity
@@ -241,5 +260,12 @@ It's emitted when worker will register new harvested rewards
 - `pids`: Array of position ids
 
 - `amounts`: Array of reward amounts assign to the specific positions
+
+
+### ApproveRewardAssigners
+
+```solidity
+  event ApproveRewardAssigners(address caller, address[] entities, bool isApproved)
+```
 
 

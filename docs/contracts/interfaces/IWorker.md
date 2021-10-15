@@ -147,6 +147,20 @@ Get operating vault address.
 
 
 
+### getName
+
+```solidity
+  function getName() external returns(string)
+```
+
+Returns worker's name
+
+
+
+
+#### Return Values:
+
+- `string`: worker's name
 
 ___
 

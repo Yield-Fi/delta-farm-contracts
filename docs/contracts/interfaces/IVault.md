@@ -7,6 +7,38 @@ ___
 
 ## Functions
 
+### approvedRewardAssigners
+
+```solidity
+  function approvedRewardAssigners(address assigner) external returns(bool)
+```
+
+(Mapping) Rewards ACL - function-to-mapping
+
+> **NOTE:** Functions' declarations for mappings and properties
+
+
+
+### token
+
+```solidity
+  function token() external returns(address)
+```
+
+(Property) Get vault's base token
+
+
+
+### rewards
+
+```solidity
+  function rewards(uint256 pid) external returns(uint256)
+```
+
+(Mapping) Position ID => Native Token Amount
+
+
+
 ### totalToken
 
 ```solidity
@@ -14,6 +46,8 @@ ___
 ```
 
 Return the total ERC20 entitled to the token holders. Be careful of unaccrued interests.
+
+> **NOTE:** True functions
 
 
 
@@ -27,10 +61,20 @@ Request funds from user through Vault
 
 
 
+### approveRewardAssigners
+
+```solidity
+  function approveRewardAssigners(address[] rewardAssigners, bool isApproved)
+```
+
+Rewards ACL
+
+
+
 ### work
 
 ```solidity
-  function work(uint256 id, address worker, uint256 amount, address endUser, bytes data)
+  function work(uint256 id, address worker, uint256 amount, address recipient, bytes data)
 ```
 
 Protocol entry point

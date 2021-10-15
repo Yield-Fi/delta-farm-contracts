@@ -86,12 +86,12 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     )) as MockToken__factory;
     baseToken = (await upgrades.deployProxy(MockToken, ["BTOKEN", "BTOKEN"])) as MockToken;
     await baseToken.deployed();
-    await baseToken.mint(await alice.getAddress(), ethers.utils.parseEther("100"));
-    await baseToken.mint(await bob.getAddress(), ethers.utils.parseEther("100"));
+    await baseToken.mint(await alice.getAddress(), ethers.utils.parseEther("100000"));
+    await baseToken.mint(await bob.getAddress(), ethers.utils.parseEther("100000"));
     farmingToken = (await upgrades.deployProxy(MockToken, ["FTOKEN", "FTOKEN"])) as MockToken;
     await farmingToken.deployed();
-    await farmingToken.mint(await alice.getAddress(), ethers.utils.parseEther("10"));
-    await farmingToken.mint(await bob.getAddress(), ethers.utils.parseEther("10"));
+    await farmingToken.mint(await alice.getAddress(), ethers.utils.parseEther("10000"));
+    await farmingToken.mint(await bob.getAddress(), ethers.utils.parseEther("10000"));
 
     await factoryV2.createPair(baseToken.address, farmingToken.address);
 
@@ -198,5 +198,41 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
         )
       )
     ).to.be.revertedWith("insufficient LP tokens received");
+  });
+
+  it("Should estimate amounts of base token after split and converting to token0", async () => {
+    await baseTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("1000"));
+    await farmingTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("10000"));
+
+    await routerV2AsAlice.addLiquidity(
+      baseToken.address,
+      farmingToken.address,
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("10000"),
+      "0",
+      "0",
+      await alice.getAddress(),
+      FOREVER
+    );
+
+    const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
+      await strat.estimateAmounts(
+        baseToken.address,
+        baseToken.address,
+        farmingToken.address,
+        parseEther("1")
+      );
+
+    expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("0.499499311482782575").toString());
+    expect(secondPartOfBaseToken.toString()).to.be.eq(
+      parseEther("0.500500688517217425").toString()
+    );
+    expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
+      parseEther("1").toString()
+    );
+    expect(amountOfToken0.toString()).to.be.eq(parseEther("0.499499311482782575").toString());
+    /// 1 BASE TOKEN = 10 TOKEN1
+    /// 0.5 BASE TOKEN ~= 0.5 TOKEN0 - some trading fee
+    expect(amountOfToken1.toString()).to.be.eq(parseEther("4.990003111716109636").toString());
   });
 });

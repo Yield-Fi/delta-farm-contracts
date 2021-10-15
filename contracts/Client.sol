@@ -12,6 +12,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
+import "./interfaces/IStrategy.sol";
 import "./utils/SafeToken.sol";
 
 contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe {
@@ -277,5 +278,37 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @return string client's name
   function getName() external view returns (string memory) {
     return _CLIENT_NAME_;
+  }
+
+  /// @dev Function to get data about deposit
+  /// @param worker Address of worker (farm)
+  /// @param amount Amount of base token to deposit
+  function estimateDeposit(address worker, uint256 amount)
+    public
+    view
+    returns (
+      uint256,
+      uint256,
+      uint256,
+      uint256
+    )
+  {
+    IWorker _worker = IWorker(worker);
+    IAddStrategy strategy = IAddStrategy(chooseStrategy(_worker));
+
+    return
+      strategy.estimateAmounts(_worker.baseToken(), _worker.token0(), _worker.token1(), amount);
+  }
+
+  /// Internal function to choose appropriate strategy
+  function chooseStrategy(IWorker worker) internal view returns (address) {
+    // Get native vault token
+    IVault vault = IVault(worker.operatingVault());
+    address vaultToken = vault.token();
+
+    return
+      worker.token0() == vaultToken || worker.token1() == vaultToken
+        ? worker.getStrategies()[0]
+        : worker.getStrategies()[1];
   }
 }

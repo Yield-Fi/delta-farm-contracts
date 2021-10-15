@@ -8,6 +8,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 import "../../../contracts/libs/pancake/interfaces/IPancakeRouterV2.sol";
+import "../../../contracts/libs/pancake/PancakeLibraryV2.sol";
 
 import "../../interfaces/IStrategy.sol";
 
@@ -18,7 +19,7 @@ contract PancakeswapStrategyAddToPoolWithoutBaseToken is
   Initializable,
   OwnableUpgradeSafe,
   ReentrancyGuardUpgradeSafe,
-  IStrategy
+  IAddStrategy
 {
   using SafeToken for address;
   using SafeMath for uint256;
@@ -45,21 +46,17 @@ contract PancakeswapStrategyAddToPoolWithoutBaseToken is
       (address, address, address, uint256)
     );
 
-    // 2. Find appropriate lp tokens
+    // 2. Find appropriate lp token
     IPancakePair T0_T1_LP = IPancakePair(factory.getPair(token0, token1));
-    IPancakePair BT_T0_LP = IPancakePair(factory.getPair(baseToken, token0));
-    IPancakePair BT_T1_LP = IPancakePair(factory.getPair(baseToken, token1));
 
     // 3. Calculate amount of base token to swap on token 0
     uint256 amountOfBaseTokenToSwapOnToken0 = _calculateAmountOfBaseTokenToSwapOnToken0(
-      T0_T1_LP,
-      BT_T0_LP,
-      BT_T1_LP,
       baseToken,
-      token0
+      token0,
+      token1
     );
 
-    // 4. Add liquidity and get amount of new lp tokens
+    // 3. Add liquidity and get amount of new lp tokens
     uint256 amountOfNewLpTokens = _addLiquidity(
       amountOfBaseTokenToSwapOnToken0,
       baseToken,
@@ -131,52 +128,112 @@ contract PancakeswapStrategyAddToPoolWithoutBaseToken is
   }
 
   function _calculateAmountOfBaseTokenToSwapOnToken0(
-    IPancakePair t0_t1_LP,
-    IPancakePair bt_t0_LP,
-    IPancakePair bt_t1_LP,
     address baseToken,
-    address token0
+    address token0,
+    address token1
   ) internal view returns (uint256) {
     // Calculate ratio in which base token will be swapped to token0 and token1
-    (uint256 x, uint256 y) = _calculateBaseTokenRatioToSwapOnTokens(
-      t0_t1_LP,
-      bt_t0_LP,
-      bt_t1_LP,
-      baseToken,
-      token0
-    );
+    (uint256 x, uint256 y) = _calculateBaseTokenRatioToSplit(baseToken, token0, token1);
 
     return baseToken.myBalance().mul(x).div(x.add(y));
   }
 
-  function _calculateBaseTokenRatioToSwapOnTokens(
-    IPancakePair t0_t1_LP,
-    IPancakePair bt_t0_LP,
-    IPancakePair bt_t1_LP,
+  /// @dev Function to estimate amounts of split and swap of the base token
+  /// @param baseToken Address of the base token
+  /// @param token0 Address of the first of the token in pancake swap's pool
+  /// @param token1 Address of the second of the token in pancake swap's pool
+  /// @param amount Amount of base token to deposit
+  /// @return uint256 Amount of the part of the base token after split
+  /// @return uint256 Amount of the part of the base token after split
+  /// @return uint256 Amount of the token0 which will be received from swapped base token
+  /// @return uint256 Amount of the token1 which will be received from swapped base token
+  function estimateAmounts(
     address baseToken,
-    address token0
+    address token0,
+    address token1,
+    uint256 amount
+  )
+    external
+    view
+    override
+    returns (
+      uint256,
+      uint256,
+      uint256,
+      uint256
+    )
+  {
+    // 1. Calculate amount of base token after split
+    (
+      uint256 firstPartOfBaseToken,
+      uint256 secondPartOfBaseToken
+    ) = _calculateAmountsOfBaseTokenAfterSplit(baseToken, token0, token1, amount);
+
+    // 2. Estimate amounts and return it
+    return (
+      firstPartOfBaseToken,
+      secondPartOfBaseToken,
+      _getAmountOutHelper(firstPartOfBaseToken, baseToken, token0),
+      _getAmountOutHelper(secondPartOfBaseToken, baseToken, token1)
+    );
+  }
+
+  function _calculateBaseTokenRatioToSplit(
+    address baseToken,
+    address token0,
+    address token1
   ) internal view returns (uint256, uint256) {
     // Get reserves of tokens in given pools needed to the calculations
     // Naming convention: e.g. ResBTOK_bt_t0 - Reserve of base token in the baseToken-token0 pool
-    (uint256 r0, uint256 r1, ) = t0_t1_LP.getReserves();
-    (uint256 ResTOK0_t0_t1, uint256 ResTOK1_t0_t1) = t0_t1_LP.token0() == token0
-      ? (r0, r1)
-      : (r1, r0);
+    (uint256 ResTOK0_t0_t1, uint256 ResTOK1_t0_t1) = PancakeLibraryV2.getReserves(
+      address(factory),
+      token0,
+      token1
+    );
 
-    (r0, r1, ) = bt_t0_LP.getReserves();
-    (uint256 ResBTOK_bt_t0, uint256 ResTOK0_bt_t0) = bt_t0_LP.token0() == baseToken
-      ? (r0, r1)
-      : (r1, r0);
+    (uint256 ResBTOK_bt_t0, uint256 ResTOK0_bt_t0) = PancakeLibraryV2.getReserves(
+      address(factory),
+      baseToken,
+      token0
+    );
 
-    (r0, r1, ) = bt_t1_LP.getReserves();
-    (uint256 ResBTOK_bt_t1, uint256 ResTOK1_bt_t1) = bt_t1_LP.token0() == baseToken
-      ? (r0, r1)
-      : (r1, r0);
+    (uint256 ResBTOK_bt_t1, uint256 ResTOK1_bt_t1) = PancakeLibraryV2.getReserves(
+      address(factory),
+      baseToken,
+      token1
+    );
 
     uint256 x = ResTOK0_t0_t1.mul(ResBTOK_bt_t0).div(ResTOK0_bt_t0);
     uint256 y = ResTOK1_t0_t1.mul(ResBTOK_bt_t1).div(ResTOK1_bt_t1);
 
     return (x, y);
+  }
+
+  function _calculateAmountsOfBaseTokenAfterSplit(
+    address baseToken,
+    address token0,
+    address token1,
+    uint256 amount
+  ) internal view returns (uint256, uint256) {
+    (uint256 x, uint256 y) = _calculateBaseTokenRatioToSplit(baseToken, token0, token1);
+    uint256 firstPartOfBaseToken = amount.mul(x).div(x.add(y));
+    uint256 secondPartOfBaseToken = amount.sub(firstPartOfBaseToken);
+
+    return (firstPartOfBaseToken, secondPartOfBaseToken);
+  }
+
+  function _getAmountOutHelper(
+    uint256 amountIn,
+    address tokenIn,
+    address tokenOut
+  ) internal view returns (uint256) {
+    (uint256 reserveIn, uint256 reserveOut) = PancakeLibraryV2.getReserves(
+      address(factory),
+      tokenIn,
+      tokenOut
+    );
+
+    return PancakeLibraryV2.getAmountOut(amountIn, reserveIn, reserveOut);
   }
 
   receive() external payable {}
