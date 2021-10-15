@@ -6,51 +6,76 @@
 2021-10-14 15:35:41 ||| - ADA: 0xd49635f1D770d715B058df45067aB7bc0B55C43b
 2021-10-14 15:36:17 ||| - DAI: 0x86401c8f5a243036bd47F2B111b6F587074f591C
 2021-10-14 15:36:52 ||| - BTC: 0xe956CaBc1dD0ac3bff4063ff2fa417753db1D23C
-2021-10-14 15:49:13 ||| --> Deploying Pancakeswap v2...
-2021-10-14 15:49:31 |||  - PancakeFactory is deployed at 0xeAa72fA5AD56EC5d6D21210636FfB699F9f3b4e0
-2021-10-14 15:49:47 |||  - PancakeRouter deployed at 0x639972F8315945cC575E3a228c94A2a4B4B319CD
-2021-10-14 15:50:00 |||  - Cake token deployed at 0x688B1909314700c6D759Db7D046a1483FF68800c
-2021-10-14 15:50:09 |||  - Syrup Bar token deployed at 0x549A44C80561A0779c759F20638478b0CdB80FaA
-2021-10-14 15:50:20 |||  - Pancake MasterChef deployed at 0x8E424AfeB695e6D464DF69179155aB03cc4C7D25
-2021-10-14 15:58:42 ||| --> Creating new pairs on Pancakeswap...
-2021-10-14 15:58:51 |||  - BUSD-USDT pair:
-2021-10-14 15:59:33 |||  - Liquidity added: tx hash - 0x68052ab63d1a950cf1b38887d425500c29ef1fb7f0924f5f16e772217cdce6f8
-2021-10-14 15:59:46 |||  - Farm added: pool id - 1, lp token: 0xfb5F520959b86A72FE04AA9ADFF0740acc95711d, tx hash - 0x13dd1fc08e8341a893b1efdb7d6e8bdfac245438952de0be2535ff5c0335c879
-2021-10-14 15:59:53 |||  - BUSD-DAI pair:
-2021-10-14 16:00:33 |||  - Liquidity added: tx hash - 0xb7fb4375aa965cc801425762fecad72cf4c2eca4f9ef6816fa34b3e9f6e61f48
-2021-10-14 16:00:45 |||  - Farm added: pool id - 2, lp token: 0xBA79d73916A0b2DA4D8E142A8eC5b349Ec1C07AB, tx hash - 0x24c0e8d6632a27f810a3751fb55f502d8af355fd56db4e7de0a77df8bcf5db6e
-2021-10-14 16:00:53 |||  - USDT-DAI pair:
-2021-10-14 16:01:33 |||  - Liquidity added: tx hash - 0x113afa1cf8009f1f8dc492a59b8d259b963de62d05b31b203cf0cc8791dd6d07
-2021-10-14 16:01:45 |||  - Farm added: pool id - 3, lp token: 0x8AEfADF6c0C788041e7B28E3Ec0E4fE26BBbD451, tx hash - 0xd97c7deaf4e49438d80ae74f01c595a054e7262756cdc08b2513486cf6fe3ba5
-2021-10-14 16:01:53 |||  - WBNB-BUSD pair:
-2021-10-14 16:02:42 |||  - Liquidity added: tx hash - 0x7cd98ae3bd532408df52c7fc8ce2077e28ff3522a9c4440097a56a7ddd1dfd76
-2021-10-14 16:02:55 |||  - Farm added: pool id - 4, lp token: 0x18842A62973482aF0837f5676547Eea971d88b5a, tx hash - 0x7f630888161d9bcd2eb67645e0d87006ce0f7c546265a3c8ec692e5c8517ce8c
-2021-10-14 16:09:23 ||| ---> Deploying ProtocolManager... <---
-2021-10-14 16:10:08 ||| - ProtocolManager deployed at 0x84378f58c4E5beC1a88374c6306c271795f3D04C
-2021-10-14 16:11:55 ||| ---> Deploying Admin contract... <---
-2021-10-14 16:12:34 ||| - Admin contract deployed at 0x618c9111BcE2dfA273a22623CD26C3db8C8d953c
-2021-10-14 16:13:27 ||| ---> Deploying fee collector... <---
-2021-10-14 16:13:54 ||| - FeeCollector deployed at 0xC11B2efC9E4cCe8E176b81658110c31623985a83
-2021-10-14 16:16:01 ||| ---> Deploying WrappedNativeTokenRelayer... <---
-2021-10-14 16:16:31 ||| - WrappedNativeTokenRelayer deployed at 0x90F4770c309C5550ee5b7d1ae92a075cb7Ec0271
-2021-10-14 16:17:12 ||| ---> Deploying vaults... <---
-2021-10-14 16:17:12 |||   -> BUSD Vault
-2021-10-14 16:17:39 |||   - Vault Config deployed at 0x1484cc3a92C6A834ef33210eb0808A58d5D920F3
-2021-10-14 16:18:18 |||   - Vault deployed at 0xDCA36DFaB06a3fB0Ee7197922365E4C581521628
-2021-10-14 16:19:46 ||| ---> Deploying strategies for the pancakeswap workers... <---
-2021-10-14 16:20:16 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0x65b8584720e15E1a8097204847e1D7F23330aFE9
-2021-10-14 16:20:44 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0xd780253C818FFB28395b280eb81f862eFA39089F
-2021-10-14 16:21:11 ||| - LiquidateStrategy deployed at 0x8e564dFa5636553C51a0917a3d2b995e497Fe8dE
-2021-10-14 16:25:28 ||| ---> Deploying Client contracts... <---
-2021-10-14 16:25:28 |||   -> Contract of Client A
-2021-10-14 16:26:22 |||   - Contract of Client A deployed at 0x28A59e7820a018a48b7dDDe69579f4A851BcefAC
-2021-10-15 10:55:11 ||| ---> Deploying pancakeswap workers... <---
-2021-10-15 10:55:11 ||| -> Deploying workers for BUSD Vault
-2021-10-15 10:55:11 |||   - Deploying BUSD-USDT PancakeswapWorker...
-2021-10-15 10:56:06 |||   - BUSD-USDT PancakeswapWorker deployed at 0x873c1b00383aC38dE565EA6cff2bfefb95eA7028
-2021-10-15 10:56:06 |||   - Deploying BUSD-DAI PancakeswapWorker...
-2021-10-15 10:56:42 |||   - BUSD-DAI PancakeswapWorker deployed at 0xaeb1Eb3f2B1e6FF13Da552d3769dF48c09291f2E
-2021-10-15 10:56:42 |||   - Deploying USDT-DAI PancakeswapWorker...
-2021-10-15 10:57:16 |||   - USDT-DAI PancakeswapWorker deployed at 0xDB393589467797C5C82D67b675fe713Af90FB7B7
-2021-10-15 10:57:16 |||   - Deploying WBNB-BUSD PancakeswapWorker...
-2021-10-15 10:57:49 |||   - WBNB-BUSD PancakeswapWorker deployed at 0xd58A3faf43b3151cf027f0b4FCAf8867526A06f2
+2021-10-15 13:17:16 ||| --> Deploying Pancakeswap v2...
+2021-10-15 13:17:34 |||  - PancakeFactory is deployed at 0x0C896b39F6f51613c16d317f58806df998cf8319
+2021-10-15 13:17:50 |||  - PancakeRouter deployed at 0x0c0c300ccd543A11B9AFE4dE3268F68bA81bB6f8
+2021-10-15 13:18:11 |||  - Cake token deployed at 0x8dD60cc834a9E16363234F38cc08d42b655DE9A5
+2021-10-15 13:18:22 |||  - Syrup Bar token deployed at 0x7f2B092784ac5E1AdfB0aF14812c6B81AE7D8a6c
+2021-10-15 13:18:33 |||  - Pancake MasterChef deployed at 0xFe5D8a0E5a280B9bA06B4cbb02404478dE73581b
+2021-10-15 13:25:30 ||| --> Creating new pairs on Pancakeswap...
+2021-10-15 13:25:39 |||  - BUSD-USDT pair:
+2021-10-15 13:26:21 |||  - Liquidity added: tx hash - 0x61eb21d1ae6449487b40dc8867775a0d19db0b5b6cdc3831e4946e36da99e101
+2021-10-15 13:26:34 |||  - Farm added: pool id - 1, lp token: 0xb8DA25cFB4E913eA665426232abDc32676346847, tx hash - 0x2a39c927a5770616c69e294152cd4c7c956c6dfaa9ce469707b3255493f3c740
+2021-10-15 13:26:41 |||  - BUSD-DAI pair:
+2021-10-15 13:27:21 |||  - Liquidity added: tx hash - 0x1c96111d75e6208c0139a8602dd97fc74e061475d9670e97e81429aa3e89f120
+2021-10-15 13:27:34 |||  - Farm added: pool id - 2, lp token: 0xd7F35c7B2E9840C63d120EcaE0c501b57c4dCcA4, tx hash - 0xe0b469bb1023aa364b42376b0b6c88638628d60185d02e8f1f8b0a0c7fce615c
+2021-10-15 13:27:41 |||  - USDT-DAI pair:
+2021-10-15 13:28:24 |||  - Liquidity added: tx hash - 0xa427e27a293c59b22ca1dae7b27d5077e5ab1558d98310d19e36c9058e3b6d83
+2021-10-15 13:28:37 |||  - Farm added: pool id - 3, lp token: 0xdae2342f5DB3d5a460d092C26886bd882c8fBec8, tx hash - 0xb0633ccd42a18fed7b6d24f1baee2b62d721f8fd43c598ae0600fbb1a6374620
+2021-10-15 13:28:44 |||  - WBNB-BUSD pair:
+2021-10-15 13:29:34 |||  - Liquidity added: tx hash - 0x58a234cdfeded829b0c55a2c7fbc4b6a8d1324b6042ad1ab4bfe51111f8d458d
+2021-10-15 13:29:47 |||  - Farm added: pool id - 4, lp token: 0x90b04A7f9681b3759bc0342F8EC6FaD765F98a2c, tx hash - 0xfabdda98a8034434b4c04ad7504ab2eb1954f19fc5bc7420e1dbdfb56bfb4b82
+2021-10-15 13:29:54 |||  - WBNB-USDT pair:
+2021-10-15 13:30:44 |||  - Liquidity added: tx hash - 0x0e33b9649f20c648bd6633e8a1cadb2ec0d85d4b39c982d00e002f6eb3bed8ae
+2021-10-15 13:30:57 |||  - Farm added: pool id - 5, lp token: 0x113f70dDE380C7e16cceaEfca24Cb11C5f98F358, tx hash - 0x9b380eed4c060968be0dd48cf1be49ec9d3873b75c21f8808841366724450f27
+2021-10-15 13:31:04 |||  - WBNB-Cake pair:
+2021-10-15 13:31:54 |||  - Liquidity added: tx hash - 0x76080ff7b41da3abe0616cf8ab300eb7edc994b0184403f5a914300968586d34
+2021-10-15 13:32:07 |||  - Farm added: pool id - 6, lp token: 0x13270e75B15384aeb8d92BB27ca5ECfAF1870558, tx hash - 0xda5eb175c7b2d56bb97124558e888d728a366abb20b8b49ae0bd8ddfc7ddb70e
+2021-10-15 13:32:14 |||  - Cake-BUSD pair:
+2021-10-15 13:32:54 |||  - Liquidity added: tx hash - 0x1207e9b782a45bcb7852a936a3040a24ba079009b599e84d6be79d9c297ad50e
+2021-10-15 13:33:06 |||  - Farm added: pool id - 7, lp token: 0xFb3761BD647C594502F8e8194c044F39A600A061, tx hash - 0x5a34493772822d95d881c44bccf085c0db2068b493e57090badc71d42cfb7dda
+2021-10-15 13:33:14 |||  - Cake-USDC pair:
+2021-10-15 13:33:54 |||  - Liquidity added: tx hash - 0x954263a289949133fc78e059e05876c912df06940a5832cb699caaaeeda2c088
+2021-10-15 13:34:06 |||  - Farm added: pool id - 8, lp token: 0x891Cc7BE028F310d0Bb1D316eb87ffC51a377E32, tx hash - 0x1a780502696c04afb44f566884aa77380bc6c330c6929c1fde21d9dddb2e9d49
+2021-10-15 13:34:13 |||  - Cake-USDT pair:
+2021-10-15 13:34:53 |||  - Liquidity added: tx hash - 0x76e78d504f6c486ae16f9fffe00bb2411488f7fe14acc2c11a7f5eb63206f6ed
+2021-10-15 13:35:06 |||  - Farm added: pool id - 9, lp token: 0x7E60cB2a97CF7f2294fdfF5329055b88a212D211, tx hash - 0xcf44123bfb8ae8de757aa7362e65cd65730c0c4487efd0fe177d30ff5e856f33
+2021-10-15 13:39:46 ||| ---> Deploying ProtocolManager... <---
+2021-10-15 13:40:14 ||| - ProtocolManager deployed at 0x90008ABd28FB9fB5BDE7B45C31B8dD4E2d0a05d9
+2021-10-15 13:40:55 ||| ---> Deploying Admin contract... <---
+2021-10-15 13:41:31 ||| - Admin contract deployed at 0x77729525453adde1B45E689E0C07bD2B89B4Fd93
+2021-10-15 13:42:02 ||| ---> Deploying fee collector... <---
+2021-10-15 13:42:29 ||| - FeeCollector deployed at 0xB5Ed691eC9A2E490F2266c04EA1A0DF76E1EaC9D
+2021-10-15 13:42:55 ||| ---> Deploying WrappedNativeTokenRelayer... <---
+2021-10-15 13:43:22 ||| - WrappedNativeTokenRelayer deployed at 0xA33d82D24b82C20eA26aD5Dd9Efe2ca5088227Ae
+2021-10-15 13:43:45 ||| ---> Deploying vaults... <---
+2021-10-15 13:43:45 |||   -> BUSD Vault
+2021-10-15 13:44:13 |||   - Vault Config deployed at 0x29Fe39B17Eb4f6cfbefc13CA9CDfCFD97cCF51c2
+2021-10-15 13:44:41 |||   - Vault deployed at 0xba14d8A1912073647B38dCc6FDF9A1717c9d2011
+2021-10-15 13:45:09 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2021-10-15 13:45:39 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0x06dD3511Cad1c5cc56B379de2eb9B27974329975
+2021-10-15 13:46:04 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0xc9Bb48879C61745d18ADa432BBe7C0700c98e670
+2021-10-15 13:46:29 ||| - LiquidateStrategy deployed at 0x7160533C1dbaC94F9970b7965dC76cfAAbA0bBC5
+2021-10-15 13:47:06 ||| ---> Deploying pancakeswap workers... <---
+2021-10-15 13:47:06 ||| -> Deploying workers for BUSD Vault
+2021-10-15 13:47:06 |||   - Deploying BUSD-USDT PancakeswapWorker...
+2021-10-15 13:47:43 |||   - BUSD-USDT PancakeswapWorker deployed at 0x49BE0A4Cc6599efD8dE8045aDDd1e4Fea5fe306a
+2021-10-15 13:47:43 |||   - Deploying BUSD-DAI PancakeswapWorker...
+2021-10-15 13:48:16 |||   - BUSD-DAI PancakeswapWorker deployed at 0xB57275E202EA4395D6F129B2D285E031241c43bd
+2021-10-15 13:48:16 |||   - Deploying USDT-DAI PancakeswapWorker...
+2021-10-15 13:48:53 |||   - USDT-DAI PancakeswapWorker deployed at 0x5D7E91c313992e6fC3715A31602D67926330a4a1
+2021-10-15 13:48:53 |||   - Deploying WBNB-BUSD PancakeswapWorker...
+2021-10-15 13:49:29 |||   - WBNB-BUSD PancakeswapWorker deployed at 0xf9aE649B797E25D38FBCdb47811cd3C7bf5872EE
+2021-10-15 13:49:29 |||   - Deploying WBNB-USDT PancakeswapWorker...
+2021-10-15 13:50:05 |||   - WBNB-USDT PancakeswapWorker deployed at 0x4556885dBCBD5397CB4FAB9602685F58da3A06d7
+2021-10-15 13:50:05 |||   - Deploying WBNB-CAKE PancakeswapWorker...
+2021-10-15 13:50:41 |||   - WBNB-CAKE PancakeswapWorker deployed at 0x5C874ff89F367a6cc3Ef857D42f3e1eCCEA9A77B
+2021-10-15 13:50:41 |||   - Deploying BUSD-CAKE PancakeswapWorker...
+2021-10-15 13:51:17 |||   - BUSD-CAKE PancakeswapWorker deployed at 0xDcEfC7cEf2dD57be912A1406c38f45630e1A9788
+2021-10-15 13:51:17 |||   - Deploying CAKE-USDC PancakeswapWorker...
+2021-10-15 13:51:54 |||   - CAKE-USDC PancakeswapWorker deployed at 0x7395bD72A43950bEaD0c5458B2C06Db9697c05D3
+2021-10-15 13:51:54 |||   - Deploying CAKE-USDT PancakeswapWorker...
+2021-10-15 13:52:30 |||   - CAKE-USDT PancakeswapWorker deployed at 0xc4aD8CF7a5fcb75DeD1A33408B1b5645435b7290
+2021-10-15 13:58:12 ||| ---> Deploying Client contracts... <---
+2021-10-15 13:58:12 |||   -> Contract of Client A
+2021-10-15 13:59:14 |||   - Contract of Client A deployed at 0x3dAb9b273cCf9B92420a6Aa865Ebb673056dF696

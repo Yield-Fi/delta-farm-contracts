@@ -3,6 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { getConfig } from "../utils/config";
 import { ethers } from "hardhat";
 import { logger } from "../utils/logger";
+import { parseEther } from "@ethersproject/units";
 
 const func: DeployFunction = async function ({ network }: HardhatRuntimeEnvironment) {
   if (network.name !== "testnet") {
@@ -41,6 +42,8 @@ const func: DeployFunction = async function ({ network }: HardhatRuntimeEnvironm
   const CAKE = await CAKEFactory.deploy();
 
   await CAKE.deployed();
+
+  await CAKE["mint(address,uint256)"](deployer.address, parseEther("100000000"));
 
   logger(` - Cake token deployed at ${CAKE.address}`);
 

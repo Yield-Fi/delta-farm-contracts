@@ -272,4 +272,10 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
     emit ToggleWorkers(msg.sender, workers, isEnabled);
   }
+
+  /// @dev Returns client's name
+  /// @return string client's name
+  function getName() external view returns (string memory) {
+    return _CLIENT_NAME_;
+  }
 }

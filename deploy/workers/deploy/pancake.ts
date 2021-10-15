@@ -13,6 +13,11 @@ const deployFunc: DeployFunction = async () => {
     "BUSD-DAI PancakeswapWorker",
     "USDT-DAI PancakeswapWorker",
     "WBNB-BUSD PancakeswapWorker",
+    "WBNB-USDT PancakeswapWorker",
+    "WBNB-CAKE PancakeswapWorker",
+    "BUSD-CAKE PancakeswapWorker",
+    "CAKE-USDC PancakeswapWorker",
+    "CAKE-USDT PancakeswapWorker",
   ];
 
   const [deployer] = await ethers.getSigners();

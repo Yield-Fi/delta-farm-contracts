@@ -53,6 +53,51 @@ const func: DeployFunction = async function () {
       },
       allocPoints: 1000,
     },
+    {
+      token0: config.tokens.WBNB,
+      token1: config.tokens.USDT,
+      liquidity: {
+        token0: parseEther("1.5"),
+        token1: parseEther("10000"),
+      },
+      allocPoints: 1000,
+    },
+    {
+      token0: config.tokens.WBNB,
+      token1: config.tokens.CAKE,
+      liquidity: {
+        token0: parseEther("1.5"),
+        token1: parseEther("10000"),
+      },
+      allocPoints: 1000,
+    },
+    {
+      token0: config.tokens.CAKE,
+      token1: config.tokens.BUSD,
+      liquidity: {
+        token0: parseEther("10000"),
+        token1: parseEther("10000"),
+      },
+      allocPoints: 1000,
+    },
+    {
+      token0: config.tokens.CAKE,
+      token1: config.tokens.USDC,
+      liquidity: {
+        token0: parseEther("10000"),
+        token1: parseEther("10000"),
+      },
+      allocPoints: 1000,
+    },
+    {
+      token0: config.tokens.CAKE,
+      token1: config.tokens.USDT,
+      liquidity: {
+        token0: parseEther("10000"),
+        token1: parseEther("10000"),
+      },
+      allocPoints: 1000,
+    },
   ];
 
   const WBNB = MockWBNB__factory.connect(config.tokens.WBNB, deployer);
@@ -108,9 +153,7 @@ const func: DeployFunction = async function () {
     const addFarmTx = await PancakeMasterChef.add(pair.allocPoints, LP_TOKEN, true);
 
     logger(
-      ` - Farm added: pool id - ${poolLength + 1}, lp token: ${LP_TOKEN}, tx hash - ${
-        addFarmTx.hash
-      }`
+      ` - Farm added: pool id - ${poolLength}, lp token: ${LP_TOKEN}, tx hash - ${addFarmTx.hash}`
     );
   }
 };
