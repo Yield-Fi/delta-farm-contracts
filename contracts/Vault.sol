@@ -350,7 +350,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @notice Return composition: pos<Position>{pid: pids[i], worker: workers[i] owner: owners[i], client: clients[i]}
   /// @notice Due to solidity flavours:
   /// @notice slot [0] will be occupied using zeroed values (address(0) for addresses and uint256(0) for numbers)
-  function getAllPositions()
+  function getAllPositions(uint256 fromPid)
     external
     view
     override
@@ -361,18 +361,22 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       address[] memory
     )
   {
-    uint256[] memory _pids = new uint256[](nextPositionID);
-    address[] memory _workers = new address[](nextPositionID);
-    address[] memory _owners = new address[](nextPositionID);
-    address[] memory _clients = new address[](nextPositionID);
+    uint256 itemsAmount = nextPositionID - fromPid;
 
-    for (uint256 i = 1; i < nextPositionID; i++) {
-      Position memory pos = positions[i];
+    uint256[] memory _pids = new uint256[](itemsAmount);
+    address[] memory _workers = new address[](itemsAmount);
+    address[] memory _owners = new address[](itemsAmount);
+    address[] memory _clients = new address[](itemsAmount);
 
-      _pids[i] = i;
+    for (uint256 i = 0; i < itemsAmount; i++) {
+      Position memory pos = positions[fromPid];
+
+      _pids[i] = fromPid;
       _workers[i] = pos.worker;
       _owners[i] = pos.owner;
       _clients[i] = pos.client;
+
+      fromPid++;
     }
 
     return (_pids, _workers, _owners, _clients);
@@ -384,7 +388,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @notice Return composition: rew<Reward>{pid: pids[i], reward: rewards[i], totalReward: totalRewards[i]}
   /// @notice Due to solidity flavours:
   /// @notice slot [0] will be occupied using zeroed values (uint256(0) for numbers)
-  function getAllRewards()
+  function getAllRewards(uint256 fromPid)
     external
     view
     override
@@ -394,14 +398,18 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       uint256[] memory
     )
   {
-    uint256[] memory _pids = new uint256[](nextPositionID);
-    uint256[] memory _rewards = new uint256[](nextPositionID);
-    uint256[] memory _totalRewards = new uint256[](nextPositionID);
+    uint256 itemsAmount = nextPositionID - fromPid;
 
-    for (uint256 i = 1; i < nextPositionID; i++) {
-      _pids[i] = i;
-      _rewards[i] = rewards[i];
-      _totalRewards[i] = totalRewards[i];
+    uint256[] memory _pids = new uint256[](itemsAmount);
+    uint256[] memory _rewards = new uint256[](itemsAmount);
+    uint256[] memory _totalRewards = new uint256[](itemsAmount);
+
+    for (uint256 i = 0; i < itemsAmount; i++) {
+      _pids[i] = fromPid;
+      _rewards[i] = rewards[fromPid];
+      _totalRewards[i] = totalRewards[fromPid];
+
+      fromPid++;
     }
 
     return (_pids, _rewards, _totalRewards);

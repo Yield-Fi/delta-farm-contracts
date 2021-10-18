@@ -55,7 +55,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "fromPid",
+        "type": "uint256"
+      }
+    ],
     "name": "getAllPositions",
     "outputs": [
       {
@@ -83,7 +89,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "fromPid",
+        "type": "uint256"
+      }
+    ],
     "name": "getAllRewards",
     "outputs": [
       {

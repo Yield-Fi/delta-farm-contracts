@@ -39,7 +39,7 @@ interface IVault {
   ) external payable;
 
   /// @dev Data gathering
-  function getAllPositions()
+  function getAllPositions(uint256 fromPid)
     external
     view
     returns (
@@ -50,7 +50,7 @@ interface IVault {
     );
 
   /// @dev Data gathering
-  function getAllRewards()
+  function getAllRewards(uint256 fromPid)
     external
     view
     returns (
