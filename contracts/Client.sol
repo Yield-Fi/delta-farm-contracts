@@ -283,6 +283,10 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Function to get data about deposit
   /// @param worker Address of worker (farm)
   /// @param amount Amount of base token to deposit
+  /// @return uint256 Amount of the part of the base token after split
+  /// @return uint256 Amount of the part of the base token after split
+  /// @return uint256 Amount of the token0 which will be received from swapped base token
+  /// @return uint256 Amount of the token1 which will be received from swapped base token
   function estimateDeposit(address worker, uint256 amount)
     public
     view

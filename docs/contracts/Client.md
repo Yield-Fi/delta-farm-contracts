@@ -191,6 +191,16 @@ Function to get data about deposit
 - `amount`: Amount of base token to deposit
 
 
+#### Return Values:
+
+- `uint256`: Amount of the part of the base token after split
+
+- `uint256`: Amount of the part of the base token after split
+
+- `uint256`: Amount of the token0 which will be received from swapped base token
+
+- `uint256`: Amount of the token1 which will be received from swapped base token
+
 ___
 
 ## Events
