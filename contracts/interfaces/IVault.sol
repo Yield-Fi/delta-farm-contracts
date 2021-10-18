@@ -37,4 +37,25 @@ interface IVault {
     address recipient,
     bytes calldata data
   ) external payable;
+
+  /// @dev Data gathering
+  function getAllPositions()
+    external
+    view
+    returns (
+      uint256[] memory,
+      address[] memory,
+      address[] memory,
+      address[] memory
+    );
+
+  /// @dev Data gathering
+  function getAllRewards()
+    external
+    view
+    returns (
+      uint256[] memory,
+      uint256[] memory,
+      uint256[] memory
+    );
 }

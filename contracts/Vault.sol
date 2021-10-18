@@ -79,6 +79,8 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   mapping(uint256 => uint256) public override rewards;
   mapping(address => bool) public override approvedRewardAssigners;
 
+  mapping(uint256 => uint256) public totalRewards;
+
   modifier onlyWhitelistedRewardAssigners() {
     require(approvedRewardAssigners[msg.sender], "Vault: Reward assigner not whitelisted");
     _;
@@ -277,6 +279,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
 
       // Assign final reward to the user
       rewards[pid] = rewards[pid].add(userReward);
+      totalRewards[pid] = totalRewards[pid].add(userReward);
     }
 
     token.safeTransfer(address(feeCollector), singleTxAcc);
@@ -339,6 +342,69 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     }
 
     emit ApproveRewardAssigners(msg.sender, rewardAssigners, isApproved);
+  }
+
+  /// @dev Get all listed positions in the Vault
+  /// @return set of marked arrays
+  /// @notice Return Type: [pids], [workers], [owners], [clients];
+  /// @notice Return composition: pos<Position>{pid: pids[i], worker: workers[i] owner: owners[i], client: clients[i]}
+  /// @notice Due to solidity flavours:
+  /// @notice slot [0] will be occupied using zeroed values (address(0) for addresses and uint256(0) for numbers)
+  function getAllPositions()
+    external
+    view
+    override
+    returns (
+      uint256[] memory,
+      address[] memory,
+      address[] memory,
+      address[] memory
+    )
+  {
+    uint256[] memory _pids = new uint256[](nextPositionID);
+    address[] memory _workers = new address[](nextPositionID);
+    address[] memory _owners = new address[](nextPositionID);
+    address[] memory _clients = new address[](nextPositionID);
+
+    for (uint256 i = 1; i < nextPositionID; i++) {
+      Position memory pos = positions[i];
+
+      _pids[i] = i;
+      _workers[i] = pos.worker;
+      _owners[i] = pos.owner;
+      _clients[i] = pos.client;
+    }
+
+    return (_pids, _workers, _owners, _clients);
+  }
+
+  /// @dev Get all listed rewards in the Vault
+  /// @return set of marked arrays
+  /// @notice Return Type: [pids], [rewards]
+  /// @notice Return composition: rew<Reward>{pid: pids[i], reward: rewards[i], totalReward: totalRewards[i]}
+  /// @notice Due to solidity flavours:
+  /// @notice slot [0] will be occupied using zeroed values (uint256(0) for numbers)
+  function getAllRewards()
+    external
+    view
+    override
+    returns (
+      uint256[] memory,
+      uint256[] memory,
+      uint256[] memory
+    )
+  {
+    uint256[] memory _pids = new uint256[](nextPositionID);
+    uint256[] memory _rewards = new uint256[](nextPositionID);
+    uint256[] memory _totalRewards = new uint256[](nextPositionID);
+
+    for (uint256 i = 1; i < nextPositionID; i++) {
+      _pids[i] = i;
+      _rewards[i] = rewards[i];
+      _totalRewards[i] = totalRewards[i];
+    }
+
+    return (_pids, _rewards, _totalRewards);
   }
 
   /// @dev Fallback function to accept BNB.
