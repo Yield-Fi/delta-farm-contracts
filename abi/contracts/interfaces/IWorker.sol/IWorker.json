@@ -66,6 +66,19 @@
   },
   {
     "inputs": [],
+    "name": "isWorkerEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "lpToken",
     "outputs": [
       {
@@ -143,6 +156,19 @@
       }
     ],
     "name": "setTreasuryFee",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bool",
+        "name": "_isEnable",
+        "type": "bool"
+      }
+    ],
+    "name": "toggleWorker",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

@@ -299,10 +299,7 @@ describe("Client contract", async () => {
     await exampleClient.whitelistOperators([deployerAddress], true);
 
     // Enable workers on the client side
-    await exampleClient.toggleWorkers(
-      [pancakeswapWorker01.address, pancakeswapWorker02.address],
-      true
-    );
+    await exampleClient.enableFarms([pancakeswapWorker01.address, pancakeswapWorker02.address]);
 
     // Whitelist client
     await protocolManager.approveClients([exampleClient.address], true);
@@ -328,7 +325,7 @@ describe("Client contract", async () => {
       await exampleClient.whitelistOperators([deployerAddress], true);
 
       // Whitelist Alice (caller)
-      await exampleClient.whitelistCallers([aliceAddress], true);
+      await exampleClient.whitelistUsers([aliceAddress], true);
 
       // Alice (DEX user) must approve client contract, so client contract can transfer asset to the Vault
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
@@ -353,13 +350,13 @@ describe("Client contract", async () => {
 
     it("should revert if target work is disabled by client", async () => {
       // Disable worker
-      await exampleClient.toggleWorkers([pancakeswapWorker01.address], false);
+      await exampleClient.disableFarms([pancakeswapWorker01.address]);
 
       // Proceed with entering the protocol
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
       await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
       await exampleClient.whitelistOperators([deployerAddress], true);
-      await exampleClient.whitelistCallers([aliceAddress], true);
+      await exampleClient.whitelistUsers([aliceAddress], true);
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
       await expect(
         exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT)
@@ -379,7 +376,7 @@ describe("Client contract", async () => {
       await exampleClient.whitelistOperators([deployerAddress], true);
 
       // Whitelist Alice (caller)
-      await exampleClient.whitelistCallers([aliceAddress], true);
+      await exampleClient.whitelistUsers([aliceAddress], true);
 
       // Alice (DEX user) must approve client contract, so client contract can transfer asset to the Vault
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
@@ -410,7 +407,7 @@ describe("Client contract", async () => {
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
       await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
       await exampleClient.whitelistOperators([deployerAddress], true);
-      await exampleClient.whitelistCallers([aliceAddress], true);
+      await exampleClient.whitelistUsers([aliceAddress], true);
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
       await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 
@@ -430,17 +427,17 @@ describe("Client contract", async () => {
 
   context("set worker fee", async () => {
     it("should revert upon providing invalid worker address", async () => {
-      expect(exampleClient.setWorkerFee(ethers.constants.AddressZero, 100)).to.be.reverted;
+      expect(exampleClient.setFarmsFee([ethers.constants.AddressZero], 100)).to.be.reverted;
     });
 
     it("should revert when fee is greater than or equal to 100%", async () => {
       await expect(
-        exampleClient.setWorkerFee(pancakeswapWorker01.address, 10001)
+        exampleClient.setFarmsFee([pancakeswapWorker01.address], 10001)
       ).to.be.revertedWith("ClientContract: Invalid fee amount given");
     });
 
     it("should work if provided fee is valid", async () => {
-      await exampleClient.setWorkerFee(pancakeswapWorker01.address, 500);
+      await exampleClient.setFarmsFee([pancakeswapWorker01.address], 500);
 
       expect(
         await pancakeswapWorker01.getClientFee(exampleClient.address)
@@ -462,13 +459,13 @@ describe("Client contract", async () => {
       await pancakeswapWorker01.setHarvestersOk([deployerAddress], true);
       await vault.approveRewardAssigners([pancakeswapWorker01.address], true);
       await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
-      await exampleClient.setWorkerFee(pancakeswapWorker01.address, 500); // 10% for the client
-      await exampleClient.whitelistCallers([deployerAddress], true);
+      await exampleClient.setFarmsFee([pancakeswapWorker01.address], 500); // 10% for the client
+      await exampleClient.whitelistUsers([deployerAddress], true);
 
       // Open some positions
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
       await exampleClient.whitelistOperators([deployerAddress], true);
-      await exampleClient.whitelistCallers([aliceAddress], true);
+      await exampleClient.whitelistUsers([aliceAddress], true);
 
       await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);

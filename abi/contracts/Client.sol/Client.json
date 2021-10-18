@@ -5,13 +5,38 @@
       {
         "indexed": true,
         "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "CollectFee",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
         "name": "recipient",
         "type": "address"
       },
       {
         "indexed": true,
         "internalType": "address",
-        "name": "worker",
+        "name": "farm",
         "type": "address"
       },
       {
@@ -53,10 +78,10 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "worker",
-        "type": "address"
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "farms",
+        "type": "address[]"
       },
       {
         "indexed": true,
@@ -65,7 +90,7 @@
         "type": "uint256"
       }
     ],
-    "name": "SetWorkerFee",
+    "name": "SetFarmsFee",
     "type": "event"
   },
   {
@@ -80,7 +105,7 @@
       {
         "indexed": false,
         "internalType": "address[]",
-        "name": "workers",
+        "name": "farms",
         "type": "address[]"
       },
       {
@@ -90,32 +115,7 @@
         "type": "bool"
       }
     ],
-    "name": "ToggleWorkers",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "caller",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address[]",
-        "name": "callers",
-        "type": "address[]"
-      },
-      {
-        "indexed": true,
-        "internalType": "bool",
-        "name": "isOk",
-        "type": "bool"
-      }
-    ],
-    "name": "WhitelistCallers",
+    "name": "ToggleFarms",
     "type": "event"
   },
   {
@@ -136,11 +136,36 @@
       {
         "indexed": true,
         "internalType": "bool",
-        "name": "isOk",
+        "name": "isWhitelisted",
         "type": "bool"
       }
     ],
     "name": "WhitelistOperators",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "users",
+        "type": "address[]"
+      },
+      {
+        "indexed": true,
+        "internalType": "bool",
+        "name": "isWhitelisted",
+        "type": "bool"
+      }
+    ],
+    "name": "WhitelistUsers",
     "type": "event"
   },
   {
@@ -188,7 +213,7 @@
       },
       {
         "internalType": "address",
-        "name": "worker",
+        "name": "farm",
         "type": "address"
       },
       {
@@ -198,6 +223,32 @@
       }
     ],
     "name": "deposit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "farms",
+        "type": "address[]"
+      }
+    ],
+    "name": "disableFarms",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "farms",
+        "type": "address[]"
+      }
+    ],
+    "name": "enableFarms",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -255,6 +306,25 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "farm",
+        "type": "address"
+      }
+    ],
+    "name": "getFarmFee",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getName",
     "outputs": [
@@ -301,6 +371,63 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "farm",
+        "type": "address"
+      }
+    ],
+    "name": "isFarmEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "isOperatorWhitelisted",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "isUserWhitelisted",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -323,9 +450,9 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "worker",
-        "type": "address"
+        "internalType": "address[]",
+        "name": "farms",
+        "type": "address[]"
       },
       {
         "internalType": "uint256",
@@ -333,25 +460,7 @@
         "type": "uint256"
       }
     ],
-    "name": "setWorkerFee",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
-        "name": "workers",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "isEnabled",
-        "type": "bool"
-      }
-    ],
-    "name": "toggleWorkers",
+    "name": "setFarmsFee",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -373,16 +482,16 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "callers",
+        "name": "operators",
         "type": "address[]"
       },
       {
         "internalType": "bool",
-        "name": "isOk",
+        "name": "isWhitelisted",
         "type": "bool"
       }
     ],
-    "name": "whitelistCallers",
+    "name": "whitelistOperators",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -391,16 +500,16 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "operators",
+        "name": "users",
         "type": "address[]"
       },
       {
         "internalType": "bool",
-        "name": "isOk",
+        "name": "isWhitelisted",
         "type": "bool"
       }
     ],
-    "name": "whitelistOperators",
+    "name": "whitelistUsers",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -419,7 +528,7 @@
       },
       {
         "internalType": "address",
-        "name": "worker",
+        "name": "farm",
         "type": "address"
       }
     ],

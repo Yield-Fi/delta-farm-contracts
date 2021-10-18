@@ -217,6 +217,20 @@ Set fee in bps for specific client
 
 - `clientFeeBps`: The fee in BPS
 
+### toggleWorker
+
+```solidity
+  function toggleWorker(bool _isEnable)
+```
+
+Function to set worker as enabled or disabled
+
+
+
+#### Parameters:
+
+- `_isEnable`: Whether worker will be enable or disable
+
 
 ___
 

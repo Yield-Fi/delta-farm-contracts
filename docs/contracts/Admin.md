@@ -1,32 +1,34 @@
 # Admin
 
-
+Smart contract to interact from central admin panel
 
 
 ___
 
 ## Functions
 
-### setWorkerFee
+### setFarmsFee
 
 ```solidity
-  function setWorkerFee(address worker, uint256 feeBps)
+  function setFarmsFee(address[] farms, uint256 feeBps)
 ```
 
-Function to set fee for giver worker (farm)
+Function to set fee for giver farm
 
 
+> **NOTE:** Function can be called only by approved protocol's operators
 
 #### Parameters:
 
-- `worker`: Address of worker (farm)
+- `farms`: Array of farms' addresses
 
 - `feeBps`: Fee in BPS (0 < 10000)
 
-### getWorkerFee
+
+### getFarmFee
 
 ```solidity
-  function getWorkerFee(address worker) external returns(uint256)
+  function getFarmFee(address farm) external returns(uint256)
 ```
 
 Function returns fee for giver worker (farm) in BPS
@@ -35,30 +37,92 @@ Function returns fee for giver worker (farm) in BPS
 
 #### Parameters:
 
-- `worker`: Address of worker (farm)
+- `farm`: Address of farm
 
 
 #### Return Values:
 
 - `uint256`: Fee in BPS (0 < 10000)
+### enableFarms
+
+```solidity
+  function enableFarms(address[] farms)
+```
+
+Enables given farms
+
+
+> **NOTE:** Function can be called only by whitelisted protocol's operators
+
+#### Parameters:
+
+- `farms`: Addresses of farms to enable
+
+
+### disableFarms
+
+```solidity
+  function disableFarms(address[] farms)
+```
+
+Disables given farms
+
+
+> **NOTE:** Function can be called only by whitelisted protocol's operators
+
+#### Parameters:
+
+- `farms`: Addresses of farms to disable
+
+
+### isFarmEnabled
+
+```solidity
+  function isFarmEnabled(address farm) external returns(bool)
+```
+
+Returns whether given farm is enabled or disabled
+
+
+
+
+#### Return Values:
+
+- `bool`: true or false
 
 ___
 
 ## Events
 
-### SetWorkerFee
+### SetFarmsFee
 
 ```solidity
-  event SetWorkerFee(address caller, address worker, uint256 feeBps)
+  event SetFarmsFee(address caller, address[] farms, uint256 feeBps)
 ```
-Event is emitted when fee for worker will be changed
+Event is emitted when fee for farms will be changed
 
 
 #### Parameters:
 
-- `caller`: Address which will change fee for worker (farm)
+- `caller`: Address which will change fee for farms
 
-- `worker`: Address of given worker
+- `farms`: Array of farms' addresses
 
 - `feeBps`: Fee in BPS (0-10000)
+
+### ToggleFarms
+
+```solidity
+  event ToggleFarms(address caller, address[] farms, bool isEnabled)
+```
+Event is emimtted when given farm will be enabled or disabled.
+
+
+#### Parameters:
+
+- `caller`: Address which will change farm state
+
+- `farms`: Addresses of farm
+
+- `isEnabled`: New farm status
 
