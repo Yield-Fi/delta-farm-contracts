@@ -52,4 +52,8 @@ interface IWorker {
   /// @dev Returns worker's name
   /// @return string worker's name
   function getName() external view returns (string memory);
+
+  function toggleWorker(bool _isEnable) external;
+
+  function isWorkerEnabled() external view returns (bool);
 }

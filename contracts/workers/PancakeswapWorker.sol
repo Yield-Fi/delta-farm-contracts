@@ -116,6 +116,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   uint256 public totalShare;
   uint256[] private positionIds;
   uint256 public override treasuryFeeBps;
+  bool private isEnabled;
   mapping(address => uint256) public clientFeesBps;
   mapping(address => bool) public okHarvesters;
 
@@ -152,6 +153,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     token0 = lpToken.token0();
     token1 = lpToken.token1();
     cake = address(masterChef.cake());
+    isEnabled = true;
 
     // 5. Assign Re-invest parameters
     treasuryFeeBps = _treasuryFeeBps;
@@ -274,11 +276,17 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     onlyOperatingVault
     nonReentrant
   {
+    (address strategy, bytes memory stratParams) = abi.decode(data, (address, bytes));
+
+    // Revert transaction when farm is disabled and strategy to add liquidity is used
+    if (!isEnabled && (strategy == strategies[0] || strategy != strategies[1])) {
+      revert("PancakeswapWorker->work: given farm is disabled");
+    }
+
     addPositionId(positionId);
     // 1. Convert this position back to LP tokens.
     _removeShare(positionId);
     // 2. Transfer funds and perform the worker strategy.
-    (address strategy, bytes memory stratParams) = abi.decode(data, (address, bytes));
     require(approvedStrategies[strategy], "PancakeswapWorker->work: unapproved work strategy");
     require(
       lpToken.transfer(strategy, lpToken.balanceOf(address(this))),
@@ -485,6 +493,16 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     clientFeesBps[msg.sender] = clientFeeBps;
 
     emit SetClientFee(msg.sender, clientFeeBps);
+  }
+
+  /// @dev Function to set worker as enabled or disabled
+  /// @param _isEnable Whether worker will be enable or disable
+  function toggleWorker(bool _isEnable) external override onlyAdminContract {
+    isEnabled = _isEnable;
+  }
+
+  function isWorkerEnabled() external view override returns (bool) {
+    return isEnabled;
   }
 
   /// Internal function to add new position id to the array with position ids

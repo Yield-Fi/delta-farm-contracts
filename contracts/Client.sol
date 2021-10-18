@@ -15,6 +15,8 @@ import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.so
 import "./interfaces/IStrategy.sol";
 import "./utils/SafeToken.sol";
 
+/// @dev Smart contract for protocol's specific clients.
+/// Contains a set of methods to interact with protocol and manage farms and users.
 contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe {
   /// @dev Libraries
   using SafeMath for uint256;
@@ -23,35 +25,41 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Event is emmitted when new operators are whitelisted
   /// @param caller Address of msg.sender
   /// @param operators Array of operators to whitelist
-  /// @param isOk Whether operators will be whitelisted or not
-  event WhitelistOperators(address indexed caller, address[] operators, bool indexed isOk);
+  /// @param isWhitelisted Whether operators will be whitelisted or not
+  event WhitelistOperators(address indexed caller, address[] operators, bool indexed isWhitelisted);
 
-  /// @dev Event is emmitted when new callers are whitelisted
+  /// @dev Event is emmitted when new users are whitelisted
   /// @param caller Address of msg.sender
-  /// @param callers Array of callers to whitelist
-  /// @param isOk Whether callers will be whitelisted or not
-  event WhitelistCallers(address indexed caller, address[] callers, bool indexed isOk);
+  /// @param users Array of Users to whitelist
+  /// @param isWhitelisted Whether Users will be whitelisted or not
+  event WhitelistUsers(address indexed caller, address[] users, bool indexed isWhitelisted);
 
   /// @dev Event is emmitted when deposit function will be called
   /// @param recipient Address for which protocol should open new position, reward will be sent there later on
-  /// @param worker Address of target worker
+  /// @param farm Address of target farm
   /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
-  event Deposit(address indexed recipient, address indexed worker, uint256 indexed amount);
+  event Deposit(address indexed recipient, address indexed farm, uint256 indexed amount);
 
-  /// @dev Event is emmited when fee for given worker(pool) will be changed
+  /// @dev Event is emmited when fee for given farms will be changed
   /// @param caller Address of msg.sender
-  /// @param worker target worker(pool) address
+  /// @param farms Array of farms' addresses
   /// @param feeBps new fee denominator (0 < feeBps < 10000)
-  event SetWorkerFee(address indexed caller, address indexed worker, uint256 indexed feeBps);
+  event SetFarmsFee(address indexed caller, address[] farms, uint256 indexed feeBps);
 
-  /// @dev Event is emmited when workers will be enabled or disabled
+  /// @dev Event is emmited when farms will be enabled or disabled
   /// @param caller Address of msg.sender
-  /// @param workers array of workers' addresses to perform action on
+  /// @param farms array of farms' addresses to perform action on
   /// @param isEnabled new worker status relative for client end users
-  event ToggleWorkers(address indexed caller, address[] workers, bool indexed isEnabled);
+  event ToggleFarms(address indexed caller, address[] farms, bool indexed isEnabled);
+
+  /// @dev Event is emmited when all collected fee will be withdrawn
+  /// @param caller Address of msg.sender
+  /// @param _to Address of fee recipient
+  /// @param amount Amount of collected fee
+  event CollectFee(address indexed caller, address indexed _to, uint256 amount);
 
   /// @dev Enabled farms
-  mapping(address => bool) enabledWorkers;
+  mapping(address => bool) enabledFarms;
 
   /// @dev Protocol related general metadata, may be removed in further versions
   string _KIND_;
@@ -63,12 +71,12 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   IFeeCollector private feeCollector;
 
   /// @dev Whitelist mappings
-  mapping(address => bool) whitelistedCallers;
+  mapping(address => bool) whitelistedUsers;
   mapping(address => bool) whitelistedOperators;
 
-  /// @dev Whitelist modifiers - callers
-  modifier onlyWhitelistedCallers() {
-    require(whitelistedCallers[msg.sender], "ClientContract: Caller not whitelisted.");
+  /// @dev Whitelist modifiers - Users
+  modifier onlyWhitelistedUsers() {
+    require(whitelistedUsers[msg.sender], "ClientContract: Caller not whitelisted.");
     _;
   }
 
@@ -78,33 +86,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     _;
   }
 
-  /// @dev Whitelist methods - callers
-  function whitelistCallers(address[] calldata callers, bool isOk)
-    external
-    onlyWhitelistedOperators
-  {
-    for (uint256 i = 0; i < callers.length; i++) {
-      whitelistedCallers[callers[i]] = isOk;
-    }
-
-    emit WhitelistCallers(msg.sender, callers, isOk);
-  }
-
-  /// @dev Whitelist methods - operators
-  function _whitelistOperators(address[] memory operators, bool isOk) internal {
-    for (uint256 i = 0; i < operators.length; i++) {
-      whitelistedOperators[operators[i]] = isOk;
-    }
-
-    emit WhitelistOperators(msg.sender, operators, isOk);
-  }
-
-  /// @dev External interface for function above
-  function whitelistOperators(address[] calldata operators, bool isOk) external onlyOwner {
-    _whitelistOperators(operators, isOk);
-  }
-
-  /// @dev Function to initialize new contract instance.
+  /// Function to initialize new contract instance.
   /// @param kind Kind of new client
   /// @param clientName Name of new client
   /// @param _protocolManager Address of protocol manager contract
@@ -128,25 +110,70 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     _whitelistOperators(initialOperators, true);
   }
 
-  /// @notice Deposit function for client's end user. a.k.a protocol entry point
+  /// @dev Function to update registry of whitelisted users
+  /// @param users Array of users' addresses
+  /// @param isWhitelisted Whether users will be whitelisted or not
+  /// @notice Function can be called only by whitelisted operators
+  function whitelistUsers(address[] calldata users, bool isWhitelisted)
+    external
+    onlyWhitelistedOperators
+  {
+    for (uint256 i = 0; i < users.length; i++) {
+      whitelistedUsers[users[i]] = isWhitelisted;
+    }
+
+    emit WhitelistUsers(msg.sender, users, isWhitelisted);
+  }
+
+  /// Whitelist methods - operators
+  function _whitelistOperators(address[] memory operators, bool isWhitelisted) internal {
+    for (uint256 i = 0; i < operators.length; i++) {
+      whitelistedOperators[operators[i]] = isWhitelisted;
+    }
+
+    emit WhitelistOperators(msg.sender, operators, isWhitelisted);
+  }
+
+  /// @dev Update registry of whitelisted operators
+  /// @param operators Array of operators' addresses to update
+  /// @param isWhitelisted Whether operators will be whitelisted or not
+  /// @notice Function can be called only by whitelisted operators
+  function whitelistOperators(address[] calldata operators, bool isWhitelisted)
+    external
+    onlyWhitelistedOperators
+  {
+    _whitelistOperators(operators, isWhitelisted);
+  }
+
+  /// @dev Returns whether given address is whitelisted as operator
+  /// @param account Address of account to check
+  /// @return bool Whether given address is whitelisted
+  function isOperatorWhitelisted(address account) external view returns (bool) {
+    return whitelistedOperators[account];
+  }
+
+  /// @dev Returns whether given address is whitelisted as user
+  /// @param account Address of account to check
+  /// @return bool Whether given address is whitelisted
+  function isUserWhitelisted(address account) external view returns (bool) {
+    return whitelistedUsers[account];
+  }
+
+  /// @dev Deposit function for client's end user. a.k.a protocol entry point
   /// @param recipient Address for which protocol should open new position, reward will be sent there later on
-  /// @param worker Address of target worker
-  /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
-  /// @dev Vault native token in which assets should have been provided will be resolved on-the-fly using
-  /// internal ProtocolManager.
+  /// @param farm Address of target farm
+  /// @param amount Amount of token (asset) user is willing to enter protocol with.
+  /// @notice Function can be called only by whitelisted users.
   function deposit(
     address recipient,
-    address worker,
+    address farm,
     uint256 amount
-  ) external onlyWhitelistedCallers {
+  ) external onlyWhitelistedUsers {
     // Cast worker for further methods' usage
-    IWorker _worker = IWorker(worker);
+    IWorker _worker = IWorker(farm);
 
     // Check for worker outage due to client-assigned pause
-    require(
-      enabledWorkers[worker],
-      "ClientContract: Target pool hasn't been enabled by the client"
-    );
+    require(enabledFarms[farm], "ClientContract: Target pool hasn't been enabled by the client");
 
     // Cast vault for further method's usage
     IVault vault = IVault(_worker.operatingVault());
@@ -173,23 +200,24 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
     // Enter the protocol using resolved worker strategy
     /// @dev encoded: (address strategy, (address baseToken, address farmingToken, uint256 minLPAmount))
-    vault.work(0, worker, amount, recipient, payload);
+    vault.work(0, farm, amount, recipient, payload);
 
     // Reset approvals
     vaultToken.safeApprove(address(vault), 0);
 
-    emit Deposit(recipient, worker, amount);
+    emit Deposit(recipient, farm, amount);
   }
 
   /// @dev Collect accumulated rewards
   /// @param pid Position ID
   /// @param recipient Position owner
   /// @param rewardTokenOrVaultAddress Information about asset in which reward will be paid out
+  /// @notice Function can be called only by whitelisted users.
   function collectReward(
     uint256 pid,
     address recipient,
     address rewardTokenOrVaultAddress
-  ) external onlyWhitelistedCallers {
+  ) external onlyWhitelistedUsers {
     // Try to resolve Vault address based on given token address
     address vaultAddress = protocolManager.tokenToVault(rewardTokenOrVaultAddress);
 
@@ -211,10 +239,10 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   function withdraw(
     uint256 pid,
     address recipient,
-    address worker
-  ) external onlyWhitelistedCallers {
+    address farm
+  ) external onlyWhitelistedUsers {
     // Cast worker for further methods' usage
-    IWorker _worker = IWorker(worker);
+    IWorker _worker = IWorker(farm);
 
     // Cast vault for further method's usage
     IVault vault = IVault(_worker.operatingVault());
@@ -224,7 +252,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     /// worker.getStrategies()[2] = Liquidate
     vault.work(
       pid,
-      worker,
+      farm,
       0,
       recipient,
       abi.encode(
@@ -234,15 +262,25 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     );
   }
 
-  /// @dev Set client-side fee for given worker
-  /// @param worker target worker(pool) address
+  /// @dev Set client-side fee for given farms
+  /// @param farms Array of farms' addresses
   /// @param feeBps new fee denominator (0 < feeBps < 10000)
-  function setWorkerFee(address worker, uint256 feeBps) external onlyWhitelistedOperators {
+  /// @notice Function can be called only by whitelisted operators.
+  function setFarmsFee(address[] calldata farms, uint256 feeBps) external onlyWhitelistedOperators {
     require(0 <= feeBps && feeBps < 10000, "ClientContract: Invalid fee amount given");
 
-    IWorker(worker).setClientFee(feeBps);
+    for (uint256 i = 0; i < farms.length; i++) {
+      IWorker(farms[i]).setClientFee(feeBps);
+    }
 
-    emit SetWorkerFee(msg.sender, worker, feeBps);
+    emit SetFarmsFee(msg.sender, farms, feeBps);
+  }
+
+  /// @dev Get client-side- fee for given farm
+  /// @param farm Target farm address
+  /// @return uint256 Fee in BPS
+  function getFarmFee(address farm) external view returns (uint256) {
+    return IWorker(farm).getClientFee(address(this));
   }
 
   /// @dev Withdraw all collected fee
@@ -251,7 +289,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   function collectFee(address _to) external onlyWhitelistedOperators {
     feeCollector.collect();
     address feeToken = feeCollector.getFeeToken();
-    feeToken.safeTransfer(_to, feeToken.myBalance());
+    uint256 feeTokenBalance = feeToken.myBalance();
+    feeToken.safeTransfer(_to, feeTokenBalance);
+    emit CollectFee(msg.sender, _to, feeTokenBalance);
   }
 
   /// @dev Returns amount of fee to collect
@@ -260,18 +300,30 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     return feeCollector.feeToCollect();
   }
 
-  /// @dev Enable or disabled given array of workers
-  /// @param workers array of workers' addresses to perform action on
-  /// @param isEnabled new worker status relative for client end users
-  function toggleWorkers(address[] calldata workers, bool isEnabled)
-    external
-    onlyWhitelistedOperators
-  {
-    for (uint256 i = 0; i < workers.length; i++) {
-      enabledWorkers[workers[i]] = isEnabled;
+  /// @dev Enables given farm
+  /// @param farms Address of farm to enable
+  /// @notice Function can be called by whitelisted operators
+  function enableFarms(address[] calldata farms) external onlyWhitelistedOperators {
+    for (uint256 i = 0; i < farms.length; i++) {
+      enabledFarms[farms[i]] = true;
     }
+    emit ToggleFarms(msg.sender, farms, true);
+  }
 
-    emit ToggleWorkers(msg.sender, workers, isEnabled);
+  /// @dev Disables given farm
+  /// @param farms Address of farm to disable
+  /// @notice Function can be called by whitelisted operators
+  function disableFarms(address[] calldata farms) external onlyWhitelistedOperators {
+    for (uint256 i = 0; i < farms.length; i++) {
+      enabledFarms[farms[i]] = false;
+    }
+    emit ToggleFarms(msg.sender, farms, false);
+  }
+
+  /// @dev Returns whether given farm is enabled or disabled
+  /// @return bool true or false
+  function isFarmEnabled(address farm) external view returns (bool) {
+    return IWorker(farm).isWorkerEnabled();
   }
 
   /// @dev Returns client's name

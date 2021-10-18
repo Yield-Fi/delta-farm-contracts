@@ -1,83 +1,103 @@
 # Client
 
-
+Smart contract for protocol's specific clients.
+Contains a set of methods to interact with protocol and manage farms and users.
 
 
 ___
 
 ## Functions
 
-### whitelistCallers
+### whitelistUsers
 
 ```solidity
-  function whitelistCallers(address[] callers, bool isOk)
+  function whitelistUsers(address[] users, bool isWhitelisted)
 ```
 
-Whitelist methods - callers
+Function to update registry of whitelisted users
 
 
+> **NOTE:** Function can be called only by whitelisted operators
 
-### _whitelistOperators
+#### Parameters:
 
-```solidity
-  function _whitelistOperators(address[] operators, bool isOk)
-```
+- `users`: Array of users' addresses
 
-Whitelist methods - operators
-
+- `isWhitelisted`: Whether users will be whitelisted or not
 
 
 ### whitelistOperators
 
 ```solidity
-  function whitelistOperators(address[] operators, bool isOk)
+  function whitelistOperators(address[] operators, bool isWhitelisted)
 ```
 
-External interface for function above
+Update registry of whitelisted operators
 
 
+> **NOTE:** Function can be called only by whitelisted operators
 
-### initialize
+#### Parameters:
+
+- `operators`: Array of operators' addresses to update
+
+- `isWhitelisted`: Whether operators will be whitelisted or not
+
+
+### isOperatorWhitelisted
 
 ```solidity
-  function initialize(string kind, string clientName, address _protocolManager, address _feeCollector, address[] initialOperators)
+  function isOperatorWhitelisted(address account) external returns(bool)
 ```
 
-Function to initialize new contract instance.
+Returns whether given address is whitelisted as operator
 
 
 
 #### Parameters:
 
-- `kind`: Kind of new client
+- `account`: Address of account to check
 
-- `clientName`: Name of new client
 
-- `_protocolManager`: Address of protocol manager contract
+#### Return Values:
 
-- `_feeCollector`: Address of fee collector contract
+- `bool`: Whether given address is whitelisted
+### isUserWhitelisted
 
-- `initialOperators`: Initial array of operator's addresses to whitelist
+```solidity
+  function isUserWhitelisted(address account) external returns(bool)
+```
 
+Returns whether given address is whitelisted as user
+
+
+
+#### Parameters:
+
+- `account`: Address of account to check
+
+
+#### Return Values:
+
+- `bool`: Whether given address is whitelisted
 ### deposit
 
 ```solidity
-  function deposit(address recipient, address worker, uint256 amount)
+  function deposit(address recipient, address farm, uint256 amount)
 ```
 
-Vault native token in which assets should have been provided will be resolved on-the-fly using
-internal ProtocolManager.
+Deposit function for client's end user. a.k.a protocol entry point
 
-> **NOTE:** Deposit function for client's end user. a.k.a protocol entry point
 
+> **NOTE:** Function can be called only by whitelisted users.
 
 #### Parameters:
 
 - `recipient`: Address for which protocol should open new position, reward will be sent there later on
 
-- `worker`: Address of target worker
+- `farm`: Address of target farm
 
-- `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
+- `amount`: Amount of token (asset) user is willing to enter protocol with.
 
 
 ### collectReward
@@ -89,6 +109,7 @@ internal ProtocolManager.
 Collect accumulated rewards
 
 
+> **NOTE:** Function can be called only by whitelisted users.
 
 #### Parameters:
 
@@ -98,22 +119,43 @@ Collect accumulated rewards
 
 - `rewardTokenOrVaultAddress`: Information about asset in which reward will be paid out
 
-### setWorkerFee
+
+### setFarmsFee
 
 ```solidity
-  function setWorkerFee(address worker, uint256 feeBps)
+  function setFarmsFee(address[] farms, uint256 feeBps)
 ```
 
-Set client-side fee for given worker
+Set client-side fee for given farms
+
+
+> **NOTE:** Function can be called only by whitelisted operators.
+
+#### Parameters:
+
+- `farms`: Array of farms' addresses
+
+- `feeBps`: new fee denominator (0 < feeBps < 10000)
+
+
+### getFarmFee
+
+```solidity
+  function getFarmFee(address farm) external returns(uint256)
+```
+
+Get client-side- fee for given farm
 
 
 
 #### Parameters:
 
-- `worker`: target worker(pool) address
+- `farm`: Target farm address
 
-- `feeBps`: new fee denominator (0 < feeBps < 10000)
 
+#### Return Values:
+
+- `uint256`: Fee in BPS
 ### collectFee
 
 ```solidity
@@ -144,22 +186,52 @@ Returns amount of fee to collect
 #### Return Values:
 
 - `uint256`: Amount of fee to collect
-### toggleWorkers
+### enableFarms
 
 ```solidity
-  function toggleWorkers(address[] workers, bool isEnabled)
+  function enableFarms(address[] farms)
 ```
 
-Enable or disabled given array of workers
+Enables given farm
 
 
+> **NOTE:** Function can be called by whitelisted operators
 
 #### Parameters:
 
-- `workers`: array of workers' addresses to perform action on
+- `farms`: Address of farm to enable
 
-- `isEnabled`: new worker status relative for client end users
 
+### disableFarms
+
+```solidity
+  function disableFarms(address[] farms)
+```
+
+Disables given farm
+
+
+> **NOTE:** Function can be called by whitelisted operators
+
+#### Parameters:
+
+- `farms`: Address of farm to disable
+
+
+### isFarmEnabled
+
+```solidity
+  function isFarmEnabled(address farm) external returns(bool)
+```
+
+Returns whether given farm is enabled or disabled
+
+
+
+
+#### Return Values:
+
+- `bool`: true or false
 ### getName
 
 ```solidity
@@ -208,7 +280,7 @@ ___
 ### WhitelistOperators
 
 ```solidity
-  event WhitelistOperators(address caller, address[] operators, bool isOk)
+  event WhitelistOperators(address caller, address[] operators, bool isWhitelisted)
 ```
 Event is emmitted when new operators are whitelisted
 
@@ -219,28 +291,28 @@ Event is emmitted when new operators are whitelisted
 
 - `operators`: Array of operators to whitelist
 
-- `isOk`: Whether operators will be whitelisted or not
+- `isWhitelisted`: Whether operators will be whitelisted or not
 
-### WhitelistCallers
+### WhitelistUsers
 
 ```solidity
-  event WhitelistCallers(address caller, address[] callers, bool isOk)
+  event WhitelistUsers(address caller, address[] users, bool isWhitelisted)
 ```
-Event is emmitted when new callers are whitelisted
+Event is emmitted when new users are whitelisted
 
 
 #### Parameters:
 
 - `caller`: Address of msg.sender
 
-- `callers`: Array of callers to whitelist
+- `users`: Array of Users to whitelist
 
-- `isOk`: Whether callers will be whitelisted or not
+- `isWhitelisted`: Whether Users will be whitelisted or not
 
 ### Deposit
 
 ```solidity
-  event Deposit(address recipient, address worker, uint256 amount)
+  event Deposit(address recipient, address farm, uint256 amount)
 ```
 Event is emmitted when deposit function will be called
 
@@ -249,39 +321,55 @@ Event is emmitted when deposit function will be called
 
 - `recipient`: Address for which protocol should open new position, reward will be sent there later on
 
-- `worker`: Address of target worker
+- `farm`: Address of target farm
 
 - `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
 
-### SetWorkerFee
+### SetFarmsFee
 
 ```solidity
-  event SetWorkerFee(address caller, address worker, uint256 feeBps)
+  event SetFarmsFee(address caller, address[] farms, uint256 feeBps)
 ```
-Event is emmited when fee for given worker(pool) will be changed
+Event is emmited when fee for given farms will be changed
 
 
 #### Parameters:
 
 - `caller`: Address of msg.sender
 
-- `worker`: target worker(pool) address
+- `farms`: Array of farms' addresses
 
 - `feeBps`: new fee denominator (0 < feeBps < 10000)
 
-### ToggleWorkers
+### ToggleFarms
 
 ```solidity
-  event ToggleWorkers(address caller, address[] workers, bool isEnabled)
+  event ToggleFarms(address caller, address[] farms, bool isEnabled)
 ```
-Event is emmited when workers will be enabled or disabled
+Event is emmited when farms will be enabled or disabled
 
 
 #### Parameters:
 
 - `caller`: Address of msg.sender
 
-- `workers`: array of workers' addresses to perform action on
+- `farms`: array of farms' addresses to perform action on
 
 - `isEnabled`: new worker status relative for client end users
+
+### CollectFee
+
+```solidity
+  event CollectFee(address caller, address _to, uint256 amount)
+```
+Event is emmited when all collected fee will be withdrawn
+
+
+#### Parameters:
+
+- `caller`: Address of msg.sender
+
+- `_to`: Address of fee recipient
+
+- `amount`: Amount of collected fee
 
