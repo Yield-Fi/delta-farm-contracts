@@ -4,7 +4,7 @@ import { IWorker } from "./interfaces/IWorker.sol";
 import { IVault } from "./interfaces/IVault.sol";
 import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
 import { IFeeCollector } from "./interfaces/IFeeCollector.sol";
-//https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.4.0/contracts/token/ERC20/ERC20.sol
+
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
@@ -39,18 +39,6 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param farm Address of target farm
   /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
   event Deposit(address indexed recipient, address indexed farm, uint256 indexed amount);
-
-  /// @dev Event is emmitted when withdraw function will be called
-  /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly
-  /// @param farm Address of target farm
-  /// @param amount Amount of vault operating token (asset) user is willing to leave protocol with.
-  event Withdraw(address indexed recipient, address indexed farm, uint256 indexed amount);
-
-  /// @dev Event is emmitted when Claim/Harvest function will be called
-  /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly
-  /// @param farm Address of target farm
-  /// @param amount Amount of vault operating token (asset) user is goint to harvest from protocol .
-  event ClaimReward(address indexed recipient, address indexed farm, uint256 indexed amount);
 
   /// @dev Event is emmited when fee for given farms will be changed
   /// @param caller Address of msg.sender
@@ -185,7 +173,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     IWorker _worker = IWorker(farm);
 
     // Check for worker outage due to client-assigned pause
-    require(enabledFarms[farm], "ClientContract: Target farm hasn't been enabled by the client");
+    require(enabledFarms[farm], "ClientContract: Target pool hasn't been enabled by the client");
 
     // Cast vault for further method's usage
     IVault vault = IVault(_worker.operatingVault());
@@ -202,14 +190,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     // If worker makes usage of vault's operating token, we should covert only one asset to the second, proper one.
     /// @notice Strategy 0: Vault<BUSD> -> Worker<BUSD, USDT> (convert some portion of BUSD to USDT)
     /// @notice Strategy 1: Vault<BUSD> -> Worker<USDC, USDT> (do a split conversion)
-    address workerToken0 = _worker.token0();
-    address workerToken1 = _worker.token1();
 
     bytes memory payload = _worker.token0() == vaultToken || _worker.token1() == vaultToken
-      ? abi.encode(
-        _worker.getStrategies()[0],
-        abi.encode(vaultToken, vaultToken == workerToken0 ? workerToken1 : workerToken0, 0)
-      )
+      ? abi.encode(_worker.getStrategies()[0], abi.encode(_worker.token0(), _worker.token1(), 0))
       : abi.encode(
         _worker.getStrategies()[1],
         abi.encode(vaultToken, _worker.token0(), _worker.token1(), 0)
@@ -254,7 +237,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   }
 
   function withdraw(
-    uint256 positionId,
+    uint256 pid,
     address recipient,
     address farm
   ) external onlyWhitelistedUsers {
@@ -268,7 +251,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
     /// worker.getStrategies()[2] = Liquidate
     vault.work(
-      positionId,
+      pid,
       farm,
       0,
       recipient,
@@ -277,10 +260,38 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         abi.encode(_worker.baseToken(), _worker.token1(), _worker.token0(), 0)
       )
     );
-    //how many Tokens
-    uint256 howmuch = vault.positionInfo(positionId);
-    emit Withdraw(recipient, farm, howmuch);
   }
+
+  function withdrawPartial(
+    uint256 pid,
+    address recipient,
+    address farm,
+	uint256 howmuch
+  ) external onlyWhitelistedUsers {
+    // Cast worker for further methods' usage
+    IWorker _worker = IWorker(farm);
+
+    // Cast vault for further method's usage
+    IVault vault = IVault(_worker.operatingVault());
+
+
+
+(,uint256 howmuch_token0, uint256 howmuch_token1, ) = estimateDeposit(farm,howmuch);
+    // Enter the protocol using resolved worker strategy
+    /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
+    /// worker.getStrategies()[3] = PartialLiquidate
+    vault.work(
+      pid,
+      farm, // address of the worker pancake protocol in case of other protocol most liekly farm or liquid pood tangled script like worker called FARM
+      0, // deposit tokens
+      recipient,
+      abi.encode(
+        _worker.getStrategies()[3],
+        abi.encode(_worker.baseToken(), _worker.token1(), _worker.token0(), howmuch, howmuch_token0, howmuch_token1)
+      )
+    );
+  }
+
 
   /// @dev Set client-side fee for given farms
   /// @param farms Array of farms' addresses
@@ -343,7 +354,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Returns whether given farm is enabled or disabled
   /// @return bool true or false
   function isFarmEnabled(address farm) external view returns (bool) {
-    return enabledFarms[farm];
+    return IWorker(farm).isWorkerEnabled();
   }
 
   /// @dev Returns client's name
