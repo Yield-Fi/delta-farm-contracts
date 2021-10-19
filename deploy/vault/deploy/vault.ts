@@ -24,7 +24,7 @@ const deployFunc: DeployFunction = async () => {
     const VaultConfig = await upgrades.deployProxy(VaultConfigFactory, [
       config.tokens.WBNB,
       config.wrappedNativeTokenRelayer,
-      config.treasuryAccount,
+      config.adminContract,
     ]);
 
     await VaultConfig.deployed();

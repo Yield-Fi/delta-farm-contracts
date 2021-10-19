@@ -16,16 +16,16 @@ NOTE: After each steps you should update the config file in the `configs` folder
    npm run deploy:[network]:protocolManager
 ```
 
-2. Deploy Admin contract:
-
-```bash
-   npm run deploy:[network]:Admin
-```
-
-3. Deploy FeeCollector:
+2. Deploy FeeCollector:
 
 ```bash
    npm run deploy:[network]:feeCollector
+```
+
+3. Deploy Admin contract:
+
+```bash
+   npm run deploy:[network]:Admin
 ```
 
 4. Deploy WrappedNativeTokenRelayer

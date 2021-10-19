@@ -14,7 +14,6 @@ const tokens = {
 export const mainnetConfig = {
   wrappedNativeTokenRelayer: "",
   feeCollector: "",
-  treasuryAccount: "",
   protocolManager: "",
   protocolOperators: [""],
   adminContract: "",

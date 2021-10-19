@@ -12,7 +12,10 @@ const deployFunc: DeployFunction = async () => {
 
   const AdminFactory = await ethers.getContractFactory("Admin", deployer);
 
-  const Admin = (await upgrades.deployProxy(AdminFactory, [config.protocolManager])) as Admin;
+  const Admin = (await upgrades.deployProxy(AdminFactory, [
+    config.protocolManager,
+    config.feeCollector,
+  ])) as Admin;
 
   await Admin.deployed();
 

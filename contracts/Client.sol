@@ -185,7 +185,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     IWorker _worker = IWorker(farm);
 
     // Check for worker outage due to client-assigned pause
-    require(enabledFarms[farm], "ClientContract: Target pool hasn't been enabled by the client");
+    require(enabledFarms[farm], "ClientContract: Target farm hasn't been enabled by the client");
 
     // Cast vault for further method's usage
     IVault vault = IVault(_worker.operatingVault());
@@ -338,7 +338,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Returns whether given farm is enabled or disabled
   /// @return bool true or false
   function isFarmEnabled(address farm) external view returns (bool) {
-    return IWorker(farm).isWorkerEnabled();
+    return enabledFarms[farm];
   }
 
   /// @dev Returns client's name

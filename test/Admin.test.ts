@@ -40,7 +40,11 @@ describe("Admin contract", () => {
 
     await ProtocolManager.approveWorkers([MockWorker.address], true, { from: deployerAddress });
 
-    Admin = (await deployProxyContract("Admin", [ProtocolManager.address], deployer)) as Admin;
+    Admin = (await deployProxyContract(
+      "Admin",
+      [ProtocolManager.address, ethers.constants.AddressZero],
+      deployer
+    )) as Admin;
   }
 
   beforeEach(async () => {

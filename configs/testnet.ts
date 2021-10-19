@@ -14,12 +14,11 @@ const tokens = {
 };
 
 export const testnetConfig: ProjectConfigType = {
-  wrappedNativeTokenRelayer: "0xA33d82D24b82C20eA26aD5Dd9Efe2ca5088227Ae",
-  feeCollector: "0xB5Ed691eC9A2E490F2266c04EA1A0DF76E1EaC9D",
-  protocolManager: "0x90008ABd28FB9fB5BDE7B45C31B8dD4E2d0a05d9",
-  treasuryAccount: "0x07661882d1C4b7F703Ca0A8898afE4D402dFdeF2",
+  wrappedNativeTokenRelayer: "0xB6b260Cb62D87BEBf38871ed780B51203cB35d89",
+  feeCollector: "0x795511BEdb51B1d28549896a4b5e5699579F1aEA",
+  protocolManager: "0x42991Fad54cA10F0C0A57945991Bfba423F37249",
   protocolOperators: ["0x07661882d1C4b7F703Ca0A8898afE4D402dFdeF2"],
-  adminContract: "0x77729525453adde1B45E689E0C07bD2B89B4Fd93",
+  adminContract: "0x66194F8FFcA81c476554183F953089019936D9F0",
   baseToken: tokens.BUSD,
   feeThreshold: 500,
   defaultTreasuryFeeBps: 1000,
@@ -85,23 +84,23 @@ export const testnetConfig: ProjectConfigType = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "0x1992e6d1D71378642162F716C49D6f49F64d8D61",
-      AddToPoolWithoutBaseToken: "0xD574608F656a82C093C34165266cd208b2776958",
-      Liquidate: "0xB855da6B285631fdE22f0E032EB3C8D111270055",
+      AddToPoolWithBaseToken: "0x5C024fEf8CFf1C154A5de991387cDaF98F3c7222",
+      AddToPoolWithoutBaseToken: "0x613F72801f2Ef7BC328e22753Ab7Da1866F02067",
+      Liquidate: "0x097ED2FA662c5a58C81d767F15Bc16227DC55C8E",
     },
   },
   vaults: [
     {
       name: "BUSD Vault",
-      address: "0xba14d8A1912073647B38dCc6FDF9A1717c9d2011",
+      address: "0xE5d0B7d609c057ad1CE2F27D49Aad80144936CA7",
       tokenName: "deficental BUSD",
       tokenSymbol: "defiBUSD",
       baseToken: tokens.BUSD,
-      config: "0x29Fe39B17Eb4f6cfbefc13CA9CDfCFD97cCF51c2",
+      config: "0x62957B015e5389273c269afaf583b960Fb0Ef3FC",
       workers: [
         {
           name: "BUSD-USDT PancakeswapWorker",
-          address: "0x49BE0A4Cc6599efD8dE8045aDDd1e4Fea5fe306a",
+          address: "0x7084D729A4240F458167cE33e0329EA0d29c9D5a",
           positionId: "1",
           token0: tokens.BUSD,
           token1: tokens.USDT,
@@ -109,7 +108,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "BUSD-DAI PancakeswapWorker",
-          address: "0xB57275E202EA4395D6F129B2D285E031241c43bd",
+          address: "0xAA4AAd87114948Aa160F0179568d26b454EdcC2C",
           positionId: "2",
           token0: tokens.BUSD,
           token1: tokens.DAI,
@@ -117,7 +116,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "USDT-DAI PancakeswapWorker",
-          address: "0x5D7E91c313992e6fC3715A31602D67926330a4a1",
+          address: "0x55f4dd762D6f7557dd2e31728e748eED8AFcc188",
           positionId: "3",
           token0: tokens.USDT,
           token1: tokens.DAI,
@@ -125,7 +124,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "WBNB-BUSD PancakeswapWorker",
-          address: "0xf9aE649B797E25D38FBCdb47811cd3C7bf5872EE",
+          address: "0x5Ce349eDB15922D78A3eE315C2d45F49C4DbFfE1",
           positionId: "4",
           token0: tokens.WBNB,
           token1: tokens.BUSD,
@@ -133,7 +132,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "WBNB-USDT PancakeswapWorker",
-          address: "0x4556885dBCBD5397CB4FAB9602685F58da3A06d7",
+          address: "0xcd27Bc932f87C76ff6249d1d96810bfa4608eF18",
           positionId: "5",
           token0: tokens.WBNB,
           token1: tokens.USDT,
@@ -141,7 +140,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "WBNB-CAKE PancakeswapWorker",
-          address: "0x5C874ff89F367a6cc3Ef857D42f3e1eCCEA9A77B",
+          address: "0x7145865A1F6DfcA9764718B36bf114d3aA6460e3",
           positionId: "6",
           token0: tokens.WBNB,
           token1: tokens.CAKE,
@@ -149,7 +148,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "BUSD-CAKE PancakeswapWorker",
-          address: "0xDcEfC7cEf2dD57be912A1406c38f45630e1A9788",
+          address: "0xc17ff9ff1f0CD69CBe42593A4fA314b56B5809B6",
           positionId: "7",
           token0: tokens.BUSD,
           token1: tokens.CAKE,
@@ -157,7 +156,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "CAKE-USDC PancakeswapWorker",
-          address: "0x7395bD72A43950bEaD0c5458B2C06Db9697c05D3",
+          address: "0xf07a50fB889b968AB85A1EB022B830819E416D24",
           positionId: "8",
           token0: tokens.USDC,
           token1: tokens.CAKE,
@@ -165,7 +164,7 @@ export const testnetConfig: ProjectConfigType = {
         },
         {
           name: "CAKE-USDT PancakeswapWorker",
-          address: "0xc4aD8CF7a5fcb75DeD1A33408B1b5645435b7290",
+          address: "0xF2B51A4959e95c7fA59D1939640A10B53eeBedFB",
           positionId: "9",
           token0: tokens.USDT,
           token1: tokens.CAKE,
@@ -176,7 +175,7 @@ export const testnetConfig: ProjectConfigType = {
   ],
   clients: [
     {
-      address: "0x78137120E255c5B69f8E1F87B7c91e8feA1Eb8Ed",
+      address: "0xd522802222EE597C6550E87472247A86769DABa9",
       kind: "CEX",
       name: "Client A",
       operators: [

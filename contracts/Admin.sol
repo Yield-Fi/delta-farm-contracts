@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
 import "./interfaces/IProtocolManager.sol";
 import "./interfaces/IWorker.sol";
+import "./interfaces/IFeeCollector.sol";
 import "./utils/SafeToken.sol";
 
 /// @dev Smart contract to interact from central admin panel
@@ -25,17 +26,25 @@ contract Admin is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe 
   /// @param isEnabled New farm status
   event ToggleFarms(address indexed caller, address[] farms, bool isEnabled);
 
-  IProtocolManager protocolManager;
+  /// @dev Event is emmited when all collected fee will be withdrawn
+  /// @param caller Address of msg.sender
+  /// @param _to Address of fee recipient
+  /// @param amount Amount of collected fee
+  event CollectFee(address indexed caller, address indexed _to, uint256 amount);
+
+  IProtocolManager private protocolManager;
+  IFeeCollector private feeCollector;
 
   modifier onlyOperator() {
     require(protocolManager.whitelistedOperators(msg.sender));
     _;
   }
 
-  function initialize(address _protocolManager) external initializer {
+  function initialize(address _protocolManager, address _feeCollector) external initializer {
     __Ownable_init();
 
     protocolManager = IProtocolManager(_protocolManager);
+    feeCollector = IFeeCollector(_feeCollector);
   }
 
   /// @dev Function to set fee for giver farm
@@ -82,5 +91,22 @@ contract Admin is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe 
   /// @return bool true or false
   function isFarmEnabled(address farm) external view returns (bool) {
     return IWorker(farm).isWorkerEnabled();
+  }
+
+  /// @dev Withdraw all collected fee
+  /// @param _to Address of fee recipient
+  /// @notice Function can be called only by whitelisted protocol's operators
+  function collectFee(address _to) external onlyOperator {
+    feeCollector.collect();
+    address feeToken = feeCollector.getFeeToken();
+    uint256 feeTokenBalance = feeToken.myBalance();
+    feeToken.safeTransfer(_to, feeTokenBalance);
+    emit CollectFee(msg.sender, _to, feeTokenBalance);
+  }
+
+  /// @dev Returns amount of fee to collect
+  /// @return uint256 Amount of fee to collect
+  function feeToCollect() external view returns (uint256) {
+    return feeCollector.feeToCollect();
   }
 }
