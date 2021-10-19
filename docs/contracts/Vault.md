@@ -195,6 +195,46 @@ Rewards ACL
 - `isApproved`: true | false
   f
 
+### getAllPositions
+
+```solidity
+  function getAllPositions(uint256 fromPid) external returns(uint256[], address[], address[], address[])
+```
+
+Get all listed positions in the Vault
+
+
+> **NOTE:** Return Type: [pids], [workers], [owners], [clients];
+Return composition: pos<Position>{pid: pids[i], worker: workers[i] owner: owners[i], client: clients[i]}
+Due to solidity flavours:
+slot [0] will be occupied using zeroed values (address(0) for addresses and uint256(0) for numbers)
+  f
+
+
+#### Return Values:
+
+- `set`: of marked arrays
+
+### getAllRewards
+
+```solidity
+  function getAllRewards(uint256 fromPid) external returns(uint256[], uint256[], uint256[])
+```
+
+Get all listed rewards in the Vault
+
+
+> **NOTE:** Return Type: [pids], [rewards]
+Return composition: rew<Reward>{pid: pids[i], reward: rewards[i], totalReward: totalRewards[i]}
+Due to solidity flavours:
+slot [0] will be occupied using zeroed values (uint256(0) for numbers)
+  f
+
+
+#### Return Values:
+
+- `set`: of marked arrays
+
 ### receive
 
 ```solidity

@@ -29,6 +29,8 @@ interface IVault {
   /// @dev Rewards ACL
   function approveRewardAssigners(address[] calldata rewardAssigners, bool isApproved) external;
 
+  function positionInfo(uint256 id) external view returns (uint256);
+
   /// @dev Protocol entry point
   function work(
     uint256 id,

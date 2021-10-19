@@ -141,7 +141,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
 
   /// @dev Return Token value of the given position.
   /// @param id The position ID to query.
-  function positionInfo(uint256 id) external view returns (uint256) {
+  function positionInfo(uint256 id) external view override returns (uint256) {
     Position storage pos = positions[id];
     // TODO: Uwzględnić również zarobione rewardsy - fee
     return (IWorker(pos.worker).tokensToReceive(id));

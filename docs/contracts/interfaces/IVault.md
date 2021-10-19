@@ -81,6 +81,26 @@ Protocol entry point
 
 
 
+### getAllPositions
+
+```solidity
+  function getAllPositions(uint256 fromPid) external returns(uint256[], address[], address[], address[])
+```
+
+Data gathering
+
+
+
+### getAllRewards
+
+```solidity
+  function getAllRewards(uint256 fromPid) external returns(uint256[], uint256[], uint256[])
+```
+
+Data gathering
+
+
+
 
 ___
 

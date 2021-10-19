@@ -325,6 +325,38 @@ Event is emmitted when deposit function will be called
 
 - `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
 
+### Withdraw
+
+```solidity
+  event Withdraw(address recipient, address farm, uint256 amount)
+```
+Event is emmitted when withdraw function will be called
+
+
+#### Parameters:
+
+- `recipient`: Address for which protocol should reduce old position, rewards are sent separatelly
+
+- `farm`: Address of target farm
+
+- `amount`: Amount of vault operating token (asset) user is willing to leave protocol with.
+
+### ClaimReward
+
+```solidity
+  event ClaimReward(address recipient, address farm, uint256 amount)
+```
+Event is emmitted when Claim/Harvest function will be called
+
+
+#### Parameters:
+
+- `recipient`: Address for which protocol should reduce old position, rewards are sent separatelly
+
+- `farm`: Address of target farm
+
+- `amount`: Amount of vault operating token (asset) user is goint to harvest from protocol .
+
 ### SetFarmsFee
 
 ```solidity
