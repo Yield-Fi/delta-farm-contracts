@@ -159,22 +159,6 @@ Set the harvest configuration.
 
 - `_harvestPath`: - The harvest path to update.
 
-### setHarvestersOk
-
-```solidity
-  function setHarvestersOk(address[] harvesters, bool isApprove)
-```
-
-Set the given address's to be harvestor.
-
-
-
-#### Parameters:
-
-- `harvesters`: - The harvest bot addresses.
-
-- `isApprove`: - Whether to approve or unapprove the given harvesters.
-
 ### setTreasuryFee
 
 ```solidity

@@ -57,16 +57,6 @@ Get addresses of the supported strategies
 
 
 
-### setHarvestersOk
-
-```solidity
-  function setHarvestersOk(address[] harvesters, bool isOk)
-```
-
-Set address that can be harvest
-
-
-
 ### lpToken
 
 ```solidity

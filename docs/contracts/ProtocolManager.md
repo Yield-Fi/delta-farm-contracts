@@ -337,6 +337,22 @@ Event is emitted when new admin contract will be approved
 
 - `admin`: Address of approved admin contact
 
+### ApproveHarvesters
+
+```solidity
+  event ApproveHarvesters(address caller, address[] harvesters, bool isApproved)
+```
+Event is emitted when harvester bots' approval will be updated
+
+
+#### Parameters:
+
+- `caller`: Address which update approved bounty collectors
+
+- `harvesters`: Array of harvester bots' addresses
+
+- `isApproved`: Whether given harvester bots are approved or not
+
 ### SetNativeRelayer
 
 ```solidity

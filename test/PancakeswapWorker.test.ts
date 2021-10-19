@@ -93,6 +93,7 @@ describe("PancakeswapWorker", () => {
     )) as ProtocolManager;
 
     await ProtocolManager.approveAdminContract(adminAddress);
+    await ProtocolManager.approveHarvesters([deployerAddress], true);
 
     [BaseToken, Token0, Token1] = await deployTokens(
       [
@@ -291,7 +292,6 @@ describe("PancakeswapWorker", () => {
         deployer
       );
 
-      await worker__deployer.setHarvestersOk([deployerAddress], true);
       await worker__deployer.setStrategies([
         AddToPoolWithBaseToken.address,
         AddToPoolWithoutBaseToken.address,
@@ -339,6 +339,8 @@ describe("PancakeswapWorker", () => {
 
       // Harvest rewards and send them to the operating vault in Base token
       await worker__deployer.harvestRewards(); /// + 1 BLOCK
+
+      expect(await MockVault.rewards(1)).to.be.eq(parseEther("9.755679966928919588").toString());
 
       /*
       There are two positions in pancakeMasterChef with the same alloc points, so 0.5 CAKE per block is generated for the given position.
@@ -400,7 +402,6 @@ describe("PancakeswapWorker", () => {
         deployer
       );
 
-      await worker__deployer.setHarvestersOk([deployerAddress], true);
       await worker__deployer.setStrategies([
         AddToPoolWithBaseToken.address,
         AddToPoolWithoutBaseToken.address,

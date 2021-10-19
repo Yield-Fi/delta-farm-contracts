@@ -52,4 +52,8 @@ interface IProtocolManager {
   function approveAdminContract(address _adminContract) external;
 
   function isAdminContract(address account) external view returns (bool);
+
+  function approvedHarvesters(address _harvester) external returns (bool);
+
+  function approveHarvesters(address[] calldata harvesters, bool isApprove) external;
 }

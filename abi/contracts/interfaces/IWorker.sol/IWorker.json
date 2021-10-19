@@ -120,24 +120,6 @@
     "inputs": [
       {
         "internalType": "address[]",
-        "name": "harvesters",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "isOk",
-        "type": "bool"
-      }
-    ],
-    "name": "setHarvestersOk",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address[]",
         "name": "supportedStrategies",
         "type": "address[]"
       }

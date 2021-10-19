@@ -198,7 +198,10 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
 
   //// @dev Require that the caller must be ok harvester.
   modifier onlyHarvester() {
-    require(okHarvesters[msg.sender], "PancakeswapWorker->onlyHarvester: not harvester");
+    require(
+      protocolManager.approvedHarvesters(msg.sender),
+      "PancakeswapWorker->onlyHarvester: not harvester"
+    );
     _;
   }
 
@@ -456,22 +459,6 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     harvestPath = _harvestPath;
 
     emit SetHarvestConfig(msg.sender, _harvestThreshold, _harvestPath);
-  }
-
-  /// @dev Set the given address's to be harvestor.
-  /// @param harvesters - The harvest bot addresses.
-  /// @param isApprove - Whether to approve or unapprove the given harvesters.
-  function setHarvestersOk(address[] calldata harvesters, bool isApprove)
-    external
-    override
-    onlyOwner
-  {
-    uint256 len = harvesters.length;
-    for (uint256 idx = 0; idx < len; idx++) {
-      okHarvesters[harvesters[idx]] = isApprove;
-
-      emit SetHarvesterApproval(msg.sender, harvesters[idx], isApprove);
-    }
   }
 
   /// @dev Set treasury fee.

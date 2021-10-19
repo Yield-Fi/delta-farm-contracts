@@ -329,7 +329,6 @@ describe("Client contract", async () => {
 
       // Alice (DEX user) must approve client contract, so client contract can transfer asset to the Vault
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
-      console.log("DEPOSIT", DEPOSIT_AMOUNT.toString());
       // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
       await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 
@@ -456,7 +455,7 @@ describe("Client contract", async () => {
         true
       );
       await protocolManager.approveAdminContract(deployerAddress); // Workaround
-      await pancakeswapWorker01.setHarvestersOk([deployerAddress], true);
+      await protocolManager.approveHarvesters([deployerAddress], true);
       await vault.approveRewardAssigners([pancakeswapWorker01.address], true);
       await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
       await exampleClient.setFarmsFee([pancakeswapWorker01.address], 500); // 10% for the client

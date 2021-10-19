@@ -2,6 +2,7 @@ pragma solidity 0.6.6;
 
 contract MockVault {
   address public token;
+  mapping(uint256 => uint256) public rewards;
 
   constructor(address _token) public {
     token = _token;
@@ -39,11 +40,9 @@ contract MockVault {
     return abi.decode(_returnData, (string)); // All that remains is the revert string
   }
 
-  function registerRewards(uint256[] calldata pids, uint256[] calldata amounts)
-    external
-    pure
-    returns (uint256[] memory, uint256[] memory)
-  {
-    return (pids, amounts);
+  function registerRewards(uint256[] calldata pids, uint256[] calldata amounts) external {
+    for (uint256 i = 0; i < pids.length; i++) {
+      rewards[pids[i]] = amounts[i];
+    }
   }
 }

@@ -20,9 +20,6 @@ interface IWorker {
   /// @dev Get addresses of the supported strategies
   function getStrategies() external view returns (address[] memory);
 
-  /// @dev Set address that can be harvest
-  function setHarvestersOk(address[] calldata harvesters, bool isOk) external;
-
   /// @dev LP token holds by worker
   function lpToken() external view returns (IPancakePair);
 

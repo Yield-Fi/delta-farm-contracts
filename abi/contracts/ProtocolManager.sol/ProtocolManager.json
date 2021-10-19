@@ -80,6 +80,31 @@
       {
         "indexed": false,
         "internalType": "address[]",
+        "name": "harvesters",
+        "type": "address[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "isApproved",
+        "type": "bool"
+      }
+    ],
+    "name": "ApproveHarvesters",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "caller",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
         "name": "strategies",
         "type": "address[]"
       },
@@ -329,6 +354,24 @@
     "inputs": [
       {
         "internalType": "address[]",
+        "name": "harvesters",
+        "type": "address[]"
+      },
+      {
+        "internalType": "bool",
+        "name": "isApprove",
+        "type": "bool"
+      }
+    ],
+    "name": "approveHarvesters",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
         "name": "strategies",
         "type": "address[]"
       },
@@ -425,6 +468,25 @@
       }
     ],
     "name": "approvedClients",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "approvedHarvesters",
     "outputs": [
       {
         "internalType": "bool",

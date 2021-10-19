@@ -67,6 +67,12 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
   /// @param admin Address of approved admin contact
   event ApproveAdminContract(address indexed caller, address indexed admin);
 
+  /// @dev Event is emitted when harvester bots' approval will be updated
+  /// @param caller Address which update approved bounty collectors
+  /// @param harvesters Array of harvester bots' addresses
+  /// @param isApproved Whether given harvester bots are approved or not
+  event ApproveHarvesters(address indexed caller, address[] harvesters, bool isApproved);
+
   event SetNativeRelayer(
     address indexed caller,
     address indexed oldAddress,
@@ -117,6 +123,8 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
   /// @dev Approved admin contract's address
   address private adminContract;
+
+  mapping(address => bool) public override approvedHarvesters;
 
   /// @dev initialize the owner and operators of Protocol
   function initialize(address[] calldata initialOperators) external initializer {
@@ -319,5 +327,13 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
   function isAdminContract(address account) external view override returns (bool) {
     return adminContract == account;
+  }
+
+  function approveHarvesters(address[] calldata harvesters, bool isApprove) external override {
+    for (uint256 i = 0; i < harvesters.length; i++) {
+      approvedHarvesters[harvesters[i]] = isApprove;
+    }
+
+    emit ApproveHarvesters(msg.sender, harvesters, isApprove);
   }
 }

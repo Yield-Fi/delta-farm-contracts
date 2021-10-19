@@ -36,7 +36,7 @@ contract Admin is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe 
   IFeeCollector private feeCollector;
 
   modifier onlyOperator() {
-    require(protocolManager.whitelistedOperators(msg.sender));
+    require(protocolManager.whitelistedOperators(msg.sender), "Admin: Only protocol operator");
     _;
   }
 
