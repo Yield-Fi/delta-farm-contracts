@@ -360,7 +360,7 @@ describe("Client contract", async () => {
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
       await expect(
         exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT)
-      ).to.be.revertedWith("ClientContract: Target pool hasn't been enabled by the client");
+      ).to.be.revertedWith("ClientContract: Target farm hasn't been enabled by the client");
     });
   });
 
