@@ -398,8 +398,8 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   /// expect [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, Liquidate]
   function setStrategies(address[] calldata supportedStrategies) external override onlyOwner {
     require(
-      supportedStrategies.length == 3,
-      "PancakeswapWorker->setStrategies: Array of strategies must have 3 items"
+      supportedStrategies.length == 4,
+      "PancakeswapWorker->setStrategies: Array of strategies must have 4 items"
     );
     strategies = supportedStrategies;
     for (uint256 i; i < strategies.length; i++) {
