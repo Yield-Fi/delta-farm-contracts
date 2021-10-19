@@ -4,11 +4,11 @@ import { IWorker } from "./interfaces/IWorker.sol";
 import { IVault } from "./interfaces/IVault.sol";
 import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
 import { IFeeCollector } from "./interfaces/IFeeCollector.sol";
-
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
+//https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.4.0/contracts/token/ERC20/ERC20.sol
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/math/SafeMath.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/security/ReentrancyGuard.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/utils/Initializable.sol";
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakeFactory.sol";
 import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
@@ -39,7 +39,20 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param farm Address of target farm
   /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
   event Deposit(address indexed recipient, address indexed farm, uint256 indexed amount);
-
+  
+  /// @dev Event is emmitted when withdraw function will be called
+  /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly 
+  /// @param farm Address of target farm
+  /// @param amount Amount of vault operating token (asset) user is willing to leave protocol with.
+  event Withdraw(address indexed recipient, address indexed farm, uint256 indexed positionId);
+  
+    /// @dev Event is emmitted when Claim/Harvest function will be called
+  /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly 
+  /// @param farm Address of target farm
+  /// @param amount Amount of vault operating token (asset) user is goint to harvest from protocol .
+  event ClaimReward(address indexed recipient, address indexed farm, uint256 indexed positionId);
+  
+  
   /// @dev Event is emmited when fee for given farms will be changed
   /// @param caller Address of msg.sender
   /// @param farms Array of farms' addresses
@@ -237,7 +250,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   }
 
   function withdraw(
-    uint256 pid,
+    uint256 positionId,
     address recipient,
     address farm
   ) external onlyWhitelistedUsers {
@@ -251,7 +264,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
     /// worker.getStrategies()[2] = Liquidate
     vault.work(
-      pid,
+      positionId,
       farm,
       0,
       recipient,
@@ -260,6 +273,10 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         abi.encode(_worker.baseToken(), _worker.token1(), _worker.token0(), 0)
       )
     );
+    //how many Tokens
+    uint256 howmuch = vault.positionInfo(positionId);
+      emit Withdraw(recipient, farm, howmuch ,positionId);
+  
   }
 
   /// @dev Set client-side fee for given farms
