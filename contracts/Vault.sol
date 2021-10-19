@@ -174,12 +174,12 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   }
 
   /// @dev Create a new farming position to unlock your yield farming potential.
-  /// @param id The ID of the position to unlock the earning. Use ZERO for new position.
+  /// @param positionId The ID of the position to unlock the earning. Use ZERO for new position.
   /// @param worker The address of the authorized worker to work for this position.
   /// @param amount The anout of Token to supply by user.
   /// @param data The calldata to pass along to the worker for more working context.
   function work(
-    uint256 id,
+    uint256 positionId,
     address worker,
     uint256 amount,
     address recipient,
@@ -187,29 +187,29 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   ) external payable override onlyClientContract transferTokenToVault(amount) nonReentrant {
     // 1. Sanity check the input position, or add a new position of ID is 0.
     Position storage pos;
-    if (id == 0) {
-      id = nextPositionID++;
-      pos = positions[id];
+    if (positionId == 0) {
+      positionId = nextPositionID++;
+      pos = positions[positionId];
       pos.worker = worker;
       pos.owner = recipient;
       pos.client = msg.sender;
     } else {
-      pos = positions[id];
-      require(id < nextPositionID, "bad position id");
+      pos = positions[positionId];
+      require(positionId < nextPositionID, "bad position id");
       require(pos.worker == worker, "bad position worker");
       require(pos.owner == recipient, "not position owner");
       require(pos.client == msg.sender, "bad source-client address");
     }
     // Update execution scope variables
-    POSITION_ID = id;
+    POSITION_ID = positionId;
     (STRATEGY, ) = abi.decode(data, (address, bytes));
 
-    emit Work(id, worker, amount, STRATEGY);
+    emit Work(positionId, worker, amount, STRATEGY);
 
     require(amount <= SafeToken.myBalance(token), "insufficient funds in the vault");
 
     SafeToken.safeTransfer(token, worker, amount);
-    IWorker(worker).work(id, data);
+    IWorker(worker).work(positionId, data);
     // 5. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;
