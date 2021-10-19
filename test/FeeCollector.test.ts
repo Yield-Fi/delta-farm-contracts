@@ -79,6 +79,7 @@ describe("FeeCollector", async () => {
     await ProtocolManager.approveClients([bitterexAddress], true);
     await ProtocolManager.approveVaults([MockVault.address], true);
     await ProtocolManager.whitelistOperators([deployerAddress], true);
+    await ProtocolManager.approveAdminContract(yieldFiAddress);
 
     const FeeCollector = (await ethers.getContractFactory(
       "FeeCollector",

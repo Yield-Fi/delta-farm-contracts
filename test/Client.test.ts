@@ -329,7 +329,7 @@ describe("Client contract", async () => {
 
       // Alice (DEX user) must approve client contract, so client contract can transfer asset to the Vault
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
-
+      console.log("DEPOSIT", DEPOSIT_AMOUNT.toString());
       // Using previously minted tokens, enter the protocol via path: Client.deposit -> Vault.work -> Worker.work -> Strategy.execute()
       await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 

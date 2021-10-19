@@ -43,8 +43,7 @@ contract FeeCollector is
 
   modifier onlyCollector() {
     require(
-      protocolManager.approvedClients(msg.sender) ||
-        protocolManager.whitelistedOperators(msg.sender),
+      protocolManager.approvedClients(msg.sender) || protocolManager.isAdminContract(msg.sender),
       "FeeCollector: not approved collector"
     );
     _;

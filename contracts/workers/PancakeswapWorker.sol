@@ -292,6 +292,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
       lpToken.transfer(strategy, lpToken.balanceOf(address(this))),
       "PancakeswapWorker->work: unable to transfer lp to strategy"
     );
+
     baseToken.safeTransfer(strategy, baseToken.myBalance());
     IStrategy(strategy).execute(stratParams);
     // 3. Add LP tokens back to the farming pool.
