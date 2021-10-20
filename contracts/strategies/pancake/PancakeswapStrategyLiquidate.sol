@@ -70,8 +70,11 @@ contract PancakeswapStrategyLiquidate is
       _convertTokenToBaseToken(token1, baseToken);
     }
 
-    // 5. Return all baseToken back to the original caller.
+    // 5. Return all tokens back to the original caller.
     uint256 balance = baseToken.myBalance();
+    if (lpToken.balanceOf(address(this)) > 0) {
+      lpToken.transfer(msg.sender, lpToken.balanceOf(address(this)));
+    }
     SafeToken.safeTransfer(baseToken, msg.sender, balance);
     // 6. Reset approve for safety reason
     require(
