@@ -50,7 +50,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly
   /// @param farm Address of target farm
   /// @param amount Amount of vault operating token (asset) user is goint to harvest from protocol .
-  event ClaimReward(address indexed recipient, address indexed farm, uint256 indexed amount);
+  event CollectReward(address indexed recipient, address indexed farm, uint256 indexed amount);
 
   /// @dev Event is emmited when fee for given farms will be changed
   /// @param caller Address of msg.sender
@@ -240,7 +240,10 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
     require(positionId != 0, "ClientContract: Position for given farm and recipient not found");
 
+    uint256 amount = IVault(vaultAddress).rewards(positionId);
     IVault(vaultAddress).collectReward(positionId, recipient);
+
+    emit CollectReward(recipient, farm, amount);
   }
 
   /// @dev Returns amount of rewards to collect

@@ -121,7 +121,7 @@ Collect accumulated rewards
 ### rewardToCollect
 
 ```solidity
-  function rewardToCollect(address farm, address recipient, address rewardTokenOrVaultAddress) external returns(uint256)
+  function rewardToCollect(address farm, address recipient) external returns(uint256)
 ```
 
 Returns amount of rewards to collect
@@ -133,8 +133,6 @@ Returns amount of rewards to collect
 - `farm`: Address of farm
 
 - `recipient`: Address of recipient which has been passed when the deposit was made
-
-- `rewardTokenOrVaultAddress`: Information about asset in which amount of reward will be returned
 
 
 #### Return Values:
@@ -361,10 +359,10 @@ Event is emmitted when withdraw function will be called
 
 - `amount`: Amount of vault operating token (asset) user is willing to leave protocol with.
 
-### ClaimReward
+### CollectReward
 
 ```solidity
-  event ClaimReward(address recipient, address farm, uint256 amount)
+  event CollectReward(address recipient, address farm, uint256 amount)
 ```
 Event is emmitted when Claim/Harvest function will be called
 

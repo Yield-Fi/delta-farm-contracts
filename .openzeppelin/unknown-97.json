@@ -2889,6 +2889,133 @@
           }
         }
       }
+    },
+    "eee6e4788b641fb954e2b8d4c79f26c9fe88bd6af2cebeb54618d3d0909a6ab3": {
+      "address": "0x1855B5F6Ee5a463D7f267785118D99F4451956C7",
+      "txHash": "0x3d9da0232aadc14952f05c299cef181b364d054459e09c7366195c0fd07ecdb7",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\GSN\\Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "Client",
+            "label": "enabledFarms",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Client.sol:74"
+          },
+          {
+            "contract": "Client",
+            "label": "_KIND_",
+            "type": "t_string_storage",
+            "src": "contracts\\Client.sol:77"
+          },
+          {
+            "contract": "Client",
+            "label": "_CLIENT_NAME_",
+            "type": "t_string_storage",
+            "src": "contracts\\Client.sol:78"
+          },
+          {
+            "contract": "Client",
+            "label": "protocolManager",
+            "type": "t_contract(IProtocolManager)5651",
+            "src": "contracts\\Client.sol:81"
+          },
+          {
+            "contract": "Client",
+            "label": "feeCollector",
+            "type": "t_contract(IFeeCollector)5476",
+            "src": "contracts\\Client.sol:83"
+          },
+          {
+            "contract": "Client",
+            "label": "whitelistedUsers",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Client.sol:86"
+          },
+          {
+            "contract": "Client",
+            "label": "whitelistedOperators",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Client.sol:87"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_contract(IProtocolManager)5651": {
+            "label": "contract IProtocolManager"
+          },
+          "t_contract(IFeeCollector)5476": {
+            "label": "contract IFeeCollector"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
     }
   }
 }

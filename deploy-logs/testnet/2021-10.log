@@ -116,12 +116,6 @@
 2021-10-20 13:31:15 ||| -> BUSD Vault
 2021-10-20 13:31:46 |||   - New implementation of Vault Config deployed at 0x62957B015e5389273c269afaf583b960Fb0Ef3FC
 2021-10-20 13:32:26 |||   - New implementation of Vault deployed at 0xE5d0B7d609c057ad1CE2F27D49Aad80144936CA7
-2021-10-20 13:32:47 ||| --> Upgrading implementation of client contracts... <--
-2021-10-20 13:32:47 |||   -> Upgrading contract of Client A...
-2021-10-20 13:33:33 |||   New implementation of contract of Client A deployed at 0xd522802222EE597C6550E87472247A86769DABa9
-2021-10-20 13:52:18 ||| --> Upgrading implementation of client contracts... <--
-2021-10-20 13:52:18 |||   -> Upgrading contract of Client A...
-2021-10-20 13:53:02 |||   New implementation of contract of Client A deployed at 0xd522802222EE597C6550E87472247A86769DABa9
-2021-10-20 14:06:27 ||| --> Upgrading implementation of client contracts... <--
-2021-10-20 14:06:27 |||   -> Upgrading contract of Client A...
-2021-10-20 14:07:12 |||   New implementation of contract of Client A deployed at 0xd522802222EE597C6550E87472247A86769DABa9
+2021-10-20 14:16:21 ||| --> Upgrading implementation of client contracts... <--
+2021-10-20 14:16:21 |||   -> Upgrading contract of Client A...
+2021-10-20 14:17:05 |||   New implementation of contract of Client A deployed at 0xd522802222EE597C6550E87472247A86769DABa9
