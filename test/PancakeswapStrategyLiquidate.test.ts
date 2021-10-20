@@ -50,6 +50,7 @@ describe("Pancakeswap - StrategyLiquidate", () => {
   let baseTokenAsBob: MockToken;
 
   let lpAsBob: PancakePair;
+  let lpAsAlice: PancakePair;
 
   let farmingTokenAsAlice: MockToken;
   let farmingTokenAsBob: MockToken;
@@ -86,12 +87,12 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     )) as MockToken__factory;
     baseToken = (await upgrades.deployProxy(MockToken, ["BTOKEN", "BTOKEN"])) as MockToken;
     await baseToken.deployed();
-    await baseToken.mint(await alice.getAddress(), ethers.utils.parseEther("100"));
-    await baseToken.mint(await bob.getAddress(), ethers.utils.parseEther("100"));
+    await baseToken.mint(await alice.getAddress(), ethers.utils.parseEther("10000"));
+    await baseToken.mint(await bob.getAddress(), ethers.utils.parseEther("10000"));
     farmingToken = (await upgrades.deployProxy(MockToken, ["FTOKEN", "FTOKEN"])) as MockToken;
     await farmingToken.deployed();
-    await farmingToken.mint(await alice.getAddress(), ethers.utils.parseEther("10"));
-    await farmingToken.mint(await bob.getAddress(), ethers.utils.parseEther("10"));
+    await farmingToken.mint(await alice.getAddress(), ethers.utils.parseEther("10000"));
+    await farmingToken.mint(await bob.getAddress(), ethers.utils.parseEther("10000"));
 
     await factoryV2.createPair(baseToken.address, farmingToken.address);
 
@@ -120,6 +121,7 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     routerAsBob = PancakeRouterV2__factory.connect(routerV2.address, bob);
 
     lpAsBob = PancakePair__factory.connect(lp.address, bob);
+    lpAsAlice = PancakePair__factory.connect(lp.address, alice);
   }
 
   beforeEach(async () => {
@@ -127,28 +129,28 @@ describe("Pancakeswap - StrategyLiquidate", () => {
   });
 
   it("should convert all LP tokens back to baseToken", async () => {
-    // Alice adds 0.1 FTOKEN + 1 BTOKEN
-    await baseTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("1"));
-    await farmingTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("0.1"));
+    // Alice adds 100 FTOKEN + 1000 BTOKEN
+    await baseTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("1000"));
+    await farmingTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("100"));
     await routerAsAlice.addLiquidity(
       baseToken.address,
       farmingToken.address,
-      ethers.utils.parseEther("1"),
-      ethers.utils.parseEther("0.1"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("100"),
       "0",
       "0",
       await alice.getAddress(),
       FOREVER
     );
 
-    // Bob tries to add 1 FTOKEN + 1 BTOKEN (but obviously can only add 0.1 FTOKEN)
-    await baseTokenAsBob.approve(routerV2.address, ethers.utils.parseEther("1"));
-    await farmingTokenAsBob.approve(routerV2.address, ethers.utils.parseEther("1"));
+    // Bob tries to add 1000 FTOKEN + 1000 BTOKEN (but obviously can only add 100 FTOKEN)
+    await baseTokenAsBob.approve(routerV2.address, ethers.utils.parseEther("1000"));
+    await farmingTokenAsBob.approve(routerV2.address, ethers.utils.parseEther("1000"));
     await routerAsBob.addLiquidity(
       baseToken.address,
       farmingToken.address,
-      ethers.utils.parseEther("1"),
-      ethers.utils.parseEther("1"),
+      ethers.utils.parseEther("1000"),
+      ethers.utils.parseEther("1000"),
       "0",
       "0",
       await bob.getAddress(),
@@ -156,31 +158,36 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     );
 
     expect((await baseToken.balanceOf(await bob.getAddress())).toString()).to.eq(
-      parseEther("99").toString()
+      parseEther("9000").toString()
     );
     expect((await farmingToken.balanceOf(await bob.getAddress())).toString()).to.eq(
-      parseEther("9.9").toString()
+      parseEther("9900").toString()
     );
     expect((await lp.balanceOf(await bob.getAddress())).toString()).to.eq(
-      parseEther("0.316227766016837933").toString()
+      parseEther("316.227766016837933199").toString()
     );
 
-    // Bob uses liquidate strategy to turn all LPs back to BTOKEN but with an unreasonable expectation
-    await lpAsBob.transfer(strat.address, ethers.utils.parseEther("0.316227766016837933"));
+    // Bob uses liquidate strategy to withdraw more BTOKEN than he can
+    await lpAsBob.transfer(strat.address, ethers.utils.parseEther("316.227766016837933199"));
     await expect(
       strat.execute(
         ethers.utils.defaultAbiCoder.encode(
           ["address", "address", "address", "uint256"],
-          [baseToken.address, baseToken.address, farmingToken.address, ethers.utils.parseEther("2")]
+          [
+            baseToken.address,
+            baseToken.address,
+            farmingToken.address,
+            ethers.utils.parseEther("20000"),
+          ]
         )
       )
-    ).to.be.revertedWith("PancakeswapStrategyLiquidate->execute: insufficient baseToken received");
+    ).to.be.revertedWith("PancakeswapStrategyLiquidate: Insufficient base token amount");
 
-    // Bob uses liquidate strategy to turn all LPs back to BTOKEN with a same minimum value
+    // Bob uses liquidate strategy to turn all LPs back to BTOKEN
     await strat.execute(
       ethers.utils.defaultAbiCoder.encode(
         ["address", "address", "address", "uint256"],
-        [baseToken.address, baseToken.address, farmingToken.address, ethers.utils.parseEther("1")]
+        [baseToken.address, baseToken.address, farmingToken.address, ethers.utils.parseEther("0")]
       )
     );
 
@@ -189,10 +196,17 @@ describe("Pancakeswap - StrategyLiquidate", () => {
       parseEther("0").toString()
     );
     expect((await baseToken.balanceOf(lp.address)).toString()).to.eq(
-      parseEther("0.500625782227784731").toString()
+      parseEther("500.625782227784730914").toString()
     );
     expect((await farmingToken.balanceOf(lp.address)).toString()).to.eq(
-      parseEther("0.2").toString()
+      parseEther("200.000000000000000000").toString()
     );
+
+    // Alice uses liquidate strategy remove partial of liquidity
+    console.log((await lp.balanceOf(await alice.getAddress())).toString());
+    expect((await lp.balanceOf(await bob.getAddress())).toString()).to.eq(
+      parseEther("316.227766016837932199").toString()
+    );
+    await lpAsAlice.transfer(strat.address, ethers.utils.parseEther("316.227766016837933199"));
   });
 });

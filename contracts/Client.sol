@@ -262,76 +262,29 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     return IVault(vaultAddress).rewards(positionId);
   }
 
-    function withdraw(
-    uint256 positionId,
+  function withdraw(
     address recipient,
     address farm,
-	uint256 howmuch
-     ) external onlyWhitelistedUsers {
-      if(howmuch==0){
-      withdraw00(positionId,recipient,farm); }
-      else{
-      withdrawPartial(positionId,recipient,farm,howmuch);    
-      } 
-      
-  }
+    uint256 howmuch
+  ) external onlyWhitelistedUsers {
+    IWorker worker = IWorker(farm);
+    address vaultAddress = worker.operatingVault();
 
-  function withdraw00(
-    uint256 pid,
-    address recipient,
-    address farm
-  ) public onlyWhitelistedUsers {
-    // Cast worker for further methods' usage
-    IWorker _worker = IWorker(farm);
+    require(vaultAddress != address(0), "ClientContract: Invalid farm address");
 
-    // Cast vault for further method's usage
-    IVault vault = IVault(_worker.operatingVault());
+    uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
 
-    // Enter the protocol using resolved worker strategy
-    /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
-    /// worker.getStrategies()[2] = Liquidate
-    vault.work(
-      pid,
+    IVault(vaultAddress).work(
+      positionId,
       farm,
       0,
       recipient,
       abi.encode(
-        _worker.getStrategies()[2],
-        abi.encode(_worker.baseToken(), _worker.token1(), _worker.token0(), 0)
+        worker.getStrategies()[2],
+        abi.encode(worker.baseToken(), worker.token1(), worker.token0(), howmuch)
       )
     );
   }
-
-  function withdrawPartial(
-    uint256 pid,
-    address recipient,
-    address farm,
-	uint256 howmuch
-  ) public onlyWhitelistedUsers {
-    // Cast worker for further methods' usage
-    IWorker _worker = IWorker(farm);
-
-    // Cast vault for further method's usage
-    IVault vault = IVault(_worker.operatingVault());
-
-
-
-(,uint256 howmuch_token0, uint256 howmuch_token1, ) = estimateDeposit(farm,howmuch);
-    // Enter the protocol using resolved worker strategy
-    /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
-    /// worker.getStrategies()[3] = PartialLiquidate
-    vault.work(
-      pid,
-      farm, // address of the worker pancake protocol in case of other protocol most liekly farm or liquid pood tangled script like worker called FARM
-      0, // deposit tokens
-      recipient,
-      abi.encode(
-        _worker.getStrategies()[3],
-        abi.encode(_worker.baseToken(), _worker.token1(), _worker.token0(), howmuch, howmuch_token0, howmuch_token1)
-      )
-    );
-  }
-
 
   /// @dev Set client-side fee for given farms
   /// @param farms Array of farms' addresses
@@ -394,7 +347,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Returns whether given farm is enabled or disabled
   /// @return bool true or false
   function isFarmEnabled(address farm) external view returns (bool) {
-        return enabledFarms[farm];
+    return enabledFarms[farm];
   }
 
   /// @dev Returns client's name
