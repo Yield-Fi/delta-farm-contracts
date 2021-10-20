@@ -456,7 +456,6 @@ describe("Client contract", async () => {
       );
       await protocolManager.approveAdminContract(deployerAddress); // Workaround
       await protocolManager.approveHarvesters([deployerAddress], true);
-      await vault.approveRewardAssigners([pancakeswapWorker01.address], true);
       await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
       await exampleClient.setFarmsFee([pancakeswapWorker01.address], 500); // 10% for the client
       await exampleClient.whitelistUsers([deployerAddress], true);

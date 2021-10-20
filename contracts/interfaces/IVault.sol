@@ -26,9 +26,6 @@ interface IVault {
   /// Send the rewards to position owner
   function collectReward(uint256 pid, address recipient) external;
 
-  /// @dev Rewards ACL
-  function approveRewardAssigners(address[] calldata rewardAssigners, bool isApproved) external;
-
   function positionInfo(uint256 id) external view returns (uint256);
 
   /// @dev Protocol entry point

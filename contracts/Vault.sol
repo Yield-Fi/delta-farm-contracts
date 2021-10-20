@@ -43,7 +43,6 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @param amounts Array of reward amounts assign to the specific positions
   /// @notice The order of values in the amounts array is related to the order in the pids array
   event RewardsRegister(address indexed caller, uint256[] pids, uint256[] amounts);
-  event ApproveRewardAssigners(address indexed caller, address[] entities, bool isApproved);
 
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;
@@ -82,7 +81,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   mapping(uint256 => uint256) public totalRewards;
 
   modifier onlyWhitelistedRewardAssigners() {
-    require(approvedRewardAssigners[msg.sender], "Vault: Reward assigner not whitelisted");
+    require(protocolManager.approvedWorkers(msg.sender), "Vault: not approved worker contract");
     _;
   }
 
@@ -324,24 +323,6 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     }
 
     return acc >= token.balanceOf(address(this));
-  }
-
-  /// @dev Rewards ACL
-  /// @param rewardAssigners array of addresses
-  /// @param isApproved true | false
-  function approveRewardAssigners(address[] calldata rewardAssigners, bool isApproved)
-    external
-    override
-    /// TODO: Change who can use this function
-    onlyOwner
-  {
-    uint256 length = rewardAssigners.length;
-
-    for (uint256 i = 0; i < length; i++) {
-      approvedRewardAssigners[rewardAssigners[i]] = isApproved;
-    }
-
-    emit ApproveRewardAssigners(msg.sender, rewardAssigners, isApproved);
   }
 
   /// @dev Get all listed positions in the Vault

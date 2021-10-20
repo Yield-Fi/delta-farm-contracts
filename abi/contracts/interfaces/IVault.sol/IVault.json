@@ -2,24 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "rewardAssigners",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "isApproved",
-        "type": "bool"
-      }
-    ],
-    "name": "approveRewardAssigners",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "assigner",
         "type": "address"
