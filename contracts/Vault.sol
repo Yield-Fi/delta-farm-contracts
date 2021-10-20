@@ -398,4 +398,27 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
 
   /// @dev Fallback function to accept BNB.
   receive() external payable {}
+
+  /// @dev Returns id of position
+  /// @param owner Position's owner
+  /// @param worker Position's worker (farm) address
+  /// @param client Position's client
+  /// @return uint256 Id of position, returns 0 when position with given params isn't exist
+  function getPositionId(
+    address owner,
+    address worker,
+    address client
+  ) external view override returns (uint256) {
+    for (uint256 i = 1; i < nextPositionID; i++) {
+      if (
+        positions[i].owner == owner &&
+        positions[i].worker == worker &&
+        positions[i].client == client
+      ) {
+        return i;
+      }
+    }
+
+    return 0;
+  }
 }

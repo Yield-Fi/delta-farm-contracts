@@ -11,7 +11,7 @@ interface IProtocolManager {
   function whitelistedOperators(address operator) external returns (bool);
 
   /// @dev Token to vault mapping
-  function tokenToVault(address token) external returns (address);
+  function tokenToVault(address token) external view returns (address);
 
   /// @dev Vault config getter, maps to internal mapping
   function approvedVaultConfigs(address vaultConfig) external returns (bool);

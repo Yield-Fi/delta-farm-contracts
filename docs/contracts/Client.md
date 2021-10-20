@@ -103,7 +103,7 @@ Deposit function for client's end user. a.k.a protocol entry point
 ### collectReward
 
 ```solidity
-  function collectReward(uint256 pid, address recipient, address rewardTokenOrVaultAddress)
+  function collectReward(address farm, address recipient, address rewardTokenOrVaultAddress)
 ```
 
 Collect accumulated rewards
@@ -113,13 +113,35 @@ Collect accumulated rewards
 
 #### Parameters:
 
-- `pid`: Position ID
+- `farm`: Address of farm from rewards will be collected
 
 - `recipient`: Position owner
 
 - `rewardTokenOrVaultAddress`: Information about asset in which reward will be paid out
 
 
+### rewardToCollect
+
+```solidity
+  function rewardToCollect(address farm, address recipient, address rewardTokenOrVaultAddress) external returns(uint256)
+```
+
+Returns amount of rewards to collect
+
+
+
+#### Parameters:
+
+- `farm`: Address of farm
+
+- `recipient`: Position owner
+
+- `rewardTokenOrVaultAddress`: Information about asset in which amount of reward will be returned
+
+
+#### Return Values:
+
+- `Amount`: of rewards to collect
 ### setFarmsFee
 
 ```solidity
@@ -249,7 +271,7 @@ Returns client's name
 ### estimateDeposit
 
 ```solidity
-  function estimateDeposit(address worker, uint256 amount) public returns(uint256, uint256, uint256, uint256)
+  function estimateDeposit(address farm, uint256 amount) public returns(uint256, uint256, uint256, uint256)
 ```
 
 Function to get data about deposit
@@ -258,7 +280,7 @@ Function to get data about deposit
 
 #### Parameters:
 
-- `worker`: Address of worker (farm)
+- `farm`: Address of worker (farm)
 
 - `amount`: Amount of base token to deposit
 

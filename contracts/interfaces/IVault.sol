@@ -57,4 +57,10 @@ interface IVault {
       uint256[] memory,
       uint256[] memory
     );
+
+  function getPositionId(
+    address owner,
+    address worker,
+    address client
+  ) external view returns (uint256);
 }

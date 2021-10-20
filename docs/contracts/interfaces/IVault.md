@@ -61,16 +61,6 @@ Request funds from user through Vault
 
 
 
-### approveRewardAssigners
-
-```solidity
-  function approveRewardAssigners(address[] rewardAssigners, bool isApproved)
-```
-
-Rewards ACL
-
-
-
 ### work
 
 ```solidity

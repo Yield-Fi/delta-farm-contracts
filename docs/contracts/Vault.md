@@ -178,23 +178,6 @@ Contract health component
 
 - `bool`: - true if amount of operating token is greater than or equal to total rewards value, false if not
   f
-### approveRewardAssigners
-
-```solidity
-  function approveRewardAssigners(address[] rewardAssigners, bool isApproved)
-```
-
-Rewards ACL
-
-
-
-#### Parameters:
-
-- `rewardAssigners`: array of addresses
-
-- `isApproved`: true | false
-  f
-
 ### getAllPositions
 
 ```solidity
@@ -246,6 +229,29 @@ Fallback function to accept BNB.
 
 
 
+### getPositionId
+
+```solidity
+  function getPositionId(address owner, address worker, address client) external returns(uint256)
+```
+
+Returns id of position
+
+
+
+#### Parameters:
+
+- `owner`: Position's owner
+
+- `worker`: Position's worker (farm) address
+
+- `client`: Position's client
+
+
+#### Return Values:
+
+- `uint256`: Id of position, returns 0 when position with given params isn't exist
+  f
 
 ___
 
@@ -300,12 +306,5 @@ It's emitted when worker will register new harvested rewards
 - `pids`: Array of position ids
 
 - `amounts`: Array of reward amounts assign to the specific positions
-
-
-### ApproveRewardAssigners
-
-```solidity
-  event ApproveRewardAssigners(address caller, address[] entities, bool isApproved)
-```
 
 

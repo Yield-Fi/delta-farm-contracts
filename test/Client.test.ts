@@ -64,11 +64,13 @@ describe("Client contract", async () => {
   // Signers
   let deployer: Signer;
   let alice: Signer;
+  let bob: Signer;
 
   let yieldFi: Signer;
 
   let deployerAddress: string;
   let aliceAddress: string;
+  let bobAddress: string;
   let yieldFiAddress: string;
 
   // Protocol Manager
@@ -92,14 +94,17 @@ describe("Client contract", async () => {
 
   // Connectors
   let baseTokenAsAlice: MockToken;
+  let baseTokenAsBob: MockToken;
   let exampleClientAsAlice: Client;
+  let exampleClientAsBob: Client;
 
   async function fixture() {
-    [deployer, alice, yieldFi] = await ethers.getSigners();
-    [deployerAddress, aliceAddress, yieldFiAddress] = await Promise.all([
+    [deployer, alice, yieldFi, bob] = await ethers.getSigners();
+    [deployerAddress, aliceAddress, yieldFiAddress, bobAddress] = await Promise.all([
       deployer.getAddress(),
       alice.getAddress(),
       yieldFi.getAddress(),
+      bob.getAddress(),
     ]);
 
     baseToken = await deployToken(
@@ -306,7 +311,9 @@ describe("Client contract", async () => {
 
     // Signers
     baseTokenAsAlice = baseToken.connect(alice);
+    baseTokenAsBob = baseToken.connect(bob);
     exampleClientAsAlice = exampleClient.connect(alice);
+    exampleClientAsBob = exampleClient.connect(bob);
   }
 
   beforeEach(async () => {
@@ -463,19 +470,31 @@ describe("Client contract", async () => {
       // Open some positions
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
       await exampleClient.whitelistOperators([deployerAddress], true);
-      await exampleClient.whitelistUsers([aliceAddress], true);
+      await exampleClient.whitelistUsers([aliceAddress, bobAddress], true);
 
       await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
       await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
       await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 
-      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
-      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
-      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
+      await baseToken.mint(bobAddress, DEPOSIT_AMOUNT);
+      await baseTokenAsBob.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await exampleClientAsBob.deposit(bobAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
 
       // Empty positions
-      expect(await vault.rewards(1)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
-      expect(await vault.rewards(2)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+      expect(
+        await exampleClient.rewardToCollect(
+          pancakeswapWorker01.address,
+          aliceAddress,
+          vault.address
+        )
+      ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+      expect(
+        await exampleClient.rewardToCollect(
+          pancakeswapWorker01.address,
+          bobAddress,
+          baseToken.address
+        )
+      ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
 
       // Transfer previously minted CAKE to the worker (simulate harvesting CAKE from staking pool)
       await cake.transfer(pancakeswapWorker01.address, ethers.utils.parseEther("10"));
@@ -494,12 +513,28 @@ describe("Client contract", async () => {
       ).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
 
       // Collect
-      await exampleClient.collectReward(1, aliceAddress, baseToken.address);
-      await exampleClient.collectReward(2, aliceAddress, baseToken.address);
+      await exampleClient.collectReward(
+        pancakeswapWorker01.address,
+        aliceAddress,
+        baseToken.address
+      );
+      await exampleClient.collectReward(pancakeswapWorker01.address, bobAddress, baseToken.address);
 
       // Position have been emptied out
-      expect(await vault.rewards(1)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
-      expect(await vault.rewards(2)).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+      expect(
+        await exampleClient.rewardToCollect(
+          pancakeswapWorker01.address,
+          aliceAddress,
+          vault.address
+        )
+      ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+      expect(
+        await exampleClient.rewardToCollect(
+          pancakeswapWorker01.address,
+          bobAddress,
+          baseToken.address
+        )
+      ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
     });
   });
 });
