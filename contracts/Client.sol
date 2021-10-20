@@ -229,28 +229,12 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
   /// @dev Collect accumulated rewards
   /// @param farm Address of farm from rewards will be collected
-  /// @param recipient Position owner
-  /// @param rewardTokenOrVaultAddress Information about asset in which reward will be paid out
+  /// @param recipient Address of recipient which has been passed when the deposit was made
   /// @notice Function can be called only by whitelisted users.
-  function collectReward(
-    address farm,
-    address recipient,
-    address rewardTokenOrVaultAddress
-  ) external onlyWhitelistedUsers {
-    // Try to resolve Vault address based on given token address
-    address vaultAddress = protocolManager.tokenToVault(rewardTokenOrVaultAddress);
+  function collectReward(address farm, address recipient) external onlyWhitelistedUsers {
+    address vaultAddress = IWorker(farm).operatingVault();
 
-    if (vaultAddress == address(0)) {
-      // Vault hasn't been resolved from mapping, try direct look up
-
-      // Did caller provide direct vault address?
-      vaultAddress = rewardTokenOrVaultAddress;
-    }
-
-    require(
-      vaultAddress != address(0),
-      "ClientContract: Invalid rewardToken given (no operating Vaults were found)"
-    );
+    require(vaultAddress != address(0), "ClientContract: Invalid farm address");
 
     uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
 
@@ -261,28 +245,12 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
   /// @dev Returns amount of rewards to collect
   /// @param farm Address of farm
-  /// @param recipient Position owner
-  /// @param rewardTokenOrVaultAddress Information about asset in which amount of reward will be returned
+  /// @param recipient Address of recipient which has been passed when the deposit was made
   /// @return Amount of rewards to collect
-  function rewardToCollect(
-    address farm,
-    address recipient,
-    address rewardTokenOrVaultAddress
-  ) external view returns (uint256) {
-    // Try to resolve Vault address based on given token address
-    address vaultAddress = protocolManager.tokenToVault(rewardTokenOrVaultAddress);
+  function rewardToCollect(address farm, address recipient) external view returns (uint256) {
+    address vaultAddress = IWorker(farm).operatingVault();
 
-    if (vaultAddress == address(0)) {
-      // Vault hasn't been resolved from mapping, try direct look up
-
-      // Did caller provide direct vault address?
-      vaultAddress = rewardTokenOrVaultAddress;
-    }
-
-    require(
-      vaultAddress != address(0),
-      "ClientContract: Invalid rewardToken given (no operating Vaults were found)"
-    );
+    require(vaultAddress != address(0), "ClientContract: Invalid farm address");
 
     uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
 

@@ -482,18 +482,10 @@ describe("Client contract", async () => {
 
       // Empty positions
       expect(
-        await exampleClient.rewardToCollect(
-          pancakeswapWorker01.address,
-          aliceAddress,
-          vault.address
-        )
+        await exampleClient.rewardToCollect(pancakeswapWorker01.address, aliceAddress)
       ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
       expect(
-        await exampleClient.rewardToCollect(
-          pancakeswapWorker01.address,
-          bobAddress,
-          baseToken.address
-        )
+        await exampleClient.rewardToCollect(pancakeswapWorker01.address, bobAddress)
       ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
 
       // Transfer previously minted CAKE to the worker (simulate harvesting CAKE from staking pool)
@@ -513,27 +505,15 @@ describe("Client contract", async () => {
       ).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
 
       // Collect
-      await exampleClient.collectReward(
-        pancakeswapWorker01.address,
-        aliceAddress,
-        baseToken.address
-      );
-      await exampleClient.collectReward(pancakeswapWorker01.address, bobAddress, baseToken.address);
+      await exampleClient.collectReward(pancakeswapWorker01.address, aliceAddress);
+      await exampleClient.collectReward(pancakeswapWorker01.address, bobAddress);
 
       // Position have been emptied out
       expect(
-        await exampleClient.rewardToCollect(
-          pancakeswapWorker01.address,
-          aliceAddress,
-          vault.address
-        )
+        await exampleClient.rewardToCollect(pancakeswapWorker01.address, aliceAddress)
       ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
       expect(
-        await exampleClient.rewardToCollect(
-          pancakeswapWorker01.address,
-          bobAddress,
-          baseToken.address
-        )
+        await exampleClient.rewardToCollect(pancakeswapWorker01.address, bobAddress)
       ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
     });
   });

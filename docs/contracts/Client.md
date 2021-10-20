@@ -103,7 +103,7 @@ Deposit function for client's end user. a.k.a protocol entry point
 ### collectReward
 
 ```solidity
-  function collectReward(address farm, address recipient, address rewardTokenOrVaultAddress)
+  function collectReward(address farm, address recipient)
 ```
 
 Collect accumulated rewards
@@ -115,9 +115,7 @@ Collect accumulated rewards
 
 - `farm`: Address of farm from rewards will be collected
 
-- `recipient`: Position owner
-
-- `rewardTokenOrVaultAddress`: Information about asset in which reward will be paid out
+- `recipient`: Address of recipient which has been passed when the deposit was made
 
 
 ### rewardToCollect
@@ -134,7 +132,7 @@ Returns amount of rewards to collect
 
 - `farm`: Address of farm
 
-- `recipient`: Position owner
+- `recipient`: Address of recipient which has been passed when the deposit was made
 
 - `rewardTokenOrVaultAddress`: Information about asset in which amount of reward will be returned
 

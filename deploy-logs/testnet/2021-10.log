@@ -122,3 +122,6 @@
 2021-10-20 13:52:18 ||| --> Upgrading implementation of client contracts... <--
 2021-10-20 13:52:18 |||   -> Upgrading contract of Client A...
 2021-10-20 13:53:02 |||   New implementation of contract of Client A deployed at 0xd522802222EE597C6550E87472247A86769DABa9
+2021-10-20 14:06:27 ||| --> Upgrading implementation of client contracts... <--
+2021-10-20 14:06:27 |||   -> Upgrading contract of Client A...
+2021-10-20 14:07:12 |||   New implementation of contract of Client A deployed at 0xd522802222EE597C6550E87472247A86769DABa9

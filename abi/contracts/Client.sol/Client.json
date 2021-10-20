@@ -242,11 +242,6 @@
         "internalType": "address",
         "name": "recipient",
         "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "rewardTokenOrVaultAddress",
-        "type": "address"
       }
     ],
     "name": "collectReward",
@@ -507,11 +502,6 @@
       {
         "internalType": "address",
         "name": "recipient",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "rewardTokenOrVaultAddress",
         "type": "address"
       }
     ],
