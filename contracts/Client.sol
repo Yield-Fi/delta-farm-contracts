@@ -40,6 +40,18 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
   event Deposit(address indexed recipient, address indexed farm, uint256 indexed amount);
 
+  /// @dev Event is emmitted when withdraw function will be called
+  /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly
+  /// @param farm Address of target farm
+  /// @param amount Amount of vault operating token (asset) user is willing to leave protocol with.
+  event Withdraw(address indexed recipient, address indexed farm, uint256 indexed amount);
+
+  /// @dev Event is emmitted when Claim/Harvest function will be called
+  /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly
+  /// @param farm Address of target farm
+  /// @param amount Amount of vault operating token (asset) user is goint to harvest from protocol .
+  event ClaimReward(address indexed recipient, address indexed farm, uint256 indexed amount);
+
   /// @dev Event is emmited when fee for given farms will be changed
   /// @param caller Address of msg.sender
   /// @param farms Array of farms' addresses
@@ -173,7 +185,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     IWorker _worker = IWorker(farm);
 
     // Check for worker outage due to client-assigned pause
-    require(enabledFarms[farm], "ClientContract: Target pool hasn't been enabled by the client");
+    require(enabledFarms[farm], "ClientContract: Target farm hasn't been enabled by the client");
 
     // Cast vault for further method's usage
     IVault vault = IVault(_worker.operatingVault());
@@ -190,9 +202,14 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     // If worker makes usage of vault's operating token, we should covert only one asset to the second, proper one.
     /// @notice Strategy 0: Vault<BUSD> -> Worker<BUSD, USDT> (convert some portion of BUSD to USDT)
     /// @notice Strategy 1: Vault<BUSD> -> Worker<USDC, USDT> (do a split conversion)
+    address workerToken0 = _worker.token0();
+    address workerToken1 = _worker.token1();
 
     bytes memory payload = _worker.token0() == vaultToken || _worker.token1() == vaultToken
-      ? abi.encode(_worker.getStrategies()[0], abi.encode(_worker.token0(), _worker.token1(), 0))
+      ? abi.encode(
+        _worker.getStrategies()[0],
+        abi.encode(vaultToken, vaultToken == workerToken0 ? workerToken1 : workerToken0, 0)
+      )
       : abi.encode(
         _worker.getStrategies()[1],
         abi.encode(vaultToken, _worker.token0(), _worker.token1(), 0)
@@ -236,11 +253,25 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     IVault(vaultAddress).collectReward(pid, recipient);
   }
 
-  function withdraw(
+    function withdraw(
+    uint256 positionId,
+    address recipient,
+    address farm,
+	uint256 howmuch
+     ) external onlyWhitelistedUsers {
+      if(howmuch==0){
+      withdraw00(positionId,recipient,farm); }
+      else{
+      withdrawPartial(positionId,recipient,farm,howmuch);    
+      } 
+      
+  }
+
+  function withdraw00(
     uint256 pid,
     address recipient,
     address farm
-  ) external onlyWhitelistedUsers {
+  ) public onlyWhitelistedUsers {
     // Cast worker for further methods' usage
     IWorker _worker = IWorker(farm);
 
@@ -267,7 +298,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     address recipient,
     address farm,
 	uint256 howmuch
-  ) external onlyWhitelistedUsers {
+  ) public onlyWhitelistedUsers {
     // Cast worker for further methods' usage
     IWorker _worker = IWorker(farm);
 
@@ -354,7 +385,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Returns whether given farm is enabled or disabled
   /// @return bool true or false
   function isFarmEnabled(address farm) external view returns (bool) {
-    return IWorker(farm).isWorkerEnabled();
+        return enabledFarms[farm];
   }
 
   /// @dev Returns client's name
