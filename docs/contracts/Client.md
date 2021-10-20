@@ -103,7 +103,7 @@ Deposit function for client's end user. a.k.a protocol entry point
 ### collectReward
 
 ```solidity
-  function collectReward(uint256 pid, address recipient, address rewardTokenOrVaultAddress)
+  function collectReward(address farm, address recipient)
 ```
 
 Collect accumulated rewards
@@ -113,13 +113,31 @@ Collect accumulated rewards
 
 #### Parameters:
 
-- `pid`: Position ID
+- `farm`: Address of farm from rewards will be collected
 
-- `recipient`: Position owner
-
-- `rewardTokenOrVaultAddress`: Information about asset in which reward will be paid out
+- `recipient`: Address of recipient which has been passed when the deposit was made
 
 
+### rewardToCollect
+
+```solidity
+  function rewardToCollect(address farm, address recipient) external returns(uint256)
+```
+
+Returns amount of rewards to collect
+
+
+
+#### Parameters:
+
+- `farm`: Address of farm
+
+- `recipient`: Address of recipient which has been passed when the deposit was made
+
+
+#### Return Values:
+
+- `Amount`: of rewards to collect
 ### setFarmsFee
 
 ```solidity
@@ -249,7 +267,7 @@ Returns client's name
 ### estimateDeposit
 
 ```solidity
-  function estimateDeposit(address worker, uint256 amount) public returns(uint256, uint256, uint256, uint256)
+  function estimateDeposit(address farm, uint256 amount) public returns(uint256, uint256, uint256, uint256)
 ```
 
 Function to get data about deposit
@@ -258,7 +276,7 @@ Function to get data about deposit
 
 #### Parameters:
 
-- `worker`: Address of worker (farm)
+- `farm`: Address of worker (farm)
 
 - `amount`: Amount of base token to deposit
 
@@ -341,10 +359,10 @@ Event is emmitted when withdraw function will be called
 
 - `amount`: Amount of vault operating token (asset) user is willing to leave protocol with.
 
-### ClaimReward
+### CollectReward
 
 ```solidity
-  event ClaimReward(address recipient, address farm, uint256 amount)
+  event CollectReward(address recipient, address farm, uint256 amount)
 ```
 Event is emmitted when Claim/Harvest function will be called
 

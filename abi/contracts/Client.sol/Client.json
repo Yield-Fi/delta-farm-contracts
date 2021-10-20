@@ -5,31 +5,6 @@
       {
         "indexed": true,
         "internalType": "address",
-        "name": "recipient",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "farm",
-        "type": "address"
-      },
-      {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "amount",
-        "type": "uint256"
-      }
-    ],
-    "name": "ClaimReward",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
         "name": "caller",
         "type": "address"
       },
@@ -47,6 +22,31 @@
       }
     ],
     "name": "CollectFee",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "farm",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "CollectReward",
     "type": "event"
   },
   {
@@ -234,18 +234,13 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "pid",
-        "type": "uint256"
-      },
-      {
         "internalType": "address",
-        "name": "recipient",
+        "name": "farm",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "rewardTokenOrVaultAddress",
+        "name": "recipient",
         "type": "address"
       }
     ],
@@ -307,7 +302,7 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "worker",
+        "name": "farm",
         "type": "address"
       },
       {
@@ -495,6 +490,30 @@
     "name": "renounceOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "farm",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      }
+    ],
+    "name": "rewardToCollect",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

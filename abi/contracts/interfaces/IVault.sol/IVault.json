@@ -2,24 +2,6 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "rewardAssigners",
-        "type": "address[]"
-      },
-      {
-        "internalType": "bool",
-        "name": "isApproved",
-        "type": "bool"
-      }
-    ],
-    "name": "approveRewardAssigners",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "assigner",
         "type": "address"
@@ -112,6 +94,35 @@
         "internalType": "uint256[]",
         "name": "",
         "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "worker",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "client",
+        "type": "address"
+      }
+    ],
+    "name": "getPositionId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",

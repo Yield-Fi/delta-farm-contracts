@@ -50,7 +50,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly
   /// @param farm Address of target farm
   /// @param amount Amount of vault operating token (asset) user is goint to harvest from protocol .
-  event ClaimReward(address indexed recipient, address indexed farm, uint256 indexed amount);
+  event CollectReward(address indexed recipient, address indexed farm, uint256 indexed amount);
 
   /// @dev Event is emmited when fee for given farms will be changed
   /// @param caller Address of msg.sender
@@ -215,9 +215,11 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         abi.encode(vaultToken, _worker.token0(), _worker.token1(), 0)
       );
 
+    uint256 positionId = vault.getPositionId(recipient, farm, address(this));
+
     // Enter the protocol using resolved worker strategy
     /// @dev encoded: (address strategy, (address baseToken, address farmingToken, uint256 minLPAmount))
-    vault.work(0, farm, amount, recipient, payload);
+    vault.work(positionId, farm, amount, recipient, payload);
 
     // Reset approvals
     vaultToken.safeApprove(address(vault), 0);
@@ -226,31 +228,38 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   }
 
   /// @dev Collect accumulated rewards
-  /// @param pid Position ID
-  /// @param recipient Position owner
-  /// @param rewardTokenOrVaultAddress Information about asset in which reward will be paid out
+  /// @param farm Address of farm from rewards will be collected
+  /// @param recipient Address of recipient which has been passed when the deposit was made
   /// @notice Function can be called only by whitelisted users.
-  function collectReward(
-    uint256 pid,
-    address recipient,
-    address rewardTokenOrVaultAddress
-  ) external onlyWhitelistedUsers {
-    // Try to resolve Vault address based on given token address
-    address vaultAddress = protocolManager.tokenToVault(rewardTokenOrVaultAddress);
+  function collectReward(address farm, address recipient) external onlyWhitelistedUsers {
+    address vaultAddress = IWorker(farm).operatingVault();
 
-    if (vaultAddress == address(0)) {
-      // Vault hasn't been resolved from mapping, try direct look up
+    require(vaultAddress != address(0), "ClientContract: Invalid farm address");
 
-      // Did caller provide direct vault address?
-      vaultAddress = rewardTokenOrVaultAddress;
-    }
+    uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
 
-    require(
-      vaultAddress != address(0),
-      "ClientContract: Invalid rewardToken given (no operating Vaults were found)"
-    );
+    require(positionId != 0, "ClientContract: Position for given farm and recipient not found");
 
-    IVault(vaultAddress).collectReward(pid, recipient);
+    uint256 amount = IVault(vaultAddress).rewards(positionId);
+    IVault(vaultAddress).collectReward(positionId, recipient);
+
+    emit CollectReward(recipient, farm, amount);
+  }
+
+  /// @dev Returns amount of rewards to collect
+  /// @param farm Address of farm
+  /// @param recipient Address of recipient which has been passed when the deposit was made
+  /// @return Amount of rewards to collect
+  function rewardToCollect(address farm, address recipient) external view returns (uint256) {
+    address vaultAddress = IWorker(farm).operatingVault();
+
+    require(vaultAddress != address(0), "ClientContract: Invalid farm address");
+
+    uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
+
+    require(positionId != 0, "ClientContract: Position for given farm and recipient not found");
+
+    return IVault(vaultAddress).rewards(positionId);
   }
 
     function withdraw(
@@ -395,13 +404,13 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   }
 
   /// @dev Function to get data about deposit
-  /// @param worker Address of worker (farm)
+  /// @param farm Address of worker (farm)
   /// @param amount Amount of base token to deposit
   /// @return uint256 Amount of the part of the base token after split
   /// @return uint256 Amount of the part of the base token after split
   /// @return uint256 Amount of the token0 which will be received from swapped base token
   /// @return uint256 Amount of the token1 which will be received from swapped base token
-  function estimateDeposit(address worker, uint256 amount)
+  function estimateDeposit(address farm, uint256 amount)
     public
     view
     returns (
@@ -411,7 +420,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
       uint256
     )
   {
-    IWorker _worker = IWorker(worker);
+    IWorker _worker = IWorker(farm);
     IAddStrategy strategy = IAddStrategy(chooseStrategy(_worker));
 
     return
