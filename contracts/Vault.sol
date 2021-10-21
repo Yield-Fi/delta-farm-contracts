@@ -44,6 +44,13 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @notice The order of values in the amounts array is related to the order in the pids array
   event RewardsRegister(address indexed caller, uint256[] pids, uint256[] amounts);
 
+  /// @dev It's emitted when worker will register new harvested rewards
+  /// @param worker Address of worker which will register rewards
+  /// @param yieldFiCut Amount of fee yield fi has taken
+  /// @param clientCut Amount of fee client has taken
+  /// @param client client address end-user opened position from
+  event FeesRegister(address indexed worker, uint256 yieldFiCut, uint256 clientCut, address client);
+
   /// @dev Flags for manage execution scope
   uint256 private constant _NOT_ENTERED = 1;
   uint256 private constant _ENTERED = 2;
@@ -278,6 +285,9 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       // Assign final reward to the user
       rewards[pid] = rewards[pid].add(userReward);
       totalRewards[pid] = totalRewards[pid].add(userReward);
+
+      // Index event
+      emit FeesRegister(position.worker, yieldFiFee, clientFee, position.client);
     }
 
     token.safeTransfer(address(feeCollector), singleTxAcc);
@@ -324,7 +334,6 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     }
 
     token.safeTransfer(owner, rewardAmount);
-
     emit RewardCollect(msg.sender, owner, rewardAmount);
   }
 
