@@ -324,7 +324,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit Withdraw(recipient, farm, howmuch);
   }
 
-  /// @dev Returns amount to withdraw from given farm
+  /// @dev Returns estimated amount to withdraw from given farm
   /// @param farm Address of target farm
   /// @param recipient Address of recipient which has been passed when the deposit was made
   /// @return uint256 Amount to withdraw

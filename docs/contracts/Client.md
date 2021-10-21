@@ -176,7 +176,7 @@ Returns amount of rewards to collect
   function amountToWithdraw(address farm, address recipient) external returns(uint256)
 ```
 
-Returns amount to withdraw from given farm
+Returns estimated amount to withdraw from given farm
 
 
 
