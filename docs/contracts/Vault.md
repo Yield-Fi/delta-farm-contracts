@@ -48,7 +48,6 @@ Return Token value of the given position.
 ```
 
 Return the total token entitled to the token holders
-  f
 
 
 
@@ -62,7 +61,6 @@ Request Funds from user through Vault
 
 
 > **NOTE:** Function can be called only by strategy
-  f
 
 #### Parameters:
 
@@ -90,7 +88,6 @@ Create a new farming position to unlock your yield farming potential.
 - `amount`: The anout of Token to supply by user.
 
 - `data`: The calldata to pass along to the worker for more working context.
-  f
 
 ### updateConfig
 
@@ -105,7 +102,6 @@ Update bank configuration to a new address. Must only be called by owner.
 #### Parameters:
 
 - `_config`: The new configurator address.
-  f
 
 ### withdrawReserve
 
@@ -122,7 +118,6 @@ Withdraw BaseToken reserve for underwater positions to the given address.
 - `to`: The address to transfer BaseToken to.
 
 - `value`: The number of BaseToken tokens to withdraw. Must not exceed `reservePool`.
-  f
 
 ### registerRewards
 
@@ -135,7 +130,6 @@ Function to register new rewards
 
 > **NOTE:** The order of values in the amounts array is related to the order in the pids array
 Function can be called only by worker
-  f
 
 #### Parameters:
 
@@ -159,7 +153,6 @@ Collect accumulated rewards
 - `pid`: Position ID
 
 - `recipient`: Recipient address - must match recipient address given during position opening
-  f
 
 ### collectAllRewards
 
@@ -174,7 +167,6 @@ Function to collect all rewards from each position of given owner
 #### Parameters:
 
 - `owner`: owner of positions
-  f
 
 ### rewardsToCollect
 
@@ -194,7 +186,6 @@ Function returns amount of all rewards from owner's positions
 #### Return Values:
 
 - `uint256`: Amount of rewards
-  f
 ### checkRewardsToBalanceStability
 
 ```solidity
@@ -211,7 +202,6 @@ Contract health component
 #### Return Values:
 
 - `bool`: - true if amount of operating token is greater than or equal to total rewards value, false if not
-  f
 ### getAllPositions
 
 ```solidity
@@ -225,7 +215,6 @@ Get all listed positions in the Vault
 Return composition: pos<Position>{pid: pids[i], worker: workers[i] owner: owners[i], client: clients[i]}
 Due to solidity flavours:
 slot [0] will be occupied using zeroed values (address(0) for addresses and uint256(0) for numbers)
-  f
 
 
 #### Return Values:
@@ -245,7 +234,6 @@ Get all listed rewards in the Vault
 Return composition: rew<Reward>{pid: pids[i], reward: rewards[i], totalReward: totalRewards[i]}
 Due to solidity flavours:
 slot [0] will be occupied using zeroed values (uint256(0) for numbers)
-  f
 
 
 #### Return Values:
@@ -259,7 +247,6 @@ slot [0] will be occupied using zeroed values (uint256(0) for numbers)
 ```
 
 Fallback function to accept BNB.
-  r
 
 
 
@@ -285,7 +272,6 @@ Returns id of position
 #### Return Values:
 
 - `uint256`: Id of position, returns 0 when position with given params isn't exist
-  f
 
 ___
 

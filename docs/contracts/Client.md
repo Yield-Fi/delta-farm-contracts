@@ -170,6 +170,26 @@ Returns amount of rewards to collect
 #### Return Values:
 
 - `Amount`: of rewards to collect
+### amountToWithdraw
+
+```solidity
+  function amountToWithdraw(address farm, address recipient) external returns(uint256)
+```
+
+Returns amount to withdraw from given farm
+
+
+
+#### Parameters:
+
+- `farm`: Address of target farm
+
+- `recipient`: Address of recipient which has been passed when the deposit was made
+
+
+#### Return Values:
+
+- `uint256`: Amount to withdraw
 ### setFarmsFee
 
 ```solidity

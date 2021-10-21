@@ -324,6 +324,24 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit Withdraw(recipient, farm, howmuch);
   }
 
+  /// @dev Returns amount to withdraw from given farm
+  /// @param farm Address of target farm
+  /// @param recipient Address of recipient which has been passed when the deposit was made
+  /// @return uint256 Amount to withdraw
+  function amountToWithdraw(address farm, address recipient) external view returns (uint256) {
+    address vaultAddress = IWorker(farm).operatingVault();
+
+    require(vaultAddress != address(0), "ClientContract: Invalid farm address");
+
+    uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
+
+    if (positionId == 0) {
+      return 0;
+    }
+
+    return IWorker(farm).tokensToReceive(positionId);
+  }
+
   /// @dev Set client-side fee for given farms
   /// @param farms Array of farms' addresses
   /// @param feeBps new fee denominator (0 < feeBps < 10000)
