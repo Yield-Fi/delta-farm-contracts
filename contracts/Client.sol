@@ -70,6 +70,12 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param amount Amount of collected fee
   event CollectFee(address indexed caller, address indexed _to, uint256 amount);
 
+  /// @dev Event is emmited when all collected rewards will be withdrawn
+  /// @param caller Address of msg.sender
+  /// @param _to Address of rewards recipient
+  /// @param amount Amount of collected rewards
+  event CollectAllRewards(address indexed caller, address indexed _to, uint256 amount);
+
   /// @dev Enabled farms
   mapping(address => bool) enabledFarms;
 
@@ -227,7 +233,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit Deposit(recipient, farm, amount);
   }
 
-  /// @dev Collect accumulated rewards
+  /// @dev Collect accumulated rewards from given farm
   /// @param farm Address of farm from rewards will be collected
   /// @param recipient Address of recipient which has been passed when the deposit was made
   /// @notice Function can be called only by whitelisted users.
@@ -246,6 +252,31 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit CollectReward(recipient, farm, amount);
   }
 
+  /// @dev Collect all accumulated rewards
+  /// @param recipient Address of recipient which has been passed when the deposit was made
+  /// @param token Address of token in which rewards are accumulated
+  function collectAllRewards(address recipient, address token) external onlyWhitelistedUsers {
+    address vaultAddress = protocolManager.tokenToVault(token);
+
+    require(vaultAddress != address(0), "ClientContract: Invalid token address");
+
+    uint256 amount = IVault(vaultAddress).rewardsToCollect(recipient);
+    IVault(vaultAddress).collectAllRewards(recipient);
+
+    emit CollectAllRewards(msg.sender, recipient, amount);
+  }
+
+  /// @dev Collect all accumulated rewards
+  /// @param recipient Address of recipient which has been passed when the deposit was made
+  /// @param token Address of token in which rewards are accumulated
+  function allRewardToCollect(address recipient, address token) external view returns (uint256) {
+    address vaultAddress = protocolManager.tokenToVault(token);
+
+    require(vaultAddress != address(0), "ClientContract: Invalid token address");
+
+    return IVault(vaultAddress).rewardsToCollect(recipient);
+  }
+
   /// @dev Returns amount of rewards to collect
   /// @param farm Address of farm
   /// @param recipient Address of recipient which has been passed when the deposit was made
@@ -257,7 +288,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
     uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
 
-    require(positionId != 0, "ClientContract: Position for given farm and recipient not found");
+    if (positionId == 0) {
+      return 0;
+    }
 
     return IVault(vaultAddress).rewards(positionId);
   }
@@ -352,7 +385,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @dev Returns whether given farm is enabled or disabled
   /// @return bool true or false
   function isFarmEnabled(address farm) external view returns (bool) {
-    return enabledFarms[farm];
+    return enabledFarms[farm] && IWorker(farm).isWorkerEnabled();
   }
 
   /// @dev Returns client's name

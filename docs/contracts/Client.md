@@ -106,7 +106,7 @@ Deposit function for client's end user. a.k.a protocol entry point
   function collectReward(address farm, address recipient)
 ```
 
-Collect accumulated rewards
+Collect accumulated rewards from given farm
 
 
 > **NOTE:** Function can be called only by whitelisted users.
@@ -117,6 +117,38 @@ Collect accumulated rewards
 
 - `recipient`: Address of recipient which has been passed when the deposit was made
 
+
+### collectAllRewards
+
+```solidity
+  function collectAllRewards(address recipient, address token)
+```
+
+Collect all accumulated rewards
+
+
+
+#### Parameters:
+
+- `recipient`: Address of recipient which has been passed when the deposit was made
+
+- `token`: Address of token in which rewards are accumulated
+
+### allRewardToCollect
+
+```solidity
+  function allRewardToCollect(address recipient, address token) external returns(uint256)
+```
+
+Collect all accumulated rewards
+
+
+
+#### Parameters:
+
+- `recipient`: Address of recipient which has been passed when the deposit was made
+
+- `token`: Address of token in which rewards are accumulated
 
 ### rewardToCollect
 
@@ -422,4 +454,20 @@ Event is emmited when all collected fee will be withdrawn
 - `_to`: Address of fee recipient
 
 - `amount`: Amount of collected fee
+
+### CollectAllRewards
+
+```solidity
+  event CollectAllRewards(address caller, address _to, uint256 amount)
+```
+Event is emmited when all collected rewards will be withdrawn
+
+
+#### Parameters:
+
+- `caller`: Address of msg.sender
+
+- `_to`: Address of rewards recipient
+
+- `amount`: Amount of collected rewards
 

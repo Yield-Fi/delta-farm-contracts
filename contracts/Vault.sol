@@ -312,6 +312,38 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     emit RewardCollect(msg.sender, position.owner, reward);
   }
 
+  /// @dev Function to collect all rewards from each position of given owner
+  /// @param owner owner of positions
+  function collectAllRewards(address owner) external override onlyClientContract {
+    uint256 rewardAmount = 0;
+
+    for (uint256 i = 1; i < nextPositionID; i++) {
+      if (positions[i].owner == owner && positions[i].client == msg.sender) {
+        rewardAmount = rewardAmount.add(rewards[i]);
+        rewards[i] = 0;
+      }
+    }
+
+    token.safeTransfer(owner, rewardAmount);
+
+    emit RewardCollect(msg.sender, owner, rewardAmount);
+  }
+
+  /// @dev Function returns amount of all rewards from owner's positions
+  /// @param owner Owner of positions
+  /// @return uint256 Amount of rewards
+  function rewardsToCollect(address owner) external view override returns (uint256) {
+    uint256 rewardAmount = 0;
+
+    for (uint256 i = 1; i < nextPositionID; i++) {
+      if (positions[i].owner == owner && positions[i].client == msg.sender) {
+        rewardAmount = rewardAmount.add(rewards[i]);
+      }
+    }
+
+    return rewardAmount;
+  }
+
   /// @dev Contract health component
   /// @notice Check if contract is able to payout all the rewards on demand
   /// @return bool - true if amount of operating token is greater than or equal to total rewards value, false if not

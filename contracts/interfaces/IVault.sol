@@ -48,6 +48,10 @@ interface IVault {
       address[] memory
     );
 
+  function collectAllRewards(address recipient) external;
+
+  function rewardsToCollect(address recipient) external view returns (uint256);
+
   /// @dev Data gathering
   function getAllRewards(uint256 fromPid)
     external

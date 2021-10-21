@@ -161,6 +161,40 @@ Collect accumulated rewards
 - `recipient`: Recipient address - must match recipient address given during position opening
   f
 
+### collectAllRewards
+
+```solidity
+  function collectAllRewards(address owner)
+```
+
+Function to collect all rewards from each position of given owner
+
+
+
+#### Parameters:
+
+- `owner`: owner of positions
+  f
+
+### rewardsToCollect
+
+```solidity
+  function rewardsToCollect(address owner) external returns(uint256)
+```
+
+Function returns amount of all rewards from owner's positions
+
+
+
+#### Parameters:
+
+- `owner`: Owner of positions
+
+
+#### Return Values:
+
+- `uint256`: Amount of rewards
+  f
 ### checkRewardsToBalanceStability
 
 ```solidity
