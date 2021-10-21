@@ -266,7 +266,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit CollectAllRewards(msg.sender, recipient, amount);
   }
 
-  /// @dev Collect all accumulated rewards
+  /// @dev Returns amount of rewards from all farms
   /// @param recipient Address of recipient which has been passed when the deposit was made
   /// @param token Address of token in which rewards are accumulated
   function allRewardToCollect(address recipient, address token) external view returns (uint256) {

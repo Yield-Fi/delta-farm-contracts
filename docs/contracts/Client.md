@@ -140,7 +140,7 @@ Collect all accumulated rewards
   function allRewardToCollect(address recipient, address token) external returns(uint256)
 ```
 
-Collect all accumulated rewards
+Returns amount of rewards from all farms
 
 
 
