@@ -31,11 +31,17 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
   /// @param strategy Address of the strategy to execute by worker
   event Work(uint256 indexed id, address worker, uint256 amount, address strategy);
 
-  /// @dev It's emitted when reward will be collected
-  /// @param caller Address which call collect function
-  /// @param rewardOwner Address of reward owner
-  /// @param reward Amount of collected reward
-  event RewardCollect(address indexed caller, address indexed rewardOwner, uint256 indexed reward);
+  /// @dev Event is emitted when Claim/Harvest function will be called
+  /// @param recipient Address for which protocol should reduce old position, rewards are sent separately
+  /// @param client Address of client end user comes from
+  /// @param farm Address of target farm
+  /// @param amount Amount of vault operating token (asset) user is going to harvest from protocol .
+  event CollectReward(
+    address indexed recipient,
+    address client,
+    address indexed farm,
+    uint256 indexed amount
+  );
 
   /// @dev It's emitted when worker will register new harvested rewards
   /// @param caller Address of worker which will register rewards
@@ -316,9 +322,6 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     token.safeTransfer(position.owner, reward);
 
     rewards[pid] = 0;
-
-    // Emit
-    emit RewardCollect(msg.sender, position.owner, reward);
   }
 
   /// @dev Function to collect all rewards from each position of given owner
@@ -330,11 +333,13 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       if (positions[i].owner == owner && positions[i].client == msg.sender) {
         rewardAmount = rewardAmount.add(rewards[i]);
         rewards[i] = 0;
+
+        // Index event
+        emit CollectReward(owner, positions[i].client, positions[i].worker, rewards[i]);
       }
     }
 
     token.safeTransfer(owner, rewardAmount);
-    emit RewardCollect(msg.sender, owner, rewardAmount);
   }
 
   /// @dev Function returns amount of all rewards from owner's positions
