@@ -208,13 +208,31 @@ Set client-side fee for given farms
 - `feeBps`: new fee denominator (0 < feeBps < 10000)
 
 
+### getFarmClientFee
+
+```solidity
+  function getFarmClientFee(address farm) external returns(uint256)
+```
+
+Get client-side fee for given farm
+
+
+
+#### Parameters:
+
+- `farm`: Target farm address
+
+
+#### Return Values:
+
+- `uint256`: Fee in BPS
 ### getFarmFee
 
 ```solidity
   function getFarmFee(address farm) external returns(uint256)
 ```
 
-Get client-side- fee for given farm
+Get fee for given farm
 
 
 

@@ -356,11 +356,22 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     emit SetFarmsFee(msg.sender, farms, feeBps);
   }
 
-  /// @dev Get client-side- fee for given farm
+  /// @dev Get client-side fee for given farm
+  /// @param farm Target farm address
+  /// @return uint256 Fee in BPS
+  function getFarmClientFee(address farm) external view returns (uint256) {
+    IWorker worker = IWorker(farm);
+
+    return worker.getClientFee(address(this));
+  }
+
+  /// @dev Get fee for given farm
   /// @param farm Target farm address
   /// @return uint256 Fee in BPS
   function getFarmFee(address farm) external view returns (uint256) {
-    return IWorker(farm).getClientFee(address(this));
+    IWorker worker = IWorker(farm);
+
+    return worker.getClientFee(address(this)).add(worker.treasuryFeeBps());
   }
 
   /// @dev Withdraw all collected fee

@@ -328,3 +328,21 @@ It's emitted when worker will register new harvested rewards
 - `amounts`: Array of reward amounts assign to the specific positions
 
 
+### FeesRegister
+
+```solidity
+  event FeesRegister(address worker, uint256 yieldFiCut, uint256 clientCut, address client)
+```
+It's emitted when worker will register new harvested rewards
+
+
+#### Parameters:
+
+- `worker`: Address of worker which will register rewards
+
+- `yieldFiCut`: Amount of fee yield fi has taken
+
+- `clientCut`: Amount of fee client has taken
+
+- `client`: client address end-user opened position from
+
