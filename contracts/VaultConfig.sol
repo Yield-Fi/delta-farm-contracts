@@ -54,6 +54,7 @@ contract VaultConfig is Initializable, OwnableUpgradeSafe, IVaultConfig {
   ) public onlyOwner {
     wrappedNativeToken = _wrappedNativeToken;
     wrappedNativeTokenRelayer = _wrappedNativeTokenRelayer;
+    treasuryAccount = _treasuryAccount;
 
     emit SetParams(_msgSender(), wrappedNativeToken, wrappedNativeTokenRelayer, _treasuryAccount);
   }
