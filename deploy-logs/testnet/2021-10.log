@@ -148,3 +148,4 @@ Client with Partial withdraw at : 0x5580A4b517656FE08D094E47d19e20E3526f38d1
 2021-10-26 14:39:13 ||| ---> Upgrading implementation of vaults... <---
 2021-10-26 14:39:13 ||| -> BUSD Vault
 2021-10-26 14:39:42 |||   - New implementation of Vault Config deployed at 0x62957B015e5389273c269afaf583b960Fb0Ef3FC
+2021-10-26 14:40:33 |||   - New implementation of Vault deployed at 0xE5d0B7d609c057ad1CE2F27D49Aad80144936CA7
