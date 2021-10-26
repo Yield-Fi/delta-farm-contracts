@@ -326,6 +326,14 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         abi.encode(worker.baseToken(), worker.token1(), worker.token0(), tokensToWithdraw)
       )
     );
+
+    emit Withdraw(
+      recipient,
+      farm,
+      howmuch >= IWorker(farm).tokensToReceive(positionId)
+        ? IWorker(farm).tokensToReceive(positionId)
+        : howmuch
+    );
   }
 
   /// @dev Returns estimated amount to withdraw from given farm
