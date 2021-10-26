@@ -4539,6 +4539,186 @@
           }
         }
       }
+    },
+    "32d17f060f4a173a3ff0e4f578674836cd2a78df4162a1e3e2659eb0c2ba9556": {
+      "address": "0x557Cfd7E5544006F530460dBA9D3e2e005804F03",
+      "txHash": "0xb6581045b18624fb225bb3f58b0b9602020d81053b2c6c6f9bcf9fd782c36a6e",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "Vault",
+            "label": "_IN_EXEC_LOCK",
+            "type": "t_uint256",
+            "src": "contracts/Vault.sol:67"
+          },
+          {
+            "contract": "Vault",
+            "label": "POSITION_ID",
+            "type": "t_uint256",
+            "src": "contracts/Vault.sol:68"
+          },
+          {
+            "contract": "Vault",
+            "label": "STRATEGY",
+            "type": "t_address",
+            "src": "contracts/Vault.sol:69"
+          },
+          {
+            "contract": "Vault",
+            "label": "token",
+            "type": "t_address",
+            "src": "contracts/Vault.sol:73"
+          },
+          {
+            "contract": "Vault",
+            "label": "config",
+            "type": "t_contract(IVaultConfig)6187",
+            "src": "contracts/Vault.sol:81"
+          },
+          {
+            "contract": "Vault",
+            "label": "positions",
+            "type": "t_mapping(t_uint256,t_struct(Position)4388_storage)",
+            "src": "contracts/Vault.sol:82"
+          },
+          {
+            "contract": "Vault",
+            "label": "nextPositionID",
+            "type": "t_uint256",
+            "src": "contracts/Vault.sol:83"
+          },
+          {
+            "contract": "Vault",
+            "label": "feeCollector",
+            "type": "t_contract(IFeeCollector)5826",
+            "src": "contracts/Vault.sol:86"
+          },
+          {
+            "contract": "Vault",
+            "label": "protocolManager",
+            "type": "t_contract(IProtocolManager)6001",
+            "src": "contracts/Vault.sol:88"
+          },
+          {
+            "contract": "Vault",
+            "label": "rewards",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/Vault.sol:91"
+          },
+          {
+            "contract": "Vault",
+            "label": "approvedRewardAssigners",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts/Vault.sol:92"
+          },
+          {
+            "contract": "Vault",
+            "label": "totalRewards",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/Vault.sol:94"
+          }
+        ],
+        "types": {
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_contract(IVaultConfig)6187": {
+            "label": "contract IVaultConfig"
+          },
+          "t_mapping(t_uint256,t_struct(Position)4388_storage)": {
+            "label": "mapping(uint256 => struct Vault.Position)"
+          },
+          "t_struct(Position)4388_storage": {
+            "label": "struct Vault.Position",
+            "members": [
+              {
+                "label": "worker",
+                "type": "t_address"
+              },
+              {
+                "label": "owner",
+                "type": "t_address"
+              },
+              {
+                "label": "client",
+                "type": "t_address"
+              }
+            ]
+          },
+          "t_contract(IFeeCollector)5826": {
+            "label": "contract IFeeCollector"
+          },
+          "t_contract(IProtocolManager)6001": {
+            "label": "contract IProtocolManager"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
     }
   }
 }
