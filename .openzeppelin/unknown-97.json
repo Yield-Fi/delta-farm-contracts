@@ -144,6 +144,11 @@
       "address": "0xBFDf0eE4B8F7A600fDF8dd438B61C4F0A35F272b",
       "txHash": "0x5044a606afba0451642d2745620c9eef5cde3790069bb26c96292c6864f29cbd",
       "kind": "transparent"
+    },
+    {
+      "address": "0x28CbD344a246Cc65B8943B955D8822de2fA2F110",
+      "txHash": "0xe42492d64e8caa38ce0e9e345d095ca84719ed9217f1ef4b00ab98675b984f62",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -4127,13 +4132,13 @@
           {
             "contract": "Client",
             "label": "protocolManager",
-            "type": "t_contract(IProtocolManager)5989",
+            "type": "t_contract(IProtocolManager)5991",
             "src": "contracts\\Client.sol:87"
           },
           {
             "contract": "Client",
             "label": "feeCollector",
-            "type": "t_contract(IFeeCollector)5814",
+            "type": "t_contract(IFeeCollector)5816",
             "src": "contracts\\Client.sol:89"
           },
           {
@@ -4162,10 +4167,10 @@
           "t_string_storage": {
             "label": "string"
           },
-          "t_contract(IProtocolManager)5989": {
+          "t_contract(IProtocolManager)5991": {
             "label": "contract IProtocolManager"
           },
-          "t_contract(IFeeCollector)5814": {
+          "t_contract(IFeeCollector)5816": {
             "label": "contract IFeeCollector"
           },
           "t_array(t_uint256)49_storage": {
@@ -4713,6 +4718,133 @@
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "22fa1590e91bd884c7932f62eb9dcfc85387812ec433292bfc000b514f80b741": {
+      "address": "0x490E374eFfb1072e2C2d5F547a7a403Faf6e1C47",
+      "txHash": "0x121cb0b1be554275cb68702dbccbe32f4896054f83168762d7e80043615d0b98",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\GSN\\Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "Client",
+            "label": "enabledFarms",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Client.sol:80"
+          },
+          {
+            "contract": "Client",
+            "label": "_KIND_",
+            "type": "t_string_storage",
+            "src": "contracts\\Client.sol:83"
+          },
+          {
+            "contract": "Client",
+            "label": "_CLIENT_NAME_",
+            "type": "t_string_storage",
+            "src": "contracts\\Client.sol:84"
+          },
+          {
+            "contract": "Client",
+            "label": "protocolManager",
+            "type": "t_contract(IProtocolManager)6001",
+            "src": "contracts\\Client.sol:87"
+          },
+          {
+            "contract": "Client",
+            "label": "feeCollector",
+            "type": "t_contract(IFeeCollector)5826",
+            "src": "contracts\\Client.sol:89"
+          },
+          {
+            "contract": "Client",
+            "label": "whitelistedUsers",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Client.sol:92"
+          },
+          {
+            "contract": "Client",
+            "label": "whitelistedOperators",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts\\Client.sol:93"
+          }
+        ],
+        "types": {
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_contract(IProtocolManager)6001": {
+            "label": "contract IProtocolManager"
+          },
+          "t_contract(IFeeCollector)5826": {
+            "label": "contract IFeeCollector"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
