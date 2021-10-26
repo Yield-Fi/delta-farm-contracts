@@ -332,10 +332,11 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     for (uint256 i = 1; i < nextPositionID; i++) {
       if (positions[i].owner == owner && positions[i].client == msg.sender) {
         rewardAmount = rewardAmount.add(rewards[i]);
-        rewards[i] = 0;
 
         // Index event
         emit CollectReward(owner, positions[i].client, positions[i].worker, rewards[i]);
+
+        rewards[i] = 0;
       }
     }
 
