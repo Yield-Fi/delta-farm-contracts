@@ -84,9 +84,9 @@ export const testnetConfig: ProjectConfigType = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "0x5C024fEf8CFf1C154A5de991387cDaF98F3c7222",
-      AddToPoolWithoutBaseToken: "0x613F72801f2Ef7BC328e22753Ab7Da1866F02067",
-      Liquidate: "0x097ED2FA662c5a58C81d767F15Bc16227DC55C8E",
+      AddToPoolWithBaseToken: "0x66C3c16516be4513B57cf80e8C1503552ae7841a",
+      AddToPoolWithoutBaseToken: "0x647d5223adfb794BdEFBCe77237C4d834Bb211EA",
+      Liquidate: "0x66C3c16516be4513B57cf80e8C1503552ae7841a",
     },
   },
   vaults: [
