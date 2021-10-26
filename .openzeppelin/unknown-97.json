@@ -149,6 +149,21 @@
       "address": "0x28CbD344a246Cc65B8943B955D8822de2fA2F110",
       "txHash": "0xe42492d64e8caa38ce0e9e345d095ca84719ed9217f1ef4b00ab98675b984f62",
       "kind": "transparent"
+    },
+    {
+      "address": "0xB25B26F77e86a657eA07177b99A7672c5Cff6c80",
+      "txHash": "0xe021b83f95fa242400b7086c308fcce920e421d69fdd6bc2fc005a1cd3b9465e",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x844d043AAE9391F9Bc48fD397Ca132860cb43f67",
+      "txHash": "0x085640ef541b725080147bafc605076ff5addacf9b7b4b463eba6d495f03b87c",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7FF08c6C3F0EdE44b7d7831b3071e3ad9c1C993A",
+      "txHash": "0x2213f2b1804e826ad4015d6aaa9bd87ef77041da05f89861bb7ce97fdc391de1",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -894,7 +909,7 @@
           {
             "contract": "PancakeswapStrategyAddToPoolWithBaseToken",
             "label": "router",
-            "type": "t_contract(IPancakeRouterV2)8761",
+            "type": "t_contract(IPancakeRouterV2)9287",
             "src": "contracts\\strategies\\pancake\\PancakeswapStrategyAddToPoolWithBaseToken.sol:29"
           }
         ],
@@ -902,7 +917,7 @@
           "t_contract(IPancakeFactory)1305": {
             "label": "contract IPancakeFactory"
           },
-          "t_contract(IPancakeRouterV2)8761": {
+          "t_contract(IPancakeRouterV2)9287": {
             "label": "contract IPancakeRouterV2"
           },
           "t_bool": {
@@ -1076,7 +1091,7 @@
           {
             "contract": "PancakeswapStrategyLiquidate",
             "label": "router",
-            "type": "t_contract(IPancakeRouterV2)8761",
+            "type": "t_contract(IPancakeRouterV2)9277",
             "src": "contracts\\strategies\\pancake\\PancakeswapStrategyLiquidate.sol:25"
           }
         ],
@@ -1084,7 +1099,7 @@
           "t_contract(IPancakeFactory)1305": {
             "label": "contract IPancakeFactory"
           },
-          "t_contract(IPancakeRouterV2)8761": {
+          "t_contract(IPancakeRouterV2)9277": {
             "label": "contract IPancakeRouterV2"
           },
           "t_bool": {
@@ -4845,6 +4860,97 @@
           },
           "t_uint256": {
             "label": "uint256"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "2179737bcae5d0b69e54ab49ed2ad57ca4d7e2cc57d9f8f561ba84afc1189dcf": {
+      "address": "0x2692B5C5100312614c987AA53B21C9213cD898Fd",
+      "txHash": "0xba4b05475f71b7a0821abc52db6f58a036e6f57bfa8d1c90b56a6c6843a2d772",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\GSN\\Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\access\\Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-ethereum-package\\contracts\\utils\\ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "PancakeswapStrategyLiquidate",
+            "label": "factory",
+            "type": "t_contract(IPancakeFactory)1305",
+            "src": "contracts\\strategies\\pancake\\PancakeswapStrategyLiquidate.sol:27"
+          },
+          {
+            "contract": "PancakeswapStrategyLiquidate",
+            "label": "router",
+            "type": "t_contract(IPancakeRouterV2)9287",
+            "src": "contracts\\strategies\\pancake\\PancakeswapStrategyLiquidate.sol:28"
+          }
+        ],
+        "types": {
+          "t_contract(IPancakeFactory)1305": {
+            "label": "contract IPancakeFactory"
+          },
+          "t_contract(IPancakeRouterV2)9287": {
+            "label": "contract IPancakeRouterV2"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"
