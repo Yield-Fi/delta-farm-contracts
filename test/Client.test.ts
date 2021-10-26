@@ -423,7 +423,7 @@ describe("Client contract", async () => {
       );
 
       // Execute withdrawal flow
-      await exampleClientAsAlice.withdraw(1, aliceAddress, pancakeswapWorker01.address);
+      await exampleClientAsAlice.withdraw(aliceAddress, pancakeswapWorker01.address, 0);
 
       console.log(
         "TODO: Aktualnie strategia likwidacji wyplaca asset na callera - w przypadku wyplaty przy aktualnej logice, callerem jest Vault. Do zmiany"

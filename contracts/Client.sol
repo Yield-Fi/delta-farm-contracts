@@ -4,7 +4,7 @@ import { IWorker } from "./interfaces/IWorker.sol";
 import { IVault } from "./interfaces/IVault.sol";
 import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
 import { IFeeCollector } from "./interfaces/IFeeCollector.sol";
-//https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v2.4.0/contracts/token/ERC20/ERC20.sol
+
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
@@ -296,32 +296,27 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   }
 
   function withdraw(
-    uint256 positionId,
     address recipient,
-    address farm
+    address farm,
+    uint256 howmuch
   ) external onlyWhitelistedUsers {
-    // Cast worker for further methods' usage
-    IWorker _worker = IWorker(farm);
+    IWorker worker = IWorker(farm);
+    address vaultAddress = worker.operatingVault();
 
-    // Cast vault for further method's usage
-    IVault vault = IVault(_worker.operatingVault());
+    require(vaultAddress != address(0), "ClientContract: Invalid farm address");
 
-    // Enter the protocol using resolved worker strategy
-    /// @dev encoded: (address strategy, (address baseToken, address token0, address token1, uint256 minLPAmount))
-    /// worker.getStrategies()[2] = Liquidate
-    vault.work(
+    uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
+
+    IVault(vaultAddress).work(
       positionId,
       farm,
       0,
       recipient,
       abi.encode(
-        _worker.getStrategies()[2],
-        abi.encode(_worker.baseToken(), _worker.token1(), _worker.token0(), 0)
+        worker.getStrategies()[2],
+        abi.encode(worker.baseToken(), worker.token1(), worker.token0(), howmuch)
       )
     );
-    //how many Tokens
-    uint256 howmuch = vault.positionInfo(positionId);
-    emit Withdraw(recipient, farm, howmuch);
   }
 
   /// @dev Returns estimated amount to withdraw from given farm
