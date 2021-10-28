@@ -356,8 +356,6 @@ export const mainnetConfig = {
     {
       name: "BUSD Vault",
       address: "",
-      tokenName: "deficental BUSD",
-      tokenSymbol: "defiBUSD",
       baseToken: tokens.BUSD,
       config: "-",
       workers: [

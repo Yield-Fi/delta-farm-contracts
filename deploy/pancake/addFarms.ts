@@ -17,60 +17,60 @@ const func: DeployFunction = async function () {
   const config = getConfig();
 
   const pairs = [
-    {
-      token0: config.tokens.BUSD,
-      token1: config.tokens.USDT,
-      liquidity: {
-        token0: parseEther("10000"),
-        token1: parseEther("10000"),
-      },
-      allocPoints: 1000,
-    },
-    {
-      token0: config.tokens.BUSD,
-      token1: config.tokens.DAI,
-      liquidity: {
-        token0: parseEther("10000"),
-        token1: parseEther("10000"),
-      },
-      allocPoints: 1000,
-    },
-    {
-      token0: config.tokens.USDT,
-      token1: config.tokens.DAI,
-      liquidity: {
-        token0: parseEther("10000"),
-        token1: parseEther("10000"),
-      },
-      allocPoints: 1000,
-    },
-    {
-      token0: config.tokens.WBNB,
-      token1: config.tokens.BUSD,
-      liquidity: {
-        token0: parseEther("1.5"),
-        token1: parseEther("10000"),
-      },
-      allocPoints: 1000,
-    },
-    {
-      token0: config.tokens.WBNB,
-      token1: config.tokens.USDT,
-      liquidity: {
-        token0: parseEther("1.5"),
-        token1: parseEther("10000"),
-      },
-      allocPoints: 1000,
-    },
-    {
-      token0: config.tokens.WBNB,
-      token1: config.tokens.CAKE,
-      liquidity: {
-        token0: parseEther("1.5"),
-        token1: parseEther("10000"),
-      },
-      allocPoints: 1000,
-    },
+    // {
+    //   token0: config.tokens.BUSD,
+    //   token1: config.tokens.USDT,
+    //   liquidity: {
+    //     token0: parseEther("10000"),
+    //     token1: parseEther("10000"),
+    //   },
+    //   allocPoints: 1000,
+    // },
+    // {
+    //   token0: config.tokens.BUSD,
+    //   token1: config.tokens.DAI,
+    //   liquidity: {
+    //     token0: parseEther("10000"),
+    //     token1: parseEther("10000"),
+    //   },
+    //   allocPoints: 1000,
+    // },
+    // {
+    //   token0: config.tokens.USDT,
+    //   token1: config.tokens.DAI,
+    //   liquidity: {
+    //     token0: parseEther("10000"),
+    //     token1: parseEther("10000"),
+    //   },
+    //   allocPoints: 1000,
+    // },
+    // {
+    //   token0: config.tokens.WBNB,
+    //   token1: config.tokens.BUSD,
+    //   liquidity: {
+    //     token0: parseEther("1.5"),
+    //     token1: parseEther("10000"),
+    //   },
+    //   allocPoints: 1000,
+    // },
+    // {
+    //   token0: config.tokens.WBNB,
+    //   token1: config.tokens.USDT,
+    //   liquidity: {
+    //     token0: parseEther("1.5"),
+    //     token1: parseEther("10000"),
+    //   },
+    //   allocPoints: 1000,
+    // },
+    // {
+    //   token0: config.tokens.WBNB,
+    //   token1: config.tokens.CAKE,
+    //   liquidity: {
+    //     token0: parseEther("1.5"),
+    //     token1: parseEther("10000"),
+    //   },
+    //   allocPoints: 1000,
+    // },
     {
       token0: config.tokens.CAKE,
       token1: config.tokens.BUSD,
@@ -122,7 +122,7 @@ const func: DeployFunction = async function () {
 
     logger(` - ${await Token0.symbol()}-${await Token1.symbol()} pair:`);
 
-    await PancakeFactory.createPair(pair.token0, pair.token1);
+    await PancakeFactory.createPair(pair.token0, pair.token1, { gasLimit: "210000" });
 
     if (Token0.address.toLowerCase() == config.tokens.WBNB.toLowerCase()) {
       await WBNB.deposit({ value: pair.liquidity.token0 });
@@ -150,7 +150,9 @@ const func: DeployFunction = async function () {
 
     const LP_TOKEN = await PancakeFactory.getPair(Token0.address, Token1.address);
 
-    const addFarmTx = await PancakeMasterChef.add(pair.allocPoints, LP_TOKEN, true);
+    const addFarmTx = await PancakeMasterChef.add(pair.allocPoints, LP_TOKEN, true, {
+      gasLimit: "210000",
+    });
 
     logger(
       ` - Farm added: pool id - ${poolLength}, lp token: ${LP_TOKEN}, tx hash - ${addFarmTx.hash}`

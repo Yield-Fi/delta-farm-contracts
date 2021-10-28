@@ -1,8 +1,17 @@
 import { network } from "hardhat";
-import { mainnetConfig, testnetConfig } from "../../configs";
+import { mainnetConfig, testnetConfig, testnetDevConfig } from "../../configs";
 
 export const getConfig = () => {
-  return network.name === "testnet" ? testnetConfig : mainnetConfig;
+  switch (network.name) {
+    case "testnet":
+      return testnetConfig;
+    case "mainnet":
+      return mainnetConfig;
+    case "testnet-dev":
+      return testnetDevConfig;
+    default:
+      throw Error("Config file not found");
+  }
 };
 
 const ConfigEntity = {

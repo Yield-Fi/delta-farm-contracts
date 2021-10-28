@@ -38,6 +38,7 @@ const testnet = process.env.TESTNET
 export default {
   networks: {
     testnet,
+    ["testnet-dev"]: testnet,
     hardhat: {
       chainId: 31337,
       gas: 12000000,

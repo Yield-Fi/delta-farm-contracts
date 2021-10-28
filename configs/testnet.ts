@@ -93,8 +93,6 @@ export const testnetConfig: ProjectConfigType = {
     {
       name: "BUSD Vault",
       address: "0xE5d0B7d609c057ad1CE2F27D49Aad80144936CA7",
-      tokenName: "deficental BUSD",
-      tokenSymbol: "defiBUSD",
       baseToken: tokens.BUSD,
       config: "0x62957B015e5389273c269afaf583b960Fb0Ef3FC",
       workers: [

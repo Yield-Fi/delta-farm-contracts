@@ -6,10 +6,12 @@ import { logger } from "../utils/logger";
 import { parseEther } from "@ethersproject/units";
 
 const func: DeployFunction = async function ({ network }: HardhatRuntimeEnvironment) {
-  if (network.name !== "testnet") {
+  if (network.name === "mainnet") {
     console.log("This deployment script should be run against testnet only");
     return;
   }
+
+  const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("3");
 
   const [deployer] = await ethers.getSigners();
   const config = getConfig();
@@ -34,8 +36,6 @@ const func: DeployFunction = async function ({ network }: HardhatRuntimeEnvironm
   await PancakeRouter.deployed();
 
   logger(` - PancakeRouter deployed at ${PancakeRouter.address}`);
-
-  const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("40");
 
   const CAKEFactory = await ethers.getContractFactory("CakeToken", deployer);
 
