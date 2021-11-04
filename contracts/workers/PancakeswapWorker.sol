@@ -282,7 +282,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     (address strategy, bytes memory stratParams) = abi.decode(data, (address, bytes));
 
     // Revert transaction when farm is disabled and strategy to add liquidity is used
-    if (!isEnabled && (strategy == strategies[0] || strategy != strategies[1])) {
+    if (!isEnabled && (strategy == strategies[0] || strategy == strategies[1])) {
       revert("PancakeswapWorker->work: given farm is disabled");
     }
 

@@ -1,4 +1,4 @@
-# PancakeswapStrategyLiquidate
+# PancakeswapStrategyPartialLiquidate
 
 
 
@@ -34,16 +34,6 @@ Execute worker strategy. Take LP token. Return  BaseToken.
 #### Parameters:
 
 - `data`: Encoded strategy params.
-
-### estimateLpTokenToRemove
-
-```solidity
-  function estimateLpTokenToRemove(address baseToken, contract IPancakePair lpToken, uint256 baseTokenToGetBack) internal returns(uint256)
-```
-
-Function to estimate amount of lp token to remove from pool
-
-
 
 
 ___
