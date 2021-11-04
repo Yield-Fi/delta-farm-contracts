@@ -72,7 +72,7 @@ Request Funds from user through Vault
 ### work
 
 ```solidity
-  function work(uint256 id, address worker, uint256 amount, address recipient, bytes data)
+  function work(uint256 positionId, address worker, uint256 amount, address recipient, bytes data)
 ```
 
 Create a new farming position to unlock your yield farming potential.
@@ -81,7 +81,7 @@ Create a new farming position to unlock your yield farming potential.
 
 #### Parameters:
 
-- `id`: The ID of the position to unlock the earning. Use ZERO for new position.
+- `positionId`: The ID of the position to unlock the earning. Use ZERO for new position.
 
 - `worker`: The address of the authorized worker to work for this position.
 
@@ -295,21 +295,23 @@ It's emitted when client contract perform deposit or withdraw action
 
 - `strategy`: Address of the strategy to execute by worker
 
-### RewardCollect
+### CollectReward
 
 ```solidity
-  event RewardCollect(address caller, address rewardOwner, uint256 reward)
+  event CollectReward(address recipient, address client, address farm, uint256 amount)
 ```
-It's emitted when reward will be collected
+Event is emitted when Claim/Harvest function will be called
 
 
 #### Parameters:
 
-- `caller`: Address which call collect function
+- `recipient`: Address for which protocol should reduce old position, rewards are sent separately
 
-- `rewardOwner`: Address of reward owner
+- `client`: Address of client end user comes from
 
-- `reward`: Amount of collected reward
+- `farm`: Address of target farm
+
+- `amount`: Amount of vault operating token (asset) user is going to harvest from protocol .
 
 ### RewardsRegister
 
