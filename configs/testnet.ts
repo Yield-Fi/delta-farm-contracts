@@ -173,7 +173,7 @@ export const testnetConfig: ProjectConfigType = {
   ],
   clients: [
     {
-      address: "0xd522802222EE597C6550E87472247A86769DABa9",
+      address: "0xf9d9b0b20969639de844ceeA22aF2Ff1735513d5",
       kind: "CEX",
       name: "Client A",
       operators: [

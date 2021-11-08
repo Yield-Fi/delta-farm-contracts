@@ -40,3 +40,6 @@
 2021-11-08 15:47:55 |||   New implementation of CAKE-USDC PancakeswapWorker deployed at 0xf07a50fB889b968AB85A1EB022B830819E416D24
 2021-11-08 15:47:55 |||   -> Upgrading CAKE-USDT PancakeswapWorker...
 2021-11-08 15:48:23 |||   New implementation of CAKE-USDT PancakeswapWorker deployed at 0xF2B51A4959e95c7fA59D1939640A10B53eeBedFB
+2021-11-08 16:26:41 ||| ---> Deploying Client contracts... <---
+2021-11-08 16:26:41 |||   -> Contract of Client A
+2021-11-08 16:27:23 |||   - Contract of Client A deployed at 0xf9d9b0b20969639de844ceeA22aF2Ff1735513d5
