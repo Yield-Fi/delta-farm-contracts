@@ -367,8 +367,8 @@ describe("PancakeswapWorker", () => {
               [
                 LiquidateStrategy.address,
                 ethers.utils.defaultAbiCoder.encode(
-                  ["address", "address", "address", "uint256"],
-                  [BaseToken.address, BaseToken.address, Token0.address, "0"]
+                  ["address", "address", "address", "uint256", "address"],
+                  [BaseToken.address, BaseToken.address, Token0.address, "0", MockVault.address]
                 ),
               ]
             ),
@@ -475,8 +475,8 @@ describe("PancakeswapWorker", () => {
               [
                 LiquidateStrategy.address,
                 ethers.utils.defaultAbiCoder.encode(
-                  ["address", "address", "address", "uint256"],
-                  [BaseToken.address, Token0.address, Token1.address, "0"]
+                  ["address", "address", "address", "uint256", "address"],
+                  [BaseToken.address, Token0.address, Token1.address, "0", MockVault.address]
                 ),
               ]
             ),

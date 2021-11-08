@@ -300,8 +300,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     address farm,
     uint256 howmuch
   ) external onlyWhitelistedUsers {
-    IWorker worker = IWorker(farm);
-    address vaultAddress = worker.operatingVault();
+    address vaultAddress = IWorker(farm).operatingVault();
 
     require(vaultAddress != address(0), "ClientContract: Invalid farm address");
 
@@ -316,15 +315,20 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
       tokensToWithdraw = howmuch;
     }
 
+    bytes memory strategyParams = abi.encode(
+      IWorker(farm).baseToken(),
+      IWorker(farm).token1(),
+      IWorker(farm).token0(),
+      tokensToWithdraw,
+      recipient
+    );
+
     IVault(vaultAddress).work(
       positionId,
       farm,
       0,
       recipient,
-      abi.encode(
-        worker.getStrategies()[2],
-        abi.encode(worker.baseToken(), worker.token1(), worker.token0(), tokensToWithdraw)
-      )
+      abi.encode(IWorker(farm).getStrategies()[2], strategyParams)
     );
 
     emit Withdraw(

@@ -177,12 +177,13 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     await expect(
       strat.execute(
         ethers.utils.defaultAbiCoder.encode(
-          ["address", "address", "address", "uint256"],
+          ["address", "address", "address", "uint256", "address"],
           [
             baseToken.address,
             baseToken.address,
             farmingToken.address,
             ethers.utils.parseEther("20000"),
+            await bob.getAddress(),
           ]
         )
       )
@@ -191,8 +192,14 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     // Bob uses liquidate strategy to turn all LPs back to BTOKEN
     await strat.execute(
       ethers.utils.defaultAbiCoder.encode(
-        ["address", "address", "address", "uint256"],
-        [baseToken.address, baseToken.address, farmingToken.address, ethers.utils.parseEther("0")]
+        ["address", "address", "address", "uint256", "address"],
+        [
+          baseToken.address,
+          baseToken.address,
+          farmingToken.address,
+          ethers.utils.parseEther("0"),
+          await bob.getAddress(),
+        ]
       )
     );
 
@@ -244,8 +251,14 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     await lpAsAlice.transfer(strat.address, ethers.utils.parseEther("31.622776601683792319"));
     await stratAsWorker.execute(
       ethers.utils.defaultAbiCoder.encode(
-        ["address", "address", "address", "uint256"],
-        [baseToken.address, baseToken.address, farmingToken.address, ethers.utils.parseEther("15")]
+        ["address", "address", "address", "uint256", "address"],
+        [
+          baseToken.address,
+          baseToken.address,
+          farmingToken.address,
+          ethers.utils.parseEther("15"),
+          await worker.getAddress(),
+        ]
       )
     );
 

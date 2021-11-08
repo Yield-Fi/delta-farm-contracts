@@ -7,7 +7,7 @@ const upgradeFunc: DeployFunction = async () => {
   const config = getConfig();
   const [deployer] = await ethers.getSigners();
 
-  logger("---> Upgrading strategies implementation for the pancakeswap workers... <---");
+  logger("---> Upgrading liquidate strategy implementation for the pancakeswap workers... <---");
 
   const liquidateStrategyProxyAddress = config.strategies.pancakeswap.Liquidate;
 
@@ -15,7 +15,7 @@ const upgradeFunc: DeployFunction = async () => {
     throw new Error("Address for PancakeswapStrategyLiquidate not found");
   }
 
-   const LiquidateStrategyFactory = await ethers.getContractFactory(
+  const LiquidateStrategyFactory = await ethers.getContractFactory(
     "PancakeswapStrategyLiquidate",
     deployer
   );
@@ -30,4 +30,4 @@ const upgradeFunc: DeployFunction = async () => {
 };
 
 export default upgradeFunc;
-upgradeFunc.tags = ["PancakeswapStrategiesUpgrade"];
+upgradeFunc.tags = ["PancakeswapLiquidateStrategyUpgrade"];
