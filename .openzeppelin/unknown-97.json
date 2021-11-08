@@ -5880,7 +5880,7 @@
           {
             "contract": "PancakeswapStrategyLiquidate",
             "label": "router",
-            "type": "t_contract(IPancakeRouterV2)9339",
+            "type": "t_contract(IPancakeRouterV2)9344",
             "src": "contracts\\strategies\\pancake\\PancakeswapStrategyLiquidate.sol:28"
           }
         ],
@@ -5888,7 +5888,7 @@
           "t_contract(IPancakeFactory)1305": {
             "label": "contract IPancakeFactory"
           },
-          "t_contract(IPancakeRouterV2)9339": {
+          "t_contract(IPancakeRouterV2)9344": {
             "label": "contract IPancakeRouterV2"
           },
           "t_bool": {

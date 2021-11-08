@@ -86,7 +86,7 @@ export const testnetConfig: ProjectConfigType = {
     pancakeswap: {
       AddToPoolWithBaseToken: "0x66C3c16516be4513B57cf80e8C1503552ae7841a",
       AddToPoolWithoutBaseToken: "0x647d5223adfb794BdEFBCe77237C4d834Bb211EA",
-      Liquidate: "0x66C3c16516be4513B57cf80e8C1503552ae7841a",
+      Liquidate: "0xA70D3E2EC79165c573dF4Da157F48E51b9B37916",
     },
   },
   vaults: [
@@ -176,11 +176,7 @@ export const testnetConfig: ProjectConfigType = {
       address: "0xf9d9b0b20969639de844ceeA22aF2Ff1735513d5",
       kind: "CEX",
       name: "Client A",
-      operators: [
-        "0x07661882d1C4b7F703Ca0A8898afE4D402dFdeF2",
-        "0x3Fec471402390B7b6ee32CAc8F88FDD6A5859A72",
-        "0x972989E6e1dFF6f6C03B3F2b0392f73081d53f8F",
-      ],
+      operators: ["0xEeF6D5514dB9785caD8f2fc69BbfFe4eBB553656"],
     },
   ],
 };

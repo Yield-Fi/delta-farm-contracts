@@ -43,3 +43,7 @@
 2021-11-08 16:26:41 ||| ---> Deploying Client contracts... <---
 2021-11-08 16:26:41 |||   -> Contract of Client A
 2021-11-08 16:27:23 |||   - Contract of Client A deployed at 0xf9d9b0b20969639de844ceeA22aF2Ff1735513d5
+2021-11-08 17:47:52 ||| ---> Upgrading strategies implementation for the pancakeswap workers... <---
+2021-11-08 17:48:23 ||| - new implementation of AddToPoolWithBaseTokenStrategy deployed at 0x66C3c16516be4513B57cf80e8C1503552ae7841a
+2021-11-08 17:54:02 ||| ---> Upgrading strategies implementation for the pancakeswap workers... <---
+2021-11-08 17:54:31 ||| - new implementation of LiquidateStrategy deployed at 0xA70D3E2EC79165c573dF4Da157F48E51b9B37916
