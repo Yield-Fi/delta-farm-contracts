@@ -41,10 +41,13 @@ contract PancakeswapStrategyLiquidate is
   /// @param data Encoded strategy params.
   function execute(bytes calldata data) external override nonReentrant {
     // 1. Decode strategy params and find lp token.
-    (address baseToken, address token0, address token1, uint256 baseTokenToGetBack) = abi.decode(
-      data,
-      (address, address, address, uint256)
-    );
+    (
+      address baseToken,
+      address token0,
+      address token1,
+      uint256 baseTokenToGetBack,
+      address recipient
+    ) = abi.decode(data, (address, address, address, uint256, address));
 
     IPancakePair lpToken = IPancakePair(factory.getPair(token0, token1));
     // 2. Approve router to do their stuffs
@@ -75,7 +78,7 @@ contract PancakeswapStrategyLiquidate is
     if (lpToken.balanceOf(address(this)) > 0) {
       lpToken.transfer(msg.sender, lpToken.balanceOf(address(this)));
     }
-    SafeToken.safeTransfer(baseToken, msg.sender, balance);
+    SafeToken.safeTransfer(baseToken, recipient, balance);
     // 6. Reset approve for safety reason
     require(
       lpToken.approve(address(router), 0),

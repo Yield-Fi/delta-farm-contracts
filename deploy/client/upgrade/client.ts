@@ -16,6 +16,7 @@ const upgradeFunc: DeployFunction = async () => {
 
     const ClientFactory = await ethers.getContractFactory("Client", deployer);
 
+    console.log(client.address);
     const Client = (await upgrades.upgradeProxy(client.address, ClientFactory)) as Client;
 
     await Client.deployed();

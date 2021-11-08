@@ -12,3 +12,8 @@
 2021-11-04 16:56:13 |||   New implementation of WBNB-USDT PancakeswapWorker deployed at 0xFDF1C9c222e394cB043f2f12a1bfA50f3733CDE0
 2021-11-04 16:56:13 |||   -> Upgrading WBNB-CAKE PancakeswapWorker...
 2021-11-04 16:56:42 |||   New implementation of WBNB-CAKE PancakeswapWorker deployed at 0xd323871FDC8f2F23653b6A2Dc497FAd8a6c9Ab05
+2021-11-08 08:44:25 ||| ---> Upgrading strategies implementation for the pancakeswap workers... <---
+2021-11-08 08:44:54 ||| - new implementation of LiquidateStrategy deployed at 0xB17e65D974c84fe85C64712221974654E3148d5f
+2021-11-08 08:47:28 ||| --> Upgrading implementation of client contracts... <--
+2021-11-08 08:47:28 |||   -> Upgrading contract of Client A...
+2021-11-08 08:48:12 |||   New implementation of contract of Client A deployed at 0xed54D3537E974259ad2cC82a4F925ab7d5fAf410

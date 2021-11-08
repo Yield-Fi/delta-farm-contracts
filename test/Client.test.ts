@@ -425,8 +425,9 @@ describe("Client contract", async () => {
       // Execute withdrawal flow
       await exampleClientAsAlice.withdraw(aliceAddress, pancakeswapWorker01.address, 0);
 
-      console.log(
-        "TODO: Aktualnie strategia likwidacji wyplaca asset na callera - w przypadku wyplaty przy aktualnej logice, callerem jest Vault. Do zmiany"
+      // Alice received ~= 1 base token after withdraw
+      expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.is.eql(
+        ethers.utils.parseEther("0.999649838808597569")
       );
     });
   });
