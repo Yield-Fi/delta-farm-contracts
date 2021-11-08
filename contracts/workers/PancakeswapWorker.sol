@@ -508,4 +508,8 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     // Add new positon id to the array
     positionIds.push(positionId);
   }
+
+  function getRewardToken() external view override returns (address) {
+    return cake;
+  }
 }

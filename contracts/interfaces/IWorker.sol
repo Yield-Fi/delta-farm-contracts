@@ -53,4 +53,6 @@ interface IWorker {
   function toggleWorker(bool _isEnable) external;
 
   function isWorkerEnabled() external view returns (bool);
+
+  function getRewardToken() external view returns (address);
 }

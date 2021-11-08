@@ -519,4 +519,10 @@ describe("PancakeswapWorker", () => {
     await worker__admin.setTreasuryFee("500");
     expect(await WorkerTOK0_TOK1.treasuryFeeBps()).to.eq("500");
   });
+
+  it("should return proper reward token", async () => {
+    const rewardToken = await WorkerBUSD_TOK0.getRewardToken();
+
+    expect(rewardToken).to.be.eql(CakeToken.address);
+  });
 });
