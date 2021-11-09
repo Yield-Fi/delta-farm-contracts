@@ -33,6 +33,7 @@ import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
 import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
 import { assertAlmostEqual } from "./helpers/assert";
+import { parseEther } from "@ethersproject/units";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -240,44 +241,44 @@ describe("Client contract", async () => {
       {
         token0: baseToken,
         token1: targetToken,
-        amount0desired: ethers.utils.parseEther("0.1"),
-        amount1desired: ethers.utils.parseEther("10"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: cake,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("0.1"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount0desired: ethers.utils.parseEther("100"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: baseToken,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("1"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: targetToken,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("1"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: testToken,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("1"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: testToken,
         token1: baseToken,
-        amount0desired: ethers.utils.parseEther("1"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: testToken,
         token1: targetToken,
-        amount0desired: ethers.utils.parseEther("1"),
-        amount1desired: ethers.utils.parseEther("1"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
     ]);
 
@@ -349,14 +350,16 @@ describe("Client contract", async () => {
       expect(position.client).to.be.eql(exampleClient.address);
 
       // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.999649838808597569;
-      expect(positionInfo).to.be.bignumber.that.is.eql(
-        ethers.utils.parseEther("0.999649838808597569")
+      expect(positionInfo.toString()).to.be.eql(
+        ethers.utils.parseEther("0.997501868759355536").toString()
       );
     });
 
     it("should revert if target work is disabled by client", async () => {
       // Disable worker
       await exampleClient.disableFarms([pancakeswapWorker01.address]);
+
+      expect(await exampleClient.isFarmEnabled(pancakeswapWorker01.address)).to.be.false;
 
       // Proceed with entering the protocol
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
@@ -367,6 +370,23 @@ describe("Client contract", async () => {
       await expect(
         exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT)
       ).to.be.revertedWith("ClientContract: Target farm hasn't been enabled by the client");
+    });
+
+    it("should estimate deposit correctly", async () => {
+      const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
+        await exampleClient.estimateDeposit(pancakeswapWorker01.address, parseEther("2"));
+
+      expect(firstPartOfBaseToken.toString()).to.be.eq(
+        parseEther("1.000751439456838049").toString()
+      );
+      expect(secondPartOfBaseToken.toString()).to.be.eq(
+        parseEther("0.999248560543161951").toString()
+      );
+      expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
+        parseEther("2").toString()
+      );
+      expect(amountOfToken0.toString()).to.be.eq(parseEther("0.997254052438285379").toString());
+      expect(amountOfToken1.toString()).to.be.eq(parseEther("0.999248560543161951").toString());
     });
   });
 
@@ -399,11 +419,32 @@ describe("Client contract", async () => {
       expect(position.owner).to.be.eql(aliceAddress);
       expect(position.client).to.be.eql(exampleClient.address);
 
-      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 1.971394083659056879 (due to liquidity ratios) [1 BT -> TST -> TT];
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.995504994395289884 (due to liquidity ratios) [1 BT -> TST -> TT];
       assertAlmostEqual(
         positionInfo.toString(),
-        ethers.utils.parseEther("1.971394083659056879").toString()
+        ethers.utils.parseEther("0.995504994395289884").toString()
       );
+    });
+
+    it("should revert transaction when user is not whitelisted", async () => {
+      await exampleClient.whitelistUsers([aliceAddress], false);
+
+      expect(
+        exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, 100)
+      ).to.be.revertedWith("ClientContract: Caller not whitelisted.");
+    });
+
+    it("should estimate deposit correctly", async () => {
+      const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
+        await exampleClient.estimateDeposit(pancakeswapWorker02.address, parseEther("2"));
+
+      expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("1").toString());
+      expect(secondPartOfBaseToken.toString()).to.be.eq(parseEther("1").toString());
+      expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
+        parseEther("2").toString()
+      );
+      expect(amountOfToken0.toString()).to.be.eq(parseEther("0.996505985279683515").toString());
+      expect(amountOfToken1.toString()).to.be.eq(parseEther("0.996505985279683515").toString());
     });
   });
 
@@ -422,13 +463,25 @@ describe("Client contract", async () => {
         ethers.utils.parseEther("0")
       );
 
+      expect(
+        (await exampleClient.amountToWithdraw(pancakeswapWorker01.address, aliceAddress)).toString()
+      ).to.be.eq(parseEther("0.997501868759355536").toString());
+
       // Execute withdrawal flow
       await exampleClientAsAlice.withdraw(aliceAddress, pancakeswapWorker01.address, 0);
 
       // Alice received ~= 1 base token after withdraw
-      expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.is.eql(
-        ethers.utils.parseEther("0.999649838808597569")
+      expect((await baseToken.balanceOf(aliceAddress)).toString()).to.be.eql(
+        ethers.utils.parseEther("0.997501868759355536").toString()
       );
+    });
+
+    it("should revert transaction when user is not whitelisted", async () => {
+      await exampleClient.whitelistUsers([aliceAddress], false);
+
+      expect(
+        exampleClientAsAlice.withdraw(aliceAddress, pancakeswapWorker01.address, 100)
+      ).to.be.revertedWith("ClientContract: Caller not whitelisted.");
     });
   });
 
@@ -443,12 +496,27 @@ describe("Client contract", async () => {
       ).to.be.revertedWith("ClientContract: Invalid fee amount given");
     });
 
-    it("should work if provided fee is valid", async () => {
+    it("should work if provided fee is valid and view functions return correct fee's data", async () => {
       await exampleClient.setFarmsFee([pancakeswapWorker01.address], 500);
 
       expect(
-        await pancakeswapWorker01.getClientFee(exampleClient.address)
+        await exampleClient.getFarmClientFee(pancakeswapWorker01.address)
       ).to.be.bignumber.that.is.eql(ethers.BigNumber.from(500));
+
+      await protocolManager.approveAdminContract(deployerAddress); // Workaround
+      await pancakeswapWorker01.setTreasuryFee(1000);
+      // + 10% treasury fee
+      expect(
+        await exampleClient.getFarmFee(pancakeswapWorker01.address)
+      ).to.be.bignumber.that.is.eql(ethers.BigNumber.from(1500));
+    });
+
+    it("should revert transaction when operator is not whitelisted", async () => {
+      await exampleClient.whitelistOperators([aliceAddress], false);
+
+      expect(
+        exampleClientAsAlice.setFarmsFee([pancakeswapWorker01.address], 100)
+      ).to.be.revertedWith("ClientContract: Operator not whitelisted.");
     });
   });
 
@@ -516,6 +584,133 @@ describe("Client contract", async () => {
       expect(
         await exampleClient.rewardToCollect(pancakeswapWorker01.address, bobAddress)
       ).to.be.bignumber.that.is.eql(ethers.BigNumber.from("0"));
+    });
+
+    it("should revert transaction when user is not whitelisted", async () => {
+      await exampleClient.whitelistUsers([aliceAddress], false);
+
+      expect(
+        exampleClientAsAlice.collectReward(pancakeswapWorker01.address, aliceAddress)
+      ).to.be.revertedWith("ClientContract: Caller not whitelisted.");
+    });
+
+    it("rewardToCollect function should return 0 when position is not exists", async () => {
+      expect(
+        (await exampleClient.rewardToCollect(pancakeswapWorker01.address, aliceAddress)).toString()
+      ).to.be.eq("0");
+    });
+  });
+
+  context("Methods for the address whitelisting", () => {
+    it("should whitelist operators", async () => {
+      await exampleClient.whitelistOperators([aliceAddress], false);
+
+      expect(await exampleClient.isOperatorWhitelisted(aliceAddress)).to.be.false;
+
+      await exampleClient.whitelistOperators([aliceAddress], true);
+
+      expect(await exampleClient.isOperatorWhitelisted(aliceAddress)).to.be.true;
+    });
+
+    it("should whitelist users", async () => {
+      await exampleClient.whitelistUsers([aliceAddress], false);
+
+      expect(await exampleClient.isUserWhitelisted(aliceAddress)).to.be.false;
+
+      await exampleClient.whitelistUsers([aliceAddress], true);
+
+      expect(await exampleClient.isUserWhitelisted(aliceAddress)).to.be.true;
+    });
+  });
+
+  context("Collect all rewards", () => {
+    it("should work as intended and collect fee", async () => {
+      // Approvals
+      await protocolManager.approveClients([exampleClient.address], true);
+      await protocolManager.approveBountyCollectors([feeCollector.address], true);
+      await protocolManager.approveVaults([vault.address], true);
+      await protocolManager.approveWorkers(
+        [pancakeswapWorker01.address, pancakeswapWorker02.address],
+        true
+      );
+      await protocolManager.approveAdminContract(deployerAddress); // Workaround
+      await protocolManager.approveHarvesters([deployerAddress], true);
+      await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
+      await exampleClient.setFarmsFee(
+        [pancakeswapWorker01.address, pancakeswapWorker02.address],
+        500
+      ); // 5% for the client
+      await exampleClient.whitelistUsers([deployerAddress], true);
+
+      // Open two positions on two different farms
+      const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
+      await exampleClient.whitelistOperators([deployerAddress], true);
+      await exampleClient.whitelistUsers([aliceAddress], true);
+
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
+
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT);
+
+      // Transfer previously minted CAKE to the workers (simulate harvesting CAKE from staking pool)
+      await cake.transfer(pancakeswapWorker01.address, ethers.utils.parseEther("2"));
+
+      await pancakeswapWorker01.harvestRewards();
+
+      await cake.transfer(pancakeswapWorker02.address, ethers.utils.parseEther("2"));
+
+      await pancakeswapWorker02.harvestRewards();
+
+      // Some cake should have been registered
+      expect((await vault.rewards(1)).toString()).to.be.not.eql(parseEther("0").toString());
+      expect((await vault.rewards(2)).toString()).to.be.not.eql(parseEther("0").toString());
+
+      expect(await feeCollector.fees(exampleClient.address)).to.be.bignumber.that.is.not.eql(
+        ethers.BigNumber.from("0")
+      );
+      expect(
+        await feeCollector.fees(await vaultConfig.treasuryAccount())
+      ).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
+
+      // 2 CAKE + 2 CAKE harvested = 4 CAKE = 40 BASE TOKEN
+      // 40 BASE TOKEN - 15 % (10% treasury fee + 5% client fee) = 34 BASE TOKEN + some additional rewards generated during execute test
+      expect(
+        (await exampleClient.allRewardToCollect(aliceAddress, baseToken.address)).toString()
+      ).to.be.eq(parseEther("34.820649428126150303"));
+
+      await exampleClient.collectAllRewards(aliceAddress, baseToken.address);
+
+      expect((await baseToken.balanceOf(aliceAddress)).toString()).to.be.eq(
+        parseEther("34.820649428126150303").toString()
+      );
+
+      // Operator can collect fee from harvested rewards
+      expect((await exampleClient.feeToCollect()).toString()).to.be.eq(
+        parseEther("1.947955231928415704").toString()
+      );
+
+      await exampleClient.collectFee(bobAddress);
+
+      expect((await baseToken.balanceOf(bobAddress)).toString()).to.be.eq(
+        parseEther("1.947955231928415704").toString()
+      );
+    });
+
+    it("should revert transaction when user is not whitelisted", async () => {
+      await exampleClient.whitelistUsers([aliceAddress], false);
+
+      expect(
+        exampleClientAsAlice.collectAllRewards(aliceAddress, baseToken.address)
+      ).to.be.revertedWith("ClientContract: Caller not whitelisted.");
+    });
+  });
+
+  context("getName", () => {
+    it("should return client name", async () => {
+      expect(await exampleClient.getName()).to.be.eq("Binance Client");
     });
   });
 });
