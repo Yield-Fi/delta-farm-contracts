@@ -146,6 +146,8 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// Whitelist methods - operators
   function _whitelistOperators(address[] memory operators, bool isWhitelisted) internal {
     for (uint256 i = 0; i < operators.length; i++) {
+      require(msg.sender != operators[i], "Client contract: Cannot modify the caller's state");
+
       whitelistedOperators[operators[i]] = isWhitelisted;
     }
 
