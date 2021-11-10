@@ -58,8 +58,10 @@ describe("ProtocolManager", async () => {
   // Signers
   let deployer: Signer;
   let evilUser: Signer;
+  let clientOperator: Signer;
 
   let deployerAddress: string;
+  let clientOperatorAddress: string;
 
   // Protocol
   let vault: Vault;
@@ -71,8 +73,9 @@ describe("ProtocolManager", async () => {
   let protocolManagerAsEvilUser: ProtocolManager;
 
   async function fixture() {
-    [deployer, evilUser] = await ethers.getSigners();
+    [deployer, evilUser, clientOperator] = await ethers.getSigners();
     deployerAddress = await deployer.getAddress();
+    clientOperatorAddress = await clientOperator.getAddress();
 
     baseToken = await deployToken(
       {
@@ -170,7 +173,7 @@ describe("ProtocolManager", async () => {
         "Binance Client",
         protocolManager.address,
         feeCollector.address,
-        [deployerAddress],
+        [clientOperatorAddress],
       ],
       deployer
     )) as Client;
