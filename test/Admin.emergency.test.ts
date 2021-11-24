@@ -33,9 +33,6 @@ import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
 import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
-import { assertAlmostEqual } from "./helpers/assert";
-import { parseEther } from "@ethersproject/units";
-import { deploy } from "@openzeppelin/hardhat-upgrades/dist/utils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -105,7 +102,7 @@ describe("Admin contract - emergency withdrawal", async () => {
   let exampleClientAsOperator: Client;
 
   async function fixture() {
-    [deployer, alice, yieldFi, bob, clientOperator] = await ethers.getSigners();
+    [, , , , , deployer, alice, yieldFi, bob, clientOperator] = await ethers.getSigners();
     [deployerAddress, aliceAddress, yieldFiAddress, bobAddress, clientOperatorAddress] =
       await Promise.all([
         deployer.getAddress(),
@@ -382,10 +379,10 @@ describe("Admin contract - emergency withdrawal", async () => {
         [exampleClient.address, yieldFiAddress /* Treasury address! */]
       );
 
-      // 20 CAKE ~= 20 BUSD since 1:1 initial ratio -  2 * 10% fee * 10 CAKE  + 6 USD initial ->  ~= 21.538796449897046794 (price offset due to pool swap)
+      // 20 CAKE ~= 20 BUSD since 1:1 initial ratio -  2 * 10% fee * 10 CAKE  + 6 USD initial ->  ~= 21.538796449897046799 (price offset due to pool swap)
       // Alice should get her assets back
       expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.eql(
-        ethers.utils.parseEther("21.538796449897046794")
+        ethers.utils.parseEther("21.538796449897046799")
       );
 
       // All rewards should have been paid out

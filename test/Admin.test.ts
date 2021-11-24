@@ -14,7 +14,7 @@ import {
 } from "../typechain";
 import { deployContract, deployProxyContract, deployToken } from "./helpers";
 import { parseEther } from "@ethersproject/units";
-import { AbiCoder, defaultAbiCoder } from "@ethersproject/abi";
+import { defaultAbiCoder } from "@ethersproject/abi";
 
 chai.use(solidity);
 chai.use(chainBn(BN));
