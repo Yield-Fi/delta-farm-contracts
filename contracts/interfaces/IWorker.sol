@@ -55,4 +55,12 @@ interface IWorker {
   function isWorkerEnabled() external view returns (bool);
 
   function getRewardToken() external view returns (address);
+
+  /// @dev Forces worker to harvest rewards immediately without payout checks.
+  /// @notice Emergency function
+  function forceHarvest() external;
+
+  /// @dev Forces worker to withdraw given position
+  /// @notice Emergency function
+  function emergencyWithdraw(uint256 positionId, address positionOwner) external;
 }

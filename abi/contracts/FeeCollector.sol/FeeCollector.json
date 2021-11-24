@@ -108,6 +108,19 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "clients",
+        "type": "address[]"
+      }
+    ],
+    "name": "forceCollect",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "getFeeToken",
     "outputs": [

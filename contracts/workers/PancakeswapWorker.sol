@@ -512,4 +512,78 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   function getRewardToken() external view override returns (address) {
     return cake;
   }
+
+  /// @dev harvestRewards equivalent without ACL and payout checks.
+  /// @notice Can be called by valid vault only.
+  /// @notice Emergency function - takes place only during emergency withdrawal triggered by AdminContract
+  function forceHarvest() external override nonReentrant onlyOperatingVault {
+    // 1. Withdraw all the rewards.
+    masterChef.withdraw(pid, 0);
+    uint256 reward = cake.balanceOf(address(this));
+
+    // 2. Approve tokens
+    cake.safeApprove(address(router), uint256(-1));
+
+    // 3. Convert all rewards to BaseToken according to config path.
+    router.swapExactTokensForTokens(reward, 0, getHarvestPath(), address(this), block.timestamp);
+
+    // 4. Send all base token to the operatingVault
+    uint256 baseTokenBalance = baseToken.myBalance();
+
+    baseToken.safeTransfer(operatingVault, baseTokenBalance);
+
+    // 5. Calculate the amount of reward for the given positions
+    uint256 numberOfPositions = positionIds.length;
+
+    uint256[] memory rewardsPerPosition = new uint256[](numberOfPositions);
+
+    for (uint256 i = 0; i < numberOfPositions; i++) {
+      uint256 positionShare = shares[positionIds[i]];
+      rewardsPerPosition[i] = baseTokenBalance.mul(positionShare).div(totalShare);
+    }
+
+    // 6. Register rewards
+    IVault(operatingVault).registerRewards(positionIds, rewardsPerPosition);
+
+    // 7. Reset approval
+    cake.safeApprove(address(router), 0);
+
+    emit Harvest(reward, baseTokenBalance, operatingVault);
+  }
+
+  /// @dev Withdraw all position funds
+  /// @param positionId The position ID to perform emergency withdrawal on.
+  /// @param positionOwner address to transfer liquidated assets to
+  function emergencyWithdraw(uint256 positionId, address positionOwner)
+    external
+    override
+    onlyOperatingVault
+    nonReentrant
+  {
+    address liquidation = this.getStrategies()[2];
+
+    addPositionId(positionId);
+    // 1. Convert this position back to LP tokens.
+    _removeShare(positionId);
+    // 2. Transfer funds and perform the worker strategy.
+    require(
+      lpToken.transfer(liquidation, lpToken.balanceOf(address(this))),
+      "PancakeswapWorker->emergencyWithdraw: unable to transfer lp to strategy"
+    );
+
+    bytes memory data = abi.encode(
+      this.baseToken(),
+      this.token1(),
+      this.token0(),
+      0,
+      positionOwner
+    );
+
+    baseToken.safeTransfer(liquidation, baseToken.myBalance());
+    IStrategy(liquidation).execute(data);
+    // 3. Add LP tokens back to the farming pool.
+    _addShare(positionId);
+    // 4. Return any remaining BaseToken back to the operatingVault.
+    baseToken.safeTransfer(msg.sender, baseToken.myBalance());
+  }
 }

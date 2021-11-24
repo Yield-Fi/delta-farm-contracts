@@ -67,4 +67,8 @@ interface IVault {
     address worker,
     address client
   ) external view returns (uint256);
+
+  /// @dev Withdraw all assets from positions opened for given worker
+  /// @notice Emergency function
+  function emergencyWithdraw(address _worker) external;
 }

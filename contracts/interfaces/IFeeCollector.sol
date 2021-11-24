@@ -7,10 +7,11 @@ interface IFeeCollector {
 
   function collect() external;
 
-  /// Register fees
   function registerFees(address[] calldata clients, uint256[] calldata fees) external;
 
   function getFeeToken() external view returns (address);
 
   function feeToCollect() external view returns (uint256);
+
+  function forceCollect(address[] calldata clients) external payable;
 }

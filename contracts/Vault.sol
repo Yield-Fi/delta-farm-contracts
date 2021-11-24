@@ -103,6 +103,11 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     _;
   }
 
+  modifier onlyAdminContract() {
+    require(protocolManager.isAdminContract(msg.sender), "Vault: Only admin contract");
+    _;
+  }
+
   /// @dev Get token from msg.sender
   modifier transferTokenToVault(uint256 value) {
     if (msg.value != 0) {
@@ -250,6 +255,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     onlyWhitelistedRewardAssigners
   {
     uint256 length = pids.length;
+    uint256[] memory userAmounts = new uint256[](amounts.length);
 
     require(length == amounts.length, "Vault: invalid input data");
 
@@ -292,13 +298,15 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
       rewards[pid] = rewards[pid].add(userReward);
       totalRewards[pid] = totalRewards[pid].add(userReward);
 
+      userAmounts[i] = userReward;
+
       // Index event
       emit FeesRegister(position.worker, yieldFiFee, clientFee, position.client);
     }
 
     token.safeTransfer(address(feeCollector), singleTxAcc);
 
-    emit RewardsRegister(msg.sender, pids, amounts);
+    emit RewardsRegister(msg.sender, pids, userAmounts);
   }
 
   /// @dev Collect accumulated rewards
@@ -466,5 +474,28 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     }
 
     return 0;
+  }
+
+  /// @dev Perform emergency withdrawal on given worker
+  /// @param _worker address of the worker to perform emergency withdraw on
+  function emergencyWithdraw(address _worker) external override onlyAdminContract {
+    for (uint256 i = 1; i < nextPositionID; i++) {
+      if (positions[i].worker == _worker) {
+        IWorker worker = IWorker(_worker);
+        // Force harvest from farming protocol & reward distribution
+        worker.forceHarvest();
+
+        // Withdraw given position from given worker and transfer asset to given address - position owner in this case
+        worker.emergencyWithdraw(i, positions[i].owner);
+
+        // Some rewards may remain unclaimed after harvesting - transfer them to.
+        uint256 reward = rewards[i];
+
+        token.safeTransfer(positions[i].owner, reward);
+
+        // Null-out remaining rewards
+        rewards[i] = 0;
+      }
+    }
   }
 }
