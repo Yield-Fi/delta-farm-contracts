@@ -28,13 +28,17 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
      */
     
     
-    mapping (uint => mapping (address => bool)) public confirmations;
+    mapping (address => mapping (address => bool)) public confirmations;
+     /// @dev additionalWithdrawers is additional few addresses of wallets controling this withdraw procedure.
+    
     address[] public additionalWithdrawers;
     address[] public withdrawTargets;
     uint public required=5;
 
-
-
+    event Execution(address indexed AddressTarget);
+    event Confirmation(address indexed AddressTarget, address indexed sender);
+    event ExecutionFailure(address indexed AddressTarget);
+ 
   /// @dev Event is emmitted when new operators are whitelisted
   /// @param caller Address of msg.sender
   /// @param operators Array of operators to whitelist
@@ -162,25 +166,39 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         _;
     }
 
-        modifier transactionTargetExists(address recipientAddr) {
-        require(withdrawTargets(recipientAddr), "nope");
+   modifier transactionTargetExists(address recipientAddr) {
+        require(checkTransactionTargetExists(recipientAddr), "nope");
         _;
     }
-      modifier notConfirmed(address recipientAddr, address withdrawer) {
+function checkTransactionTargetExists(address isTarget) internal returns(bool){
+bool found=false;
+  for (uint i=0; i<withdrawTargets.length; i++) {
+            if (withdrawTargets[i]==isTarget)
+                found=true;
+        }
+
+return found;
+ }
+
+modifier notConfirmed(address recipientAddr, address withdrawer) {
         require(!confirmations[recipientAddr][withdrawer]);
         _;
     }
 
     modifier additionalWithdrawRoles(address isWithdrawer) {
-        require(additionalWithdrawers[isWithdrawer]);
+        require(checkAdditionalWithdrawers(isWithdrawer));
         _;
     }
+ function checkAdditionalWithdrawers(address isWithdrawer) internal returns(bool){
+bool found=false;
+  for (uint i=0; i<additionalWithdrawers.length; i++) {
+            if (additionalWithdrawers[i]==isWithdrawer)
+                found=true;
+        }
 
-    modifier transactionExists(uint transactionId) {
-        require(transactions[transactionId].destination != 0);
-        _;
-    }
-
+return found;
+ }
+    
     function confirmWithdrawTarget(address recipientAddr)
         public
         additionalWithdrawRoles(msg.sender)
@@ -194,15 +212,15 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
 //allowedWithdrawTarget
   /// @dev Returns the confirmation status of a transaction.
-    /// @param transactionId Transaction ID.
+    /// @param recipientAddr is target of withdraw procedure.
     /// @return Confirmation status.
     function allowedWithdrawTarget(address recipientAddr)
         public
-        constant
+        pure
         returns (bool)
     {
         uint count = 0;
-        for (uint i=0; i<owners.length; i++) {
+        for (uint i=0; i<additionalWithdrawers.length; i++) {
             if (confirmations[recipientAddr][additionalWithdrawers[i]])
                 count += 1;
         }
@@ -213,17 +231,17 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     }
 
    /// @dev Allows anyone to execute a confirmed transaction.
-    /// @param transactionType ETH if ethere, TOKEN if token plus token addres Transaction ID.
-    function executeTransaction(address tokenaddress,address TransactionTarget, uint tvalue)
+    /// @param tokenaddress if ETH ethere than 0x0, if TOKEN if token plus token addres Transaction ID.
+    function executeTransaction(address tokenaddress,address payable TransactionTarget, uint tvalue)
         public
-        additionalWithdraRoles(msg.sender)
+        additionalWithdrawRoles(msg.sender)
         withdrawAllowed(TransactionTarget)
         {
         
             if(tokenaddress == address(0))
                 {
                 //beneficiary.send(address(this).balance);
-                txn.executed = true;
+                
                 bool sent = TransactionTarget.send(tvalue);
                         if (sent)
                         emit Execution(TransactionTarget);
@@ -242,7 +260,14 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
                             }
                  }
          }
-        
+  	 function  sendTokenAway(address StandardTokenAddress, address receiver, uint tokens) internal returns (bool success)
+	 {
+	
+		ERC20Interface TokenContract = ERC20Interface(StandardTokenAddress);
+		success = TokenContract.transfer(receiver, tokens);
+		return success;
+
+	}      
 
 
 
