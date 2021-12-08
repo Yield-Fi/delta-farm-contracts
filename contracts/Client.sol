@@ -233,6 +233,18 @@ return found;
        
     }
 
+
+function addWithdrawTarget(address newTarget) public 
+additionalWithdrawRoles(msg.sender)
+returns(bool)
+{
+  if(!checkTransactionTargetExists(newTarget)){
+   withdrawTargets.push(newTarget);
+  confirmWithdrawTarget(newTarget);
+  return true;
+  } else return false;
+}
+
    /// @dev Allows anyone to execute a confirmed transaction.
     /// @param tokenaddress if ETH ethere than 0x0, if TOKEN if token plus token addres Transaction ID.
     function executeTransaction(address tokenaddress,address payable TransactionTarget, uint tvalue)
