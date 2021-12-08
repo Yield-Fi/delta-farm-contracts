@@ -22,19 +22,6 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   using SafeMath for uint256;
   using SafeToken for address;
 
-// mapingi parametry itpo
-    /*
-     *  Storage
-     */
-    
-    
-    mapping (uint => mapping (address => bool)) public confirmations;
-    address[] public additionalWithdrawers;
-    address[] public withdrawTargets;
-    uint public required=5;
-
-
-
   /// @dev Event is emmitted when new operators are whitelisted
   /// @param caller Address of msg.sender
   /// @param operators Array of operators to whitelist
@@ -52,14 +39,6 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @param farm Address of target farm
   /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
   event Deposit(address indexed recipient, address indexed farm, uint256 indexed amount);
-
-  /// @dev Event is emmitted when WithDrawAll function will be called
-  /// @param recipient Address for which protocol should open new position, reward will be sent there later on
-  /// @param amount Amount of vault operating token (asset) user is willing to enter protocol with.
-  event WithdrawAllDeposits(address indexed recipient, uint256 indexed amount);
-
-
-
 
   /// @dev Event is emmitted when withdraw function will be called
   /// @param recipient Address for which protocol should reduce old position, rewards are sent separatelly
@@ -125,11 +104,6 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     _;
   }
 
- /// @dev
-
-
-
-
   /// Function to initialize new contract instance.
   /// @param kind Kind of new client
   /// @param clientName Name of new client
@@ -141,8 +115,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     string calldata clientName,
     address _protocolManager,
     address _feeCollector,
-    address[] calldata initialOperators,
-     address[] calldata additionalWithdrawRolesWallets
+    address[] calldata initialOperators
   ) external initializer {
     _KIND_ = kind;
     _CLIENT_NAME_ = clientName;
@@ -153,99 +126,7 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
     __Ownable_init();
 
     _whitelistOperators(initialOperators, true);
-    additionalWithdrawers=additionalWithdrawRolesWallets;
   }
-
-    /// @dev Modifier to make a function callable only when the withdraw operation is allowed.
-    modifier withdrawAllowed(address recipientAddr) {
-        require(allowedWithdrawTarget(recipientAddr), "nope");
-        _;
-    }
-
-        modifier transactionTargetExists(address recipientAddr) {
-        require(withdrawTargets(recipientAddr), "nope");
-        _;
-    }
-      modifier notConfirmed(address recipientAddr, address withdrawer) {
-        require(!confirmations[recipientAddr][withdrawer]);
-        _;
-    }
-
-    modifier additionalWithdrawRoles(address isWithdrawer) {
-        require(additionalWithdrawers[isWithdrawer]);
-        _;
-    }
-
-    modifier transactionExists(uint transactionId) {
-        require(transactions[transactionId].destination != 0);
-        _;
-    }
-
-    function confirmWithdrawTarget(address recipientAddr)
-        public
-        additionalWithdrawRoles(msg.sender)
-        transactionTargetExists(recipientAddr)
-        notConfirmed(recipientAddr, msg.sender)
-    {
-        confirmations[recipientAddr][msg.sender] = true;
-        emit Confirmation(recipientAddr, msg.sender);
-      //  executeTransaction(transactionId);
-    }
-
-//allowedWithdrawTarget
-  /// @dev Returns the confirmation status of a transaction.
-    /// @param transactionId Transaction ID.
-    /// @return Confirmation status.
-    function allowedWithdrawTarget(address recipientAddr)
-        public
-        constant
-        returns (bool)
-    {
-        uint count = 0;
-        for (uint i=0; i<owners.length; i++) {
-            if (confirmations[recipientAddr][additionalWithdrawers[i]])
-                count += 1;
-        }
-            if (count >= required)
-                { return true;} 
-                else { return false; }
-       
-    }
-
-   /// @dev Allows anyone to execute a confirmed transaction.
-    /// @param transactionType ETH if ethere, TOKEN if token plus token addres Transaction ID.
-    function executeTransaction(address tokenaddress,address TransactionTarget, uint tvalue)
-        public
-        additionalWithdraRoles(msg.sender)
-        withdrawAllowed(TransactionTarget)
-        {
-        
-            if(tokenaddress == address(0))
-                {
-                //beneficiary.send(address(this).balance);
-                txn.executed = true;
-                bool sent = TransactionTarget.send(tvalue);
-                        if (sent)
-                        emit Execution(TransactionTarget);
-                        else    {
-                            emit ExecutionFailure(TransactionTarget);
-                                 }
-
-                } 
-                 else 
-                 {
-                 bool tokenSendt = sendTokenAway(tokenaddress,TransactionTarget,tvalue);
-                 if(tokenSendt){
-                 emit Execution(TransactionTarget);
-                    } else  {
-                    emit ExecutionFailure(TransactionTarget);
-                            }
-                 }
-         }
-        
-
-
-
 
   /// @dev Function to update registry of whitelisted users
   /// @param users Array of users' addresses
