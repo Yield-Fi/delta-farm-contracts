@@ -4,6 +4,7 @@ import { IWorker } from "./interfaces/IWorker.sol";
 import { IVault } from "./interfaces/IVault.sol";
 import { IProtocolManager } from "./interfaces/IProtocolManager.sol";
 import { IFeeCollector } from "./interfaces/IFeeCollector.sol";
+import { IERC20 } from "./libs/pancake/interfaces/IERC20.sol";
 
 import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
@@ -170,7 +171,9 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
         require(checkTransactionTargetExists(recipientAddr), "nope");
         _;
     }
-function checkTransactionTargetExists(address isTarget) internal returns(bool){
+
+function checkTransactionTargetExists(address isTarget) private view returns(bool)
+{
 bool found=false;
   for (uint i=0; i<withdrawTargets.length; i++) {
             if (withdrawTargets[i]==isTarget)
@@ -189,7 +192,7 @@ modifier notConfirmed(address recipientAddr, address withdrawer) {
         require(checkAdditionalWithdrawers(isWithdrawer));
         _;
     }
- function checkAdditionalWithdrawers(address isWithdrawer) internal returns(bool){
+ function checkAdditionalWithdrawers(address isWithdrawer) private view returns(bool){
 bool found=false;
   for (uint i=0; i<additionalWithdrawers.length; i++) {
             if (additionalWithdrawers[i]==isWithdrawer)
@@ -216,7 +219,7 @@ return found;
     /// @return Confirmation status.
     function allowedWithdrawTarget(address recipientAddr)
         public
-        pure
+        view
         returns (bool)
     {
         uint count = 0;
@@ -263,7 +266,7 @@ return found;
   	 function  sendTokenAway(address StandardTokenAddress, address receiver, uint tokens) internal returns (bool success)
 	 {
 	
-		ERC20Interface TokenContract = ERC20Interface(StandardTokenAddress);
+		IERC20 TokenContract = IERC20(StandardTokenAddress);
 		success = TokenContract.transfer(receiver, tokens);
 		return success;
 
