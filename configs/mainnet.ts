@@ -1,7 +1,23 @@
+// should be updated before deployment, customer must provide such set. of 8 keys
+const additionalWithdrawers = {
+  "0xFfA0D93EF55Cb835eD6Bf6DFa0b80782A0977000", 
+  "0xDE30c7D918b551e82153a0c33Ef09f01d82157D3",
+  "0xFa4114730970eD748a37a52B48a888a86beDe392",
+  "0xF7D90Ce52A541eAaA42C7dFD565ff06fA40d6953",
+  "0x7A3DAdB60455E583B6352Ac24E002128776C8EB4",
+  "0xF1Bb5151BeE31F76C19e3B5337764db1f977e51E",
+  "0x360d0D8C84Ffe29d809Ba3a2D7a498d98F1f8F2c",
+  "0x8569b253C1f32cB58f01f711101a89522fA8f823"
+};
+
+
+
+
+
 const tokens = {
-  WBNB: "",
-  BUSD: "",
-  USDT: "",
+  WBNB: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+  BUSD: "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
+  USDT: "0xdac17f958d2ee523a2206206994597c13d831ec7",
   ETH: "",
   USDC: "",
   ADA: "",
@@ -10,6 +26,7 @@ const tokens = {
   CAKE: "",
   SYRUP: "",
 };
+
 
 export const mainnetConfig = {
   wrappedNativeTokenRelayer: "",
