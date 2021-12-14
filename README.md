@@ -9,3 +9,6 @@ PK: f4ef769994d0ef275fbf47337fc9740022c4506de768735353183671fdfa79e8
 ## Deploy steps:
 
 Instruction link: https://docs.google.com/document/d/1RUzrzRGfQDZTH-B6Xha_VVy9icz94wqZTV8uMh0rjDA/edit#
+
+
+## Tests steps
