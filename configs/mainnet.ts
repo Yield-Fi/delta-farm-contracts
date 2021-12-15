@@ -13,18 +13,18 @@ const additionalWithdrawers = {
 
 
 
-
+// https://bscscan.com/tokens
 const tokens = {
   WBNB: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
   BUSD: "0x4Fabb145d64652a948d72533023f6E7A623C7C53",
   USDT: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-  ETH: "",
-  USDC: "",
-  ADA: "",
-  DAI: "",
-  BTC: "",
-  CAKE: "",
-  SYRUP: "",
+  ETH: "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+  USDC: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
+  ADA: "0x3ee2200efb3400fabb9aacf31297cbdd1d435d47",
+  DAI: "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3",
+  BTCB: "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
+  CAKE: "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
+  SYRUP: "0x009cf7bc57584b7998236eff51b98a168dcea9b0",
 };
 
 
