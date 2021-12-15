@@ -10,9 +10,7 @@ import {
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
-  SyrupBar,
   Vault,
-  VaultConfig,
   MockToken,
   PancakeswapWorker,
   ProtocolManager,
@@ -47,7 +45,6 @@ describe("ProtocolManager", async () => {
   let baseToken: MockToken;
   let targetToken: MockToken;
   let cake: CakeToken;
-  let syrup: SyrupBar;
 
   // BC
   let feeCollector: FeeCollector;
@@ -65,8 +62,6 @@ describe("ProtocolManager", async () => {
 
   // Protocol
   let vault: Vault;
-  let vaultConfig: VaultConfig;
-  let wNativeRelayer: WrappedNativeTokenRelayer;
 
   // Connected entities (signer to target entity)
   let protocolManager: ProtocolManager;
@@ -97,7 +92,7 @@ describe("ProtocolManager", async () => {
 
     mockWBNB = await deployWBNB(deployer);
 
-    [factory, router, cake, syrup, masterChef] = await deployPancakeV2(
+    [factory, router, cake, , masterChef] = await deployPancakeV2(
       mockWBNB,
       CAKE_REWARD_PER_BLOCK,
       [{ address: deployerAddress, amount: ethers.utils.parseEther("100") }],
@@ -117,7 +112,7 @@ describe("ProtocolManager", async () => {
     )) as FeeCollector;
 
     // Treasury acc = yieldFi protocol owner
-    [vault, vaultConfig, wNativeRelayer] = await deployVault(
+    [vault] = await deployVault(
       mockWBNB,
       baseToken,
       protocolManager.address,
@@ -174,6 +169,7 @@ describe("ProtocolManager", async () => {
         protocolManager.address,
         feeCollector.address,
         [clientOperatorAddress],
+        [ethers.constants.AddressZero], // Additional withdrawer
       ],
       deployer
     )) as Client;

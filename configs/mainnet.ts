@@ -1,17 +1,14 @@
 // should be updated before deployment, customer must provide such set. of 8 keys
-const additionalWithdrawers = {
-  "0xFfA0D93EF55Cb835eD6Bf6DFa0b80782A0977000", 
+const additionalWithdrawers = [
+  "0xFfA0D93EF55Cb835eD6Bf6DFa0b80782A0977000",
   "0xDE30c7D918b551e82153a0c33Ef09f01d82157D3",
   "0xFa4114730970eD748a37a52B48a888a86beDe392",
   "0xF7D90Ce52A541eAaA42C7dFD565ff06fA40d6953",
   "0x7A3DAdB60455E583B6352Ac24E002128776C8EB4",
   "0xF1Bb5151BeE31F76C19e3B5337764db1f977e51E",
   "0x360d0D8C84Ffe29d809Ba3a2D7a498d98F1f8F2c",
-  "0x8569b253C1f32cB58f01f711101a89522fA8f823"
-};
-
-
-
+  "0x8569b253C1f32cB58f01f711101a89522fA8f823",
+];
 
 // https://bscscan.com/tokens
 const tokens = {
@@ -26,7 +23,6 @@ const tokens = {
   CAKE: "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
   SYRUP: "0x009cf7bc57584b7998236eff51b98a168dcea9b0",
 };
-
 
 export const mainnetConfig = {
   wrappedNativeTokenRelayer: "",

@@ -10,9 +10,7 @@ import {
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
-  SyrupBar,
   Vault,
-  VaultConfig,
   Client,
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken,
@@ -32,7 +30,6 @@ import { deployPancakeV2, deployProxyContract } from "./helpers";
 import { deployPancakeWorker } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
-import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -56,7 +53,6 @@ describe("Admin contract - emergency withdrawal", async () => {
   let targetToken: MockToken;
   let testToken: MockToken;
   let cake: CakeToken;
-  let syrup: SyrupBar;
 
   // BC
   let feeCollector: FeeCollector;
@@ -71,7 +67,6 @@ describe("Admin contract - emergency withdrawal", async () => {
 
   let deployerAddress: string;
   let aliceAddress: string;
-  let bobAddress: string;
   let yieldFiAddress: string;
   let clientOperatorAddress: string;
 
@@ -83,8 +78,6 @@ describe("Admin contract - emergency withdrawal", async () => {
 
   // Protocol
   let vault: Vault;
-  let vaultConfig: VaultConfig;
-  let wNativeRelayer: WrappedNativeTokenRelayer;
 
   // Strats
   let addStrat: PancakeswapStrategyAddToPoolWithBaseToken;
@@ -96,21 +89,18 @@ describe("Admin contract - emergency withdrawal", async () => {
 
   // Connectors
   let baseTokenAsAlice: MockToken;
-  let baseTokenAsBob: MockToken;
   let exampleClientAsAlice: Client;
-  let exampleClientAsBob: Client;
   let exampleClientAsOperator: Client;
 
   async function fixture() {
     [, , , , , deployer, alice, yieldFi, bob, clientOperator] = await ethers.getSigners();
-    [deployerAddress, aliceAddress, yieldFiAddress, bobAddress, clientOperatorAddress] =
-      await Promise.all([
-        deployer.getAddress(),
-        alice.getAddress(),
-        yieldFi.getAddress(),
-        bob.getAddress(),
-        clientOperator.getAddress(),
-      ]);
+    [deployerAddress, aliceAddress, yieldFiAddress, , clientOperatorAddress] = await Promise.all([
+      deployer.getAddress(),
+      alice.getAddress(),
+      yieldFi.getAddress(),
+      bob.getAddress(),
+      clientOperator.getAddress(),
+    ]);
 
     baseToken = await deployToken(
       {
@@ -143,7 +133,7 @@ describe("Admin contract - emergency withdrawal", async () => {
 
     await mockWBNB.mint(deployerAddress, ethers.utils.parseEther("10000"));
 
-    [factory, router, cake, syrup, masterChef] = await deployPancakeV2(
+    [factory, router, cake, , masterChef] = await deployPancakeV2(
       mockWBNB,
       CAKE_REWARD_PER_BLOCK,
       [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
@@ -172,7 +162,7 @@ describe("Admin contract - emergency withdrawal", async () => {
     await protocolManager.approveAdminContract(adminContract.address);
 
     // Treasury acc = yieldFi protocol owner
-    [vault, vaultConfig, wNativeRelayer] = await deployVault(
+    [vault, , ,] = await deployVault(
       mockWBNB,
       baseToken,
       protocolManager.address,
@@ -309,6 +299,7 @@ describe("Admin contract - emergency withdrawal", async () => {
         protocolManager.address,
         feeCollector.address,
         [clientOperatorAddress],
+        [ethers.constants.AddressZero], // Additional withdrawer
       ],
       deployer
     )) as Client;
@@ -328,9 +319,7 @@ describe("Admin contract - emergency withdrawal", async () => {
 
     // Signers
     baseTokenAsAlice = baseToken.connect(alice);
-    baseTokenAsBob = baseToken.connect(bob);
     exampleClientAsAlice = exampleClient.connect(alice);
-    exampleClientAsBob = exampleClient.connect(bob);
   }
 
   beforeEach(async () => {
