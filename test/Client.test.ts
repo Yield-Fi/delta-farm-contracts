@@ -57,7 +57,6 @@ describe("Client contract", async () => {
   let targetToken: MockToken;
   let testToken: MockToken;
   let cake: CakeToken;
-  let syrup: SyrupBar;
 
   // BC
   let feeCollector: FeeCollector;
@@ -84,7 +83,6 @@ describe("Client contract", async () => {
   // Protocol
   let vault: Vault;
   let vaultConfig: VaultConfig;
-  let wNativeRelayer: WrappedNativeTokenRelayer;
 
   // Strats
   let addStrat: PancakeswapStrategyAddToPoolWithBaseToken;
@@ -143,7 +141,7 @@ describe("Client contract", async () => {
 
     await mockWBNB.mint(deployerAddress, ethers.utils.parseEther("10000"));
 
-    [factory, router, cake, syrup, masterChef] = await deployPancakeV2(
+    [factory, router, cake, , masterChef] = await deployPancakeV2(
       mockWBNB,
       CAKE_REWARD_PER_BLOCK,
       [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
@@ -164,7 +162,7 @@ describe("Client contract", async () => {
     )) as FeeCollector;
 
     // Treasury acc = yieldFi protocol owner
-    [vault, vaultConfig, wNativeRelayer] = await deployVault(
+    [vault, vaultConfig] = await deployVault(
       mockWBNB,
       baseToken,
       protocolManager.address,
@@ -301,6 +299,7 @@ describe("Client contract", async () => {
         protocolManager.address,
         feeCollector.address,
         [clientOperatorAddress],
+        [ethers.constants.AddressZero], // Additional withdrawer
       ],
       deployer
     )) as Client;

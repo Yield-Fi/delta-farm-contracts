@@ -54,6 +54,11 @@ contract FeeCollector is
     _;
   }
 
+  modifier onlyAdminContract() {
+    require(protocolManager.isAdminContract(msg.sender), "FeeCollector: Only admin contract");
+    _;
+  }
+
   function initialize(
     address feeToken,
     uint256 feeThreshold,
@@ -97,7 +102,7 @@ contract FeeCollector is
 
   /// @dev Register bounties (at the same time register amount for the client and for the yieldFi)
   /// One function to wrap two calls. They should be called one by one anyway.
-  /// (If client recevies fee, yieldFi does as well)
+  /// (If client receives fee, yieldFi does as well)
   /// @param accounts Array of accounts address
   /// @param amounts Array of fee amounts assign to the specific accounts
   /// @notice Function can be called by Vault contract
@@ -129,5 +134,19 @@ contract FeeCollector is
   /// @notice Function can be called only by approved clients or protocol's operators
   function feeToCollect() external view override onlyCollector returns (uint256) {
     return fees[msg.sender];
+  }
+
+  /// @dev Force collects for any given clients
+  /// @param clients array of addresses to perform force transfers on
+  function forceCollect(address[] calldata clients) external payable override onlyAdminContract {
+    uint256 len = clients.length;
+
+    for (uint256 i = 0; i < len; i++) {
+      address client = clients[i];
+
+      uint256 _fee = fees[client];
+
+      if (_fee > 0) SafeToken.safeTransfer(_feeToken, client, _fee);
+    }
   }
 }

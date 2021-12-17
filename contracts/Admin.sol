@@ -7,6 +7,7 @@ import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 
 import "./interfaces/IProtocolManager.sol";
 import "./interfaces/IWorker.sol";
+import "./interfaces/IVault.sol";
 import "./interfaces/IFeeCollector.sol";
 import "./utils/SafeToken.sol";
 
@@ -108,5 +109,24 @@ contract Admin is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe 
   /// @return uint256 Amount of fee to collect
   function feeToCollect() external view returns (uint256) {
     return feeCollector.feeToCollect();
+  }
+
+  /// @dev Perform protocol emergency withdrawal
+  /// @param workers array of addresses of workers to perform series of withdrawals on
+  /// @param clients array of addresses of clients to force-transfer fee for
+  function emergencyWithdraw(address[] calldata workers, address[] calldata clients)
+    external
+    onlyOperator
+  {
+    uint256 len = workers.length;
+
+    for (uint256 i = 0; i < len; i++) {
+      IWorker worker = IWorker(workers[i]);
+      IVault vault = IVault(worker.operatingVault());
+
+      vault.emergencyWithdraw(address(worker));
+    }
+
+    feeCollector.forceCollect(clients);
   }
 }
