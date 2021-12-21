@@ -1,10 +1,11 @@
+import { ethers } from "ethers";
 import { ProjectConfigType } from "./types";
 
 const tokens = {
   WBNB: "0xDfb1211E2694193df5765d54350e1145FD2404A1",
   BUSD: "0x23d92E3Bbb84b6728124F568f16a036f6D104765",
   USDT: "0x7c2A2E9D3a18eFdA47D49A6c282F408dA1A3c6cC",
-  ETH: "0x6Bb2c5cE8Fe6E7DAC1eaC265be0715d03Fd8f28E",
+  WETH: "0x6Bb2c5cE8Fe6E7DAC1eaC265be0715d03Fd8f28E",
   USDC: "0x4727de0f00C7fa69F38B78bC465B59DBe8fD7E3f",
   ADA: "0xd49635f1D770d715B058df45067aB7bc0B55C43b",
   DAI: "0x86401c8f5a243036bd47F2B111b6F587074f591C",
@@ -178,6 +179,8 @@ export const testnetConfig: ProjectConfigType = {
       kind: "CEX",
       name: "Client A",
       operators: ["0xEeF6D5514dB9785caD8f2fc69BbfFe4eBB553656"],
+      callers: [ethers.constants.AddressZero],
+      additionalWithdrawers: [ethers.constants.AddressZero],
     },
   ],
 };

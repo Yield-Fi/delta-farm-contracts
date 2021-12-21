@@ -27,6 +27,7 @@ const deployFun: DeployFunction = async function () {
       config.protocolManager,
       config.feeCollector,
       client.operators,
+      client.additionalWithdrawers,
     ])) as Client;
 
     await Client.deployed();

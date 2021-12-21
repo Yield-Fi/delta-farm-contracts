@@ -1,22 +1,9 @@
-// should be updated before deployment, customer must provide such set. of 8 keys
-const additionalWithdrawers = [
-"0x646962a4cc74e85D05500540710b8966eBc10c76",
-"0xbb6538caBf0eF31e319f546e6dB497A4Ff3666df",
-"0x8db80D02Fe732cDCD1D9c1C2f92B350f80eBDFDE",
-"0x02675ac46A63fd34f52F45c842aD67c3bDe8A2bc",
-"0x7207741fb9743ebB309f83DA81993F68c5b0d08C",
-"0x942C2a648a647fcf0D2f8D43FcaE468dC375eEe0",
-"0xE58f709C84B207938Cb68B625ba8EfcA792eE082",
-"0x6d99D907ff3555Dad00726c94ed3Cf0E7aD1D5bB",
-
-];
-
 // https://bscscan.com/tokens
 const tokens = {
   WBNB: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
   BUSD: "0xe9e7cea3dedca5984780bafc599bd69add087d56",
-  USDT: "0xdac17f958d2ee523a2206206994597c13d831ec7",
   WETH: "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
+  USDT: "0x55d398326f99059fF775485246999027B3197955",
   USDC: "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d",
   ADA: "0x3ee2200efb3400fabb9aacf31297cbdd1d435d47",
   DAI: "0x1af3f329e8be154074d8769d1ffa4ee058b1dbc3",
@@ -29,7 +16,10 @@ export const mainnetConfig = {
   wrappedNativeTokenRelayer: "",
   feeCollector: "",
   protocolManager: "",
-  protocolOperators: [""],
+  protocolOperators: [
+    "0xF066caEFA8CcFC9A5a1F0859d1f5c075aC2F1f06" /* YieldFi EOA */,
+    "ADD HERE DEPLOYER ADDRESS!",
+  ],
   adminContract: "",
   feeThreshold: 500,
   defaultTreasuryFeeBps: 1000,
@@ -371,13 +361,61 @@ export const mainnetConfig = {
       name: "BUSD Vault",
       address: "",
       baseToken: tokens.BUSD,
-      config: "-",
+      config: "",
       workers: [
         {
-          name: "BUSD-USDT PancakeswapWorker",
+          name: "CAKE-WBNB Farm",
           address: "",
-          positionId: "",
-          token0: tokens.BUSD,
+          positionId: "251",
+          token0: tokens.CAKE,
+          token1: tokens.WBNB,
+          defaultHarvestThresshold: "1",
+        },
+        {
+          name: "USDT-BUSD Farm",
+          address: "",
+          positionId: "258",
+          token0: tokens.USDT,
+          token1: tokens.BUSD,
+          defaultHarvestThresshold: "1",
+        },
+        {
+          name: "WBNB-BUSD Farm",
+          address: "",
+          positionId: "252",
+          token0: tokens.WBNB,
+          token1: tokens.BUSD,
+          defaultHarvestThresshold: "1",
+        },
+        {
+          name: "DAI-BUSD Farm",
+          address: "",
+          positionId: "282",
+          token0: tokens.DAI,
+          token1: tokens.BUSD,
+          defaultHarvestThresshold: "1",
+        },
+        {
+          name: "USDT-WBNB Farm",
+          address: "",
+          positionId: "264",
+          token0: tokens.USDT,
+          token1: tokens.WBNB,
+          defaultHarvestThresshold: "1",
+        },
+        {
+          name: "CAKE-BUSD Farm",
+          address: "",
+          positionId: "389",
+          token0: tokens.CAKE,
+          token1: tokens.BUSD,
+          defaultHarvestThresshold: "1",
+        },
+        {
+          name: "CAKE-USDT Farm",
+          address: "",
+          positionId: "422",
+          token0: tokens.CAKE,
           token1: tokens.USDT,
           defaultHarvestThresshold: "1",
         },
@@ -387,9 +425,28 @@ export const mainnetConfig = {
   clients: [
     {
       address: "",
-      kind: "",
-      name: "",
-      operators: [""],
+      kind: "CEFI",
+      name: "Client A",
+      operators: [
+        "0xD2347FA9A5A41B51676c73D35ee4DAb926765A94",
+        "0x80390331BF9b2c4c62CcF4a4d71aD3699a6D2fC2",
+        "0xDD4A4AA5E2371b7c2E6D1D80ef69EbFEDF4099dE",
+      ],
+      callers: [
+        "0x28E2b8461365c91Bf8628dfca7aE6Aa158e87F13",
+        "0x1F0F7336d624656b71367A1F330094496ccb03ed",
+        "0xF24F874f243011Fa505c9b959Ebe3Ca709d8C308",
+      ],
+      additionalWithdrawers: [
+        "0x646962a4cc74e85D05500540710b8966eBc10c76",
+        "0xbb6538caBf0eF31e319f546e6dB497A4Ff3666df",
+        "0x8db80D02Fe732cDCD1D9c1C2f92B350f80eBDFDE",
+        "0x02675ac46A63fd34f52F45c842aD67c3bDe8A2bc",
+        "0x7207741fb9743ebB309f83DA81993F68c5b0d08C",
+        "0x942C2a648a647fcf0D2f8D43FcaE468dC375eEe0",
+        "0xE58f709C84B207938Cb68B625ba8EfcA792eE082",
+        "0x6d99D907ff3555Dad00726c94ed3Cf0E7aD1D5bB",
+      ],
     },
   ],
 };

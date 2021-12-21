@@ -20,23 +20,19 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
   }
 });
 
-const testnet = process.env.TESTNET
-  ? {
-      url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-      accounts: [process.env.TESTNET_PRIVATE_KEY],
-    }
-  : {
-      url: "HTTP://127.0.0.1:7545",
-      allowUnlimitedContractSize: true,
-      timeout: 1800000,
-      gas: 12000000,
-      blockGasLimit: 0x1fffffffffffff,
-      chainId: 1337,
-      accounts: [process.env.TESTNET_PRIVATE_KEY ?? "0000"],
-    };
+const testnet = {
+  url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+  accounts: [process.env.TESTNET_PRIVATE_KEY ?? "0000"],
+};
+
+const mainnet = {
+  url: "https://bsc-dataseed.binance.org/",
+  accounts: [process.env.TESTNET_PRIVATE_KEY ?? "0000"],
+};
 
 export default {
   networks: {
+    mainnet,
     testnet,
     ["testnet-dev"]: testnet,
     hardhat: {
