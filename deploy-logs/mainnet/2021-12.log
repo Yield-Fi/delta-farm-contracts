@@ -1,0 +1,31 @@
+2021-12-21 21:22:22 ||| ---> Deploying ProtocolManager... <---
+2021-12-21 21:22:54 ||| - ProtocolManager deployed at 0xc97b8f863536B7987991d437C08B70D274A5a805
+2021-12-21 21:25:05 ||| ---> Deploying fee collector... <---
+2021-12-21 21:25:31 ||| - FeeCollector deployed at 0x6abb72aD7A85973118B98447df1b327030f20b2a
+2021-12-21 21:26:01 ||| ---> Deploying Admin contract... <---
+2021-12-21 21:26:25 ||| - Admin contract deployed at 0x4EE64d49A6411a5c6d1d8E9f315e23e6B511CD00
+2021-12-21 21:26:57 ||| ---> Deploying WrappedNativeTokenRelayer... <---
+2021-12-21 21:27:24 ||| - WrappedNativeTokenRelayer deployed at 0x75D1Ad798c29f07630cb4Fea0acF14E41c4fD4f8
+2021-12-21 21:27:46 ||| ---> Deploying vaults... <---
+2021-12-21 21:27:46 |||   -> BUSD Vault
+2021-12-21 21:28:12 |||   - Vault Config deployed at 0xDEBb841b035b2736C16659D6c157d43D17BC7Ca8
+2021-12-21 21:28:36 |||   - Vault deployed at 0xE45fa1f395427B4De97D8d4Ce396D23d5EB611ac
+2021-12-21 21:29:00 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2021-12-21 21:29:26 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0x5fcA15f7186D0bAB72574D4e5BBE6F4cf6DCDe95
+2021-12-21 21:29:49 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0x91a03C4592Ca1e0611bF0d04e3Fb6Ce99573546A
+2021-12-21 21:30:14 ||| - LiquidateStrategy deployed at 0x14e5A786904796B1999f3df7eb2c37E26fD4420a
+2021-12-21 21:31:23 ||| ---> Deploying pancakeswap workers... <---
+2021-12-21 21:31:23 ||| -> Deploying workers for BUSD Vault
+2021-12-21 21:31:23 |||   - Deploying CAKE-WBNB Farm...
+2021-12-21 21:31:52 |||   - CAKE-WBNB Farm deployed at 0xBE8dc5171689bE13aB9AC05cbA77aE7e0Be96d1c
+2021-12-21 21:34:43 |||   - Deploying WBNB-BUSD Farm...
+2021-12-21 21:35:13 |||   - WBNB-BUSD Farm deployed at 0xc5ABD411d063B4F14380ea32a740615d9CA74B6B
+2021-12-21 21:35:13 |||   - Deploying DAI-BUSD Farm...
+2021-12-21 21:35:28 |||   - DAI-BUSD Farm deployed at 0x838630108CCCC79186CD57FF5aFC6F902d32d21A
+2021-12-21 21:37:15 |||   - Deploying CAKE-BUSD Farm...
+2021-12-21 21:38:01 |||   - CAKE-BUSD Farm deployed at 0x4A81Fe4bAA5a8839cB6da02e98Ec32Be6D4D8A1e
+2021-12-21 21:38:01 |||   - Deploying CAKE-USDT Farm...
+2021-12-21 21:38:47 |||   - CAKE-USDT Farm deployed at 0xd47C209B010054883A2d1B9e124b76e233E35E32
+2021-12-21 21:44:53 ||| ---> Deploying Client contracts... <---
+2021-12-21 21:44:53 |||   -> Contract of Client A
+2021-12-21 21:45:26 |||   - Contract of Client A deployed at 0x18EC0bF18d727aF80DdD51944255f2f12ECb9744

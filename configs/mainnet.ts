@@ -13,14 +13,14 @@ const tokens = {
 };
 
 export const mainnetConfig = {
-  wrappedNativeTokenRelayer: "",
-  feeCollector: "",
-  protocolManager: "",
+  wrappedNativeTokenRelayer: "0x75D1Ad798c29f07630cb4Fea0acF14E41c4fD4f8",
+  feeCollector: "0x6abb72aD7A85973118B98447df1b327030f20b2a",
+  protocolManager: "0xc97b8f863536B7987991d437C08B70D274A5a805",
   protocolOperators: [
     "0xF066caEFA8CcFC9A5a1F0859d1f5c075aC2F1f06" /* YieldFi EOA */,
-    "ADD HERE DEPLOYER ADDRESS!",
+    "0xBc29f271C33A38aB8e4020702165f1Bf025b16D3",
   ],
-  adminContract: "",
+  adminContract: "0x4EE64d49A6411a5c6d1d8E9f315e23e6B511CD00",
   feeThreshold: 500,
   defaultTreasuryFeeBps: 1000,
   baseToken: tokens.BUSD,
@@ -351,28 +351,28 @@ export const mainnetConfig = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "",
-      AddToPoolWithoutBaseToken: "",
-      Liquidate: "",
+      AddToPoolWithBaseToken: "0x5fcA15f7186D0bAB72574D4e5BBE6F4cf6DCDe95",
+      AddToPoolWithoutBaseToken: "0x91a03C4592Ca1e0611bF0d04e3Fb6Ce99573546A",
+      Liquidate: "0x14e5A786904796B1999f3df7eb2c37E26fD4420a",
     },
   },
   vaults: [
     {
       name: "BUSD Vault",
-      address: "",
+      address: "0xE45fa1f395427B4De97D8d4Ce396D23d5EB611ac",
       baseToken: tokens.BUSD,
-      config: "",
+      config: "0xDEBb841b035b2736C16659D6c157d43D17BC7Ca8",
       workers: [
         {
           name: "CAKE-WBNB Farm",
-          address: "",
+          address: "0xBE8dc5171689bE13aB9AC05cbA77aE7e0Be96d1c",
           positionId: "251",
           token0: tokens.CAKE,
           token1: tokens.WBNB,
           defaultHarvestThresshold: "1",
         },
         {
-          name: "USDT-BUSD Farm",
+          name: "USDT-BUSD Farm", // Error during deployment
           address: "",
           positionId: "258",
           token0: tokens.USDT,
@@ -381,7 +381,7 @@ export const mainnetConfig = {
         },
         {
           name: "WBNB-BUSD Farm",
-          address: "",
+          address: "0xc5ABD411d063B4F14380ea32a740615d9CA74B6B",
           positionId: "252",
           token0: tokens.WBNB,
           token1: tokens.BUSD,
@@ -389,14 +389,14 @@ export const mainnetConfig = {
         },
         {
           name: "DAI-BUSD Farm",
-          address: "",
+          address: "0x838630108CCCC79186CD57FF5aFC6F902d32d21A",
           positionId: "282",
           token0: tokens.DAI,
           token1: tokens.BUSD,
           defaultHarvestThresshold: "1",
         },
         {
-          name: "USDT-WBNB Farm",
+          name: "USDT-WBNB Farm", // Error
           address: "",
           positionId: "264",
           token0: tokens.USDT,
@@ -405,7 +405,7 @@ export const mainnetConfig = {
         },
         {
           name: "CAKE-BUSD Farm",
-          address: "",
+          address: "0x4A81Fe4bAA5a8839cB6da02e98Ec32Be6D4D8A1e",
           positionId: "389",
           token0: tokens.CAKE,
           token1: tokens.BUSD,
@@ -413,7 +413,7 @@ export const mainnetConfig = {
         },
         {
           name: "CAKE-USDT Farm",
-          address: "",
+          address: "0xd47C209B010054883A2d1B9e124b76e233E35E32",
           positionId: "422",
           token0: tokens.CAKE,
           token1: tokens.USDT,
@@ -424,7 +424,7 @@ export const mainnetConfig = {
   ],
   clients: [
     {
-      address: "",
+      address: "0x18EC0bF18d727aF80DdD51944255f2f12ECb9744",
       kind: "CEFI",
       name: "Client A",
       operators: [
