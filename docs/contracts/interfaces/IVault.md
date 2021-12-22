@@ -91,6 +91,18 @@ Data gathering
 
 
 
+### emergencyWithdraw
+
+```solidity
+  function emergencyWithdraw(address _worker)
+```
+
+Withdraw all assets from positions opened for given worker
+
+
+> **NOTE:** Emergency function
+
+
 
 ___
 

@@ -8,6 +8,38 @@ ___
 
 ## Functions
 
+### allowedWithdrawTarget
+
+```solidity
+  function allowedWithdrawTarget(address recipientAddr) public returns(bool)
+```
+
+Returns the confirmation status of a transaction.
+
+
+
+#### Parameters:
+
+- `recipientAddr`: is target of withdraw procedure.
+
+
+#### Return Values:
+
+- `Confirmation`: status.
+### executeTransaction
+
+```solidity
+  function executeTransaction(address tokenaddress, address payable TransactionTarget, uint256 tvalue)
+```
+
+Allows anyone to execute a confirmed transaction.
+
+
+
+#### Parameters:
+
+- `tokenaddress`: if ETH ethere than 0x0, if TOKEN if token plus token addres Transaction ID.
+
 ### whitelistUsers
 
 ```solidity
@@ -365,6 +397,27 @@ ___
 
 ## Events
 
+### Execution
+
+```solidity
+  event Execution(address AddressTarget)
+```
+
+
+### Confirmation
+
+```solidity
+  event Confirmation(address AddressTarget, address sender)
+```
+
+
+### ExecutionFailure
+
+```solidity
+  event ExecutionFailure(address AddressTarget)
+```
+
+
 ### WhitelistOperators
 
 ```solidity
@@ -410,6 +463,20 @@ Event is emmitted when deposit function will be called
 - `recipient`: Address for which protocol should open new position, reward will be sent there later on
 
 - `farm`: Address of target farm
+
+- `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
+
+### WithdrawAllDeposits
+
+```solidity
+  event WithdrawAllDeposits(address recipient, uint256 amount)
+```
+Event is emmitted when WithDrawAll function will be called
+
+
+#### Parameters:
+
+- `recipient`: Address for which protocol should open new position, reward will be sent there later on
 
 - `amount`: Amount of vault operating token (asset) user is willing to enter protocol with.
 

@@ -9,6 +9,7 @@
       - [PancakeswapStrategyAddToPoolWithBaseToken](contracts\strategies\pancake\PancakeswapStrategyAddToPoolWithBaseToken)
       - [PancakeswapStrategyAddToPoolWithoutBaseToken](contracts\strategies\pancake\PancakeswapStrategyAddToPoolWithoutBaseToken)
       - [PancakeswapStrategyLiquidate](contracts\strategies\pancake\PancakeswapStrategyLiquidate)
+      - [PancakeswapStrategyPartialLiquidate](contracts\strategies\pancake\PancakeswapStrategyPartialLiquidate)
   - [Vault](contracts\Vault)
   - [VaultConfig](contracts\VaultConfig)
   - Workers

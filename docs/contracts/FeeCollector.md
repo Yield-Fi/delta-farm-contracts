@@ -43,7 +43,7 @@ Collect all fee for given account
 
 Register bounties (at the same time register amount for the client and for the yieldFi)
 One function to wrap two calls. They should be called one by one anyway.
-(If client recevies fee, yieldFi does as well)
+(If client receives fee, yieldFi does as well)
 
 
 > **NOTE:** Function can be called by Vault contract
@@ -80,6 +80,20 @@ Returns amount of fee to collect
 
 > **NOTE:** Function can be called only by approved clients or protocol's operators
 
+
+### forceCollect
+
+```solidity
+  function forceCollect(address[] clients)
+```
+
+Force collects for any given clients
+
+
+
+#### Parameters:
+
+- `clients`: array of addresses to perform force transfers on
 
 
 ___

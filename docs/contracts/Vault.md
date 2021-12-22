@@ -272,6 +272,20 @@ Returns id of position
 #### Return Values:
 
 - `uint256`: Id of position, returns 0 when position with given params isn't exist
+### emergencyWithdraw
+
+```solidity
+  function emergencyWithdraw(address _worker)
+```
+
+Perform emergency withdrawal on given worker
+
+
+
+#### Parameters:
+
+- `_worker`: address of the worker to perform emergency withdraw on
+
 
 ___
 

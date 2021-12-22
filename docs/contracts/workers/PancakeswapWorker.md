@@ -215,6 +215,35 @@ Function to set worker as enabled or disabled
 
 - `_isEnable`: Whether worker will be enable or disable
 
+### forceHarvest
+
+```solidity
+  function forceHarvest()
+```
+
+harvestRewards equivalent without ACL and payout checks.
+
+
+> **NOTE:** Can be called by valid vault only.
+Emergency function - takes place only during emergency withdrawal triggered by AdminContract
+
+
+### emergencyWithdraw
+
+```solidity
+  function emergencyWithdraw(uint256 positionId, address positionOwner)
+```
+
+Withdraw all position funds
+
+
+
+#### Parameters:
+
+- `positionId`: The position ID to perform emergency withdrawal on.
+
+- `positionOwner`: address to transfer liquidated assets to
+
 
 ___
 

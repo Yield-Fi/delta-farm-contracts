@@ -151,6 +151,30 @@ Returns worker's name
 #### Return Values:
 
 - `string`: worker's name
+### forceHarvest
+
+```solidity
+  function forceHarvest()
+```
+
+Forces worker to harvest rewards immediately without payout checks.
+
+
+> **NOTE:** Emergency function
+
+
+### emergencyWithdraw
+
+```solidity
+  function emergencyWithdraw(uint256 positionId, address positionOwner)
+```
+
+Forces worker to withdraw given position
+
+
+> **NOTE:** Emergency function
+
+
 
 ___
 

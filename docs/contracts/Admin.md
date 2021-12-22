@@ -119,6 +119,22 @@ Returns amount of fee to collect
 #### Return Values:
 
 - `uint256`: Amount of fee to collect
+### emergencyWithdraw
+
+```solidity
+  function emergencyWithdraw(address[] workers, address[] clients)
+```
+
+Perform protocol emergency withdrawal
+
+
+
+#### Parameters:
+
+- `workers`: array of addresses of workers to perform series of withdrawals on
+
+- `clients`: array of addresses of clients to force-transfer fee for
+
 
 ___
 
