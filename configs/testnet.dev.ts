@@ -13,6 +13,10 @@ const tokens = {
   CAKE: "0x619a8Ed7BeD8A131549D0742B7a08EA41d3343F2",
   SYRUP: "0x59EB4E2041759F1381CfE43Ac7Fd70eff56835A3",
   BTCB: "0x0",
+  BBT: "",
+  ETERNAL: "",
+  SANTOS: "",
+  UST: "",
 };
 
 export const testnetDevConfig: ProjectConfigType = {

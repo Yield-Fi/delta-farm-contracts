@@ -10,6 +10,10 @@ const tokens = {
   BTCB: "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
   CAKE: "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
   SYRUP: "0x009cf7bc57584b7998236eff51b98a168dcea9b0",
+  BBT: "0xd48474e7444727bf500a32d5abe01943f3a59a64",
+  ETERNAL: "0xd44fd09d74cd13838f137b590497595d6b3feea4",
+  SANTOS: "0xa64455a4553c9034236734faddaddbb64ace4cc7",
+  UST: "0x23396cf899ca06c4472205fc903bdb4de249d6fc",
 };
 
 export const mainnetConfig = {
@@ -217,11 +221,6 @@ export const mainnetConfig = {
           address: "0x7752e1FA9F3a2e860856458517008558DEb989e3",
         },
         {
-          pId: 365,
-          name: "BTCB-BUSD LP",
-          address: "0xF45cd219aEF8618A92BAa7aD848364a158a24F33",
-        },
-        {
           pId: 310,
           name: "bMXX-WBNB LP",
           address: "0xc20A92a1424b29b78DFaF92FD35D4cf8A06419B4",
@@ -345,6 +344,32 @@ export const mainnetConfig = {
           pId: 451,
           name: "PHA-BUSD LP",
           address: "0x4ddd56e2f34338839BB5953515833950eA680aFb",
+        },
+        /** Second stage of deployments */
+        {
+          pid: 494,
+          name: "BBT-BNB LP",
+          address: "0x3D5A3E3824da092851026fCda3D8a0B7438c4573",
+        },
+        {
+          pid: 473,
+          name: "ETERNAL-BNB LP",
+          address: "0xbd26e08411483C4BEBba80939FA5a775beE22338",
+        },
+        {
+          pid: 481,
+          name: "SANTOS-BNB LP",
+          address: "0x06043B346450BbCfdE066ebc39fdc264FdFFeD74",
+        },
+        {
+          pId: 365,
+          name: "BTCB-BUSD LP",
+          address: "0xF45cd219aEF8618A92BAa7aD848364a158a24F33",
+        },
+        {
+          pid: 182,
+          name: "UST-BUSD LP",
+          address: "0x1719606031F1E0B3CCaCa11A2CF550Ef8feBEB0F",
         },
       ],
     },
