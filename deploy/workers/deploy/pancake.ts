@@ -9,6 +9,8 @@ import { parseEther } from "@ethersproject/units";
 const deployFunc: DeployFunction = async () => {
   // The array of workers' names to deploy.
   const workersToDeploy: Array<WorkerConfigType["name"]> = [
+    "BUSD-USDT PancakeswapWorker",
+    "BUSD-DAI PancakeswapWorker",
     // "CAKE-WBNB Farm", # Deployed
     // "USDT-BUSD Farm", # Error
     // "WBNB-BUSD Farm", # Deployed
