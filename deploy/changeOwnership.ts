@@ -149,18 +149,18 @@ const deployFunc: DeployFunction = async () => {
 
     // valuts worker
     for (const worker of vault.workers) {
-      if (worker.name.includes("PancakeswapWorker")) {
-        const w = PancakeswapWorker__factory.connect(worker.address, deployer);
-        const wOwner = await w.owner();
-        console.log(`${worker.name}->PancakeswapWorker->transferOwnership`, wOwner, "->", newOwner);
-        if (deployer.address.toLowerCase() === wOwner.toLowerCase()) {
-          transferOwnership = await w.transferOwnership(newOwner);
-          console.log(
-            `${worker.name}->PancakeswapWorker->transferOwnership->hash`,
-            transferOwnership.hash
-          );
-        } else console.log(`${worker.name}->PancakeswapWorker->transferOwnership`, "SKIP");
-      }
+      if (!worker.address) continue;
+
+      const w = PancakeswapWorker__factory.connect(worker.address, deployer);
+      const wOwner = await w.owner();
+      console.log(`${worker.name}->PancakeswapWorker->transferOwnership`, wOwner, "->", newOwner);
+      if (deployer.address.toLowerCase() === wOwner.toLowerCase()) {
+        transferOwnership = await w.transferOwnership(newOwner);
+        console.log(
+          `${worker.name}->PancakeswapWorker->transferOwnership->hash`,
+          transferOwnership.hash
+        );
+      } else console.log(`${worker.name}->PancakeswapWorker->transferOwnership`, "SKIP");
     }
   }
 

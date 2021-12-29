@@ -101,14 +101,14 @@ const deployFunc: DeployFunction = async () => {
 
     // valuts worker
     for (const worker of vault.workers) {
-      if (worker.name.includes("PancakeswapWorker")) {
-        const w = PancakeswapWorker__factory.connect(worker.address, deployer);
-        const wOwner = await w.owner();
-        console.log(
-          `${worker.name}->PancakeswapWorker->Owner`,
-          wOwner.toLowerCase() === walletToCompare
-        );
-      }
+      if (!worker.address) continue;
+
+      const w = PancakeswapWorker__factory.connect(worker.address, deployer);
+      const wOwner = await w.owner();
+      console.log(
+        `${worker.name}->PancakeswapWorker->Owner`,
+        wOwner.toLowerCase() === walletToCompare
+      );
     }
   }
 
