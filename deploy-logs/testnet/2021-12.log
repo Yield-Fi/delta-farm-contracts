@@ -1,0 +1,32 @@
+2021-12-28 13:43:59 ||| ---> Deploying ProtocolManager... <---
+2021-12-28 13:44:45 ||| - ProtocolManager deployed at 0x8f5Ccf63976338CcD02f0eB3C6A5753c5468ABC0
+2021-12-28 14:00:23 ||| ---> Deploying fee collector... <---
+2021-12-28 14:01:05 ||| - FeeCollector deployed at 0x6Ea1d3fC73dd2207F97c74715373A7A4f432dfe5
+2021-12-28 14:10:13 ||| ---> Deploying Admin contract... <---
+2021-12-28 14:11:06 ||| - Admin contract deployed at 0x3FbD9e47Fc85C6b489639E9D0414e1Aac1841FaC
+2021-12-28 14:15:54 ||| ---> Deploying WrappedNativeTokenRelayer... <---
+2021-12-28 14:16:35 ||| - WrappedNativeTokenRelayer deployed at 0xEcB919458700157D5a4D15D472D38727b09644DD
+2021-12-28 14:20:08 ||| ---> Deploying vaults... <---
+2021-12-28 14:20:08 |||   -> BUSD Vault
+2021-12-28 14:20:51 |||   - Vault Config deployed at 0xcC4d7158760c85D48AfF142D78b06919a4852BE5
+2021-12-28 14:21:27 |||   - Vault deployed at 0x2F9322016f683E328b9501072957Bc42D1cC2bb9
+2021-12-28 14:25:45 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2021-12-28 14:26:32 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0x24676a9A5952f6B3381CA264E0FeCe4308E3A935
+2021-12-28 14:27:13 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0x39728b3700Ec9C79ffB7C462e39BB6c3a683B94F
+2021-12-28 14:27:53 ||| - LiquidateStrategy deployed at 0x0cDD4Bb2756266d3b097Ba87dbB2d90cC3141c3F
+2021-12-28 14:30:20 ||| ---> Deploying pancakeswap workers... <---
+2021-12-28 14:30:20 ||| -> Deploying workers for BUSD Vault
+2021-12-28 14:32:27 ||| ---> Deploying pancakeswap workers... <---
+2021-12-28 14:32:27 ||| -> Deploying workers for BUSD Vault
+2021-12-28 14:32:27 |||   - Deploying BUSD-USDT PancakeswapWorker...
+2021-12-28 14:33:19 |||   - BUSD-USDT PancakeswapWorker deployed at 0x5AB100ABE5806640eECDe0e44f3BaCCBbB252998
+2021-12-28 14:33:19 |||   - Deploying BUSD-DAI PancakeswapWorker...
+2021-12-28 14:33:53 |||   - BUSD-DAI PancakeswapWorker deployed at 0x3b349d1326b3777A578342c87d8b60f75078BAdc
+2021-12-28 14:36:30 ||| ---> Deploying Client contracts... <---
+2021-12-28 14:36:30 |||   -> Contract of Client A
+2021-12-28 14:37:22 |||   - Contract of Client A deployed at 0xaA6F53894d5a935e2611514997c388BEbc879189
+2021-12-28 16:13:01 ||| ---> Upgrading Admin contract implementation... <---
+2021-12-28 16:13:33 ||| - Implementation of Admin contract deployed at 0x3FbD9e47Fc85C6b489639E9D0414e1Aac1841FaC
+2021-12-28 16:42:58 ||| ---> Upgrading implementation of fee collector... <---
+2021-12-28 16:50:28 ||| ---> Upgrading implementation of fee collector... <---
+2021-12-28 16:51:00 ||| - New implementation of FeeCollector deployed at 0x6Ea1d3fC73dd2207F97c74715373A7A4f432dfe5

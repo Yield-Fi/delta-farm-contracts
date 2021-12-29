@@ -18,6 +18,8 @@
     "generate-docs": "solidity-docgen --solc-module solc-0.6.6 -t templates -o docs/contracts",
     "doc-sidebar": "node ./docs/generate-sidebar.cjs",
     "doc-serve": "docsify serve ./docs",
+    "checkOwnership": "hardhat --network testnet deploy --reset --tags checkOwnership",
+    "changeOwnership": "hardhat --network testnet deploy --reset --tags changeOwnership",
     "docs": "run-p generate-docs doc-sidebar doc-serve",
     "docs:build": "npm run generate-docs",
     "prettier:fix": "prettier --write contracts/ && prettier --write test && prettier --write deploy && prettier --write scripts",

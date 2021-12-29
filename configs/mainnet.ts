@@ -396,14 +396,14 @@ export const mainnetConfig = {
           token1: tokens.WBNB,
           defaultHarvestThreshold: "0",
         },
-        {
-          name: "USDT-BUSD Farm", // Error during deployment
-          address: "",
-          poolId: "258",
-          token0: tokens.USDT,
-          token1: tokens.BUSD,
-          defaultHarvestThreshold: "0",
-        },
+        // {
+        //   name: "USDT-BUSD Farm", // Error during deployment
+        //   address: "",
+        //   positionId: "258",
+        //   token0: tokens.USDT,
+        //   token1: tokens.BUSD,
+        //   defaultHarvestThresshold: "1",
+        // },
         {
           name: "WBNB-BUSD Farm",
           address: "0xc5ABD411d063B4F14380ea32a740615d9CA74B6B",
@@ -420,17 +420,17 @@ export const mainnetConfig = {
           token1: tokens.BUSD,
           defaultHarvestThreshold: "0",
         },
-        {
-          name: "USDT-WBNB Farm", // Error
-          address: "",
-          poolId: "264",
-          token0: tokens.USDT,
-          token1: tokens.WBNB,
-          defaultHarvestThreshold: "0",
-        },
+        // {
+        //   name: "USDT-WBNB Farm", // Error
+        //   address: "",
+        //   positionId: "264",
+        //   token0: tokens.USDT,
+        //   token1: tokens.WBNB,
+        //   defaultHarvestThresshold: "1",
+        // },
         {
           name: "CAKE-BUSD Farm",
-          address: "",
+          address: "0x4A81Fe4bAA5a8839cB6da02e98Ec32Be6D4D8A1e",
           poolId: "389",
           token0: tokens.CAKE,
           token1: tokens.BUSD,
@@ -438,7 +438,7 @@ export const mainnetConfig = {
         },
         {
           name: "CAKE-USDT Farm",
-          address: "",
+          address: "0xd47C209B010054883A2d1B9e124b76e233E35E32",
           poolId: "422",
           token0: tokens.CAKE,
           token1: tokens.USDT,

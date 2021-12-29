@@ -20,11 +20,11 @@ const tokens = {
 };
 
 export const testnetConfig: ProjectConfigType = {
-  wrappedNativeTokenRelayer: "0xB6b260Cb62D87BEBf38871ed780B51203cB35d89",
-  feeCollector: "0x795511BEdb51B1d28549896a4b5e5699579F1aEA",
-  protocolManager: "0x42991Fad54cA10F0C0A57945991Bfba423F37249",
-  protocolOperators: ["0x07661882d1C4b7F703Ca0A8898afE4D402dFdeF2"],
-  adminContract: "0x66194F8FFcA81c476554183F953089019936D9F0",
+  wrappedNativeTokenRelayer: "0xEcB919458700157D5a4D15D472D38727b09644DD",
+  feeCollector: "0x6Ea1d3fC73dd2207F97c74715373A7A4f432dfe5",
+  protocolManager: "0x8f5Ccf63976338CcD02f0eB3C6A5753c5468ABC0",
+  protocolOperators: ["0x32d9A383F53B1317BBa7F99AeC19a7E97D44b76e"],
+  adminContract: "0x3FbD9e47Fc85C6b489639E9D0414e1Aac1841FaC",
   baseToken: tokens.BUSD,
   feeThreshold: 500,
   defaultTreasuryFeeBps: 1000,
@@ -90,17 +90,17 @@ export const testnetConfig: ProjectConfigType = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "0x66C3c16516be4513B57cf80e8C1503552ae7841a",
-      AddToPoolWithoutBaseToken: "0x647d5223adfb794BdEFBCe77237C4d834Bb211EA",
-      Liquidate: "0xA70D3E2EC79165c573dF4Da157F48E51b9B37916",
+      AddToPoolWithBaseToken: "0x24676a9A5952f6B3381CA264E0FeCe4308E3A935",
+      AddToPoolWithoutBaseToken: "0x39728b3700Ec9C79ffB7C462e39BB6c3a683B94F",
+      Liquidate: "0x0cDD4Bb2756266d3b097Ba87dbB2d90cC3141c3F",
     },
   },
   vaults: [
     {
       name: "BUSD Vault",
-      address: "0xE5d0B7d609c057ad1CE2F27D49Aad80144936CA7",
+      address: "0x2F9322016f683E328b9501072957Bc42D1cC2bb9",
       baseToken: tokens.BUSD,
-      config: "0x62957B015e5389273c269afaf583b960Fb0Ef3FC",
+      config: "0xcC4d7158760c85D48AfF142D78b06919a4852BE5",
       workers: [
         {
           name: "BUSD-USDT PancakeswapWorker",
@@ -179,10 +179,10 @@ export const testnetConfig: ProjectConfigType = {
   ],
   clients: [
     {
-      address: "0xf9d9b0b20969639de844ceeA22aF2Ff1735513d5",
+      address: "0xaA6F53894d5a935e2611514997c388BEbc879189",
       kind: "CEX",
       name: "Client A",
-      operators: ["0xEeF6D5514dB9785caD8f2fc69BbfFe4eBB553656"],
+      operators: ["0x6bAA0A1A70eB7975774b801Bc342EC826aA82FC6"],
       callers: [ethers.constants.AddressZero],
       additionalWithdrawers: [ethers.constants.AddressZero],
     },
