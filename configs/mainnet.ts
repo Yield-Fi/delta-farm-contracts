@@ -430,7 +430,7 @@ export const mainnetConfig = {
         // },
         {
           name: "CAKE-BUSD Farm",
-          address: "",
+          address: "0x4A81Fe4bAA5a8839cB6da02e98Ec32Be6D4D8A1e",
           poolId: "389",
           token0: tokens.CAKE,
           token1: tokens.BUSD,
@@ -438,7 +438,7 @@ export const mainnetConfig = {
         },
         {
           name: "CAKE-USDT Farm",
-          address: "",
+          address: "0xd47C209B010054883A2d1B9e124b76e233E35E32",
           poolId: "422",
           token0: tokens.CAKE,
           token1: tokens.USDT,
