@@ -10,6 +10,10 @@ const tokens = {
   BTCB: "0x7130d2a12b9bcbfae4f2634d864a1ee1ce3ead9c",
   CAKE: "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
   SYRUP: "0x009cf7bc57584b7998236eff51b98a168dcea9b0",
+  BBT: "0xd48474e7444727bf500a32d5abe01943f3a59a64",
+  ETERNAL: "0xd44fd09d74cd13838f137b590497595d6b3feea4",
+  SANTOS: "0xa64455a4553c9034236734faddaddbb64ace4cc7",
+  UST: "0x23396cf899ca06c4472205fc903bdb4de249d6fc",
 };
 
 export const mainnetConfig = {
@@ -217,11 +221,6 @@ export const mainnetConfig = {
           address: "0x7752e1FA9F3a2e860856458517008558DEb989e3",
         },
         {
-          pId: 365,
-          name: "BTCB-BUSD LP",
-          address: "0xF45cd219aEF8618A92BAa7aD848364a158a24F33",
-        },
-        {
           pId: 310,
           name: "bMXX-WBNB LP",
           address: "0xc20A92a1424b29b78DFaF92FD35D4cf8A06419B4",
@@ -346,6 +345,32 @@ export const mainnetConfig = {
           name: "PHA-BUSD LP",
           address: "0x4ddd56e2f34338839BB5953515833950eA680aFb",
         },
+        /** Second stage of deployments */
+        {
+          pid: 494,
+          name: "BBT-BNB LP",
+          address: "0x3D5A3E3824da092851026fCda3D8a0B7438c4573",
+        },
+        {
+          pid: 473,
+          name: "ETERNAL-BNB LP",
+          address: "0xbd26e08411483C4BEBba80939FA5a775beE22338",
+        },
+        {
+          pid: 481,
+          name: "SANTOS-BNB LP",
+          address: "0x06043B346450BbCfdE066ebc39fdc264FdFFeD74",
+        },
+        {
+          pId: 365,
+          name: "BTCB-BUSD LP",
+          address: "0xF45cd219aEF8618A92BAa7aD848364a158a24F33",
+        },
+        {
+          pid: 182,
+          name: "UST-BUSD LP",
+          address: "0x1719606031F1E0B3CCaCa11A2CF550Ef8feBEB0F",
+        },
       ],
     },
   },
@@ -366,10 +391,10 @@ export const mainnetConfig = {
         {
           name: "CAKE-WBNB Farm",
           address: "0xBE8dc5171689bE13aB9AC05cbA77aE7e0Be96d1c",
-          positionId: "251",
+          poolId: "251",
           token0: tokens.CAKE,
           token1: tokens.WBNB,
-          defaultHarvestThresshold: "1",
+          defaultHarvestThreshold: "0",
         },
         // {
         //   name: "USDT-BUSD Farm", // Error during deployment
@@ -382,18 +407,18 @@ export const mainnetConfig = {
         {
           name: "WBNB-BUSD Farm",
           address: "0xc5ABD411d063B4F14380ea32a740615d9CA74B6B",
-          positionId: "252",
+          poolId: "252",
           token0: tokens.WBNB,
           token1: tokens.BUSD,
-          defaultHarvestThresshold: "1",
+          defaultHarvestThreshold: "0",
         },
         {
           name: "DAI-BUSD Farm",
           address: "0x838630108CCCC79186CD57FF5aFC6F902d32d21A",
-          positionId: "282",
+          poolId: "282",
           token0: tokens.DAI,
           token1: tokens.BUSD,
-          defaultHarvestThresshold: "1",
+          defaultHarvestThreshold: "0",
         },
         // {
         //   name: "USDT-WBNB Farm", // Error
@@ -405,19 +430,59 @@ export const mainnetConfig = {
         // },
         {
           name: "CAKE-BUSD Farm",
-          address: "0x4A81Fe4bAA5a8839cB6da02e98Ec32Be6D4D8A1e",
-          positionId: "389",
+          address: "",
+          poolId: "389",
           token0: tokens.CAKE,
           token1: tokens.BUSD,
-          defaultHarvestThresshold: "1",
+          defaultHarvestThreshold: "0",
         },
         {
           name: "CAKE-USDT Farm",
-          address: "0xd47C209B010054883A2d1B9e124b76e233E35E32",
-          positionId: "422",
+          address: "",
+          poolId: "422",
           token0: tokens.CAKE,
           token1: tokens.USDT,
-          defaultHarvestThresshold: "1",
+          defaultHarvestThreshold: "0",
+        },
+        {
+          name: "BBT-BNB Farm",
+          address: "",
+          poolId: "494",
+          token0: tokens.BBT,
+          token1: tokens.WBNB,
+          defaultHarvestThreshold: "0",
+        },
+        {
+          name: "ETERNAL-BNB Farm",
+          address: "",
+          poolId: "473",
+          token0: tokens.ETERNAL,
+          token1: tokens.WBNB,
+          defaultHarvestThreshold: "0",
+        },
+        {
+          name: "SANTOS-BNB Farm",
+          address: "",
+          poolId: "481",
+          token0: tokens.SANTOS,
+          token1: tokens.WBNB,
+          defaultHarvestThreshold: "0",
+        },
+        {
+          name: "BTCB-BUSD Farm",
+          address: "",
+          poolId: "365",
+          token0: tokens.BTCB,
+          token1: tokens.BUSD,
+          defaultHarvestThreshold: "0",
+        },
+        {
+          name: "UST-BUSD Farm",
+          address: "",
+          poolId: "182",
+          token0: tokens.UST,
+          token1: tokens.BUSD,
+          defaultHarvestThreshold: "0",
         },
       ],
     },

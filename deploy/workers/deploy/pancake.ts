@@ -18,6 +18,11 @@ const deployFunc: DeployFunction = async () => {
     // "USDT-WBNB Farm", # Error
     // "CAKE-BUSD Farm", # Deployed
     // "CAKE-USDT Farm", # Deployed
+    "BBT-BNB Farm",
+    "ETERNAL-BNB Farm",
+    "SANTOS-BNB Farm",
+    "BTCB-BUSD Farm",
+    "UST-BUSD Farm",
   ];
 
   const [deployer] = await ethers.getSigners();
@@ -44,9 +49,9 @@ const deployFunc: DeployFunction = async () => {
         config.baseToken,
         config.dex.pancakeswap.MasterChef,
         config.dex.pancakeswap.RouterV2,
-        worker.positionId,
+        worker.poolId,
         [config.tokens.CAKE, config.baseToken],
-        parseEther(worker.defaultHarvestThresshold),
+        parseEther(worker.defaultHarvestThreshold),
         config.defaultTreasuryFeeBps,
         config.protocolManager,
       ])) as PancakeswapWorker;
