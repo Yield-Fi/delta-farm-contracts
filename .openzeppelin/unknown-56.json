@@ -109,6 +109,31 @@
       "address": "0x18EC0bF18d727aF80DdD51944255f2f12ECb9744",
       "txHash": "0x80e1a5e3109ee7c2620aac012072721bae135e3ec9fe4518889f352c7bce5ad7",
       "kind": "transparent"
+    },
+    {
+      "address": "0x90f9f27E67CD94e08fEEd763753562B2D521A089",
+      "txHash": "0x6838419925abd0c08bf71b731ea7a743ff428e51abe4671ee75477be644498b7",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xA646e46dC2eeB0248e61E14C57ee32E112dd7c72",
+      "txHash": "0x90a827524e4c2f85b3ef6c0ef463d47a3d6449aaf8c611c16b1c4677ad764946",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xBEF1cC5318a8504Ce7CD382E8010E38FA1861738",
+      "txHash": "0xe9c353a0400d4adb754848da7c84acfc0f4dfc169117868750176d17bafd81b8",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x184f5c9eC49E3e53743CfA47F9d884767a8FdF69",
+      "txHash": "0x122e2d3a15fa824f3712f04ec62b78c18179eb6733513f283313c6f824d68bff",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x67fAE3cB68947e02B2A0Fd06DE45aF34B468c86f",
+      "txHash": "0xd31358663ec9153a52ce3e4462a58aca2c4fce25cbdca88360608bc95d57f242",
+      "kind": "transparent"
     }
   ],
   "impls": {
@@ -1483,6 +1508,97 @@
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "6afd8084a496e05434be47d9eb21008c6280e460ded935d77a77d890a3a78caf": {
+      "address": "0x5129adEDE9b52bE01D82E362398306b14eBdb072",
+      "txHash": "0xa710f429be0a2128e708f5c8ba581593e6e8eabd451de5f4870cc87b2b29e19d",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "Admin",
+            "label": "protocolManager",
+            "type": "t_contract(IProtocolManager)6683",
+            "src": "contracts/Admin.sol:36"
+          },
+          {
+            "contract": "Admin",
+            "label": "feeCollector",
+            "type": "t_contract(IFeeCollector)6508",
+            "src": "contracts/Admin.sol:37"
+          }
+        ],
+        "types": {
+          "t_contract(IProtocolManager)6683": {
+            "label": "contract IProtocolManager"
+          },
+          "t_contract(IFeeCollector)6508": {
+            "label": "contract IFeeCollector"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address": {
+            "label": "address"
           },
           "t_array(t_uint256)50_storage": {
             "label": "uint256[50]"

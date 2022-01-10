@@ -22,7 +22,7 @@ export const mainnetConfig = {
   protocolManager: "0xc97b8f863536B7987991d437C08B70D274A5a805",
   protocolOperators: [
     "0xF066caEFA8CcFC9A5a1F0859d1f5c075aC2F1f06" /* YieldFi EOA */,
-    "0xBc29f271C33A38aB8e4020702165f1Bf025b16D3",
+    "0xa1f56ab831841b63eFA7BBda92fbaD57eeBbE5eD" /* New owner after ownership change */,
   ],
   adminContract: "0x4EE64d49A6411a5c6d1d8E9f315e23e6B511CD00",
   feeThreshold: 500,
@@ -446,7 +446,7 @@ export const mainnetConfig = {
         },
         {
           name: "BBT-BNB Farm",
-          address: "",
+          address: "0x90f9f27E67CD94e08fEEd763753562B2D521A089",
           poolId: "494",
           token0: tokens.BBT,
           token1: tokens.WBNB,
@@ -454,7 +454,7 @@ export const mainnetConfig = {
         },
         {
           name: "ETERNAL-BNB Farm",
-          address: "",
+          address: "0xA646e46dC2eeB0248e61E14C57ee32E112dd7c72",
           poolId: "473",
           token0: tokens.ETERNAL,
           token1: tokens.WBNB,
@@ -462,7 +462,7 @@ export const mainnetConfig = {
         },
         {
           name: "SANTOS-BNB Farm",
-          address: "",
+          address: "0xBEF1cC5318a8504Ce7CD382E8010E38FA1861738",
           poolId: "481",
           token0: tokens.SANTOS,
           token1: tokens.WBNB,
@@ -470,7 +470,7 @@ export const mainnetConfig = {
         },
         {
           name: "BTCB-BUSD Farm",
-          address: "",
+          address: "0x184f5c9eC49E3e53743CfA47F9d884767a8FdF69",
           poolId: "365",
           token0: tokens.BTCB,
           token1: tokens.BUSD,
@@ -478,8 +478,8 @@ export const mainnetConfig = {
         },
         {
           name: "UST-BUSD Farm",
-          address: "",
-          poolId: "182",
+          address: "0x67fAE3cB68947e02B2A0Fd06DE45aF34B468c86f",
+          poolId: "293",
           token0: tokens.UST,
           token1: tokens.BUSD,
           defaultHarvestThreshold: "0",

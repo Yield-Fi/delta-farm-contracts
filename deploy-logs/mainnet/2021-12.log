@@ -29,3 +29,19 @@
 2021-12-21 21:44:53 ||| ---> Deploying Client contracts... <---
 2021-12-21 21:44:53 |||   -> Contract of Client A
 2021-12-21 21:45:26 |||   - Contract of Client A deployed at 0x18EC0bF18d727aF80DdD51944255f2f12ECb9744
+2021-12-29 19:54:27 ||| ProtocolManager whitelist operation for addresses: [0xa1f56ab831841b63eFA7BBda92fbaD57eeBbE5eD], new state: true
+2021-12-29 19:54:31 ||| ProtocolManager whitelist operation success
+2021-12-29 19:59:37 ||| ---> Upgrading Admin contract implementation... <---
+2021-12-29 20:00:00 ||| - Implementation of Admin contract deployed at 0x4EE64d49A6411a5c6d1d8E9f315e23e6B511CD00
+2021-12-29 20:43:54 ||| ---> Deploying pancakeswap workers... <---
+2021-12-29 20:43:54 ||| -> Deploying workers for BUSD Vault
+2021-12-29 20:43:54 |||   - Deploying BBT-BNB Farm...
+2021-12-29 20:44:11 |||   - BBT-BNB Farm deployed at 0x90f9f27E67CD94e08fEEd763753562B2D521A089
+2021-12-29 20:44:11 |||   - Deploying ETERNAL-BNB Farm...
+2021-12-29 20:44:42 |||   - ETERNAL-BNB Farm deployed at 0xA646e46dC2eeB0248e61E14C57ee32E112dd7c72
+2021-12-29 20:44:42 |||   - Deploying SANTOS-BNB Farm...
+2021-12-29 20:45:06 |||   - SANTOS-BNB Farm deployed at 0xBEF1cC5318a8504Ce7CD382E8010E38FA1861738
+2021-12-29 20:45:06 |||   - Deploying BTCB-BUSD Farm...
+2021-12-29 20:45:21 |||   - BTCB-BUSD Farm deployed at 0x184f5c9eC49E3e53743CfA47F9d884767a8FdF69
+2021-12-29 20:45:21 |||   - Deploying UST-BUSD Farm...
+2021-12-29 20:45:41 |||   - UST-BUSD Farm deployed at 0x67fAE3cB68947e02B2A0Fd06DE45aF34B468c86f

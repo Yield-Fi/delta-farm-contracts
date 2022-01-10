@@ -53,7 +53,7 @@ contract Admin is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe 
   /// @param feeBps Fee in BPS (0 < 10000)
   /// @notice Function can be called only by approved protocol's operators
   function setFarmsFee(address[] calldata farms, uint256 feeBps) external onlyOperator {
-    require(feeBps > 0 && feeBps < 5000, "Admin: incorrect feeBps value");
+    require(feeBps >= 0 && feeBps < 5000, "Admin: incorrect feeBps value");
 
     for (uint256 i = 0; i < farms.length; i++) {
       IWorker(farms[i]).setTreasuryFee(feeBps);
