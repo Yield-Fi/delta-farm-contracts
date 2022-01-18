@@ -591,7 +591,6 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   /// @return uint256 Amount of the token1 which will be received from swapped base token
   function estimateDeposit(address farm, uint256 amount)
     public
-    view
     returns (
       uint256,
       uint256,

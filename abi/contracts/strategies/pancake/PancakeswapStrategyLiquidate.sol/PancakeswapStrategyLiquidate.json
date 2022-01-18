@@ -50,6 +50,11 @@
         "internalType": "contract IPancakeRouterV2",
         "name": "_router",
         "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_stables",
+        "type": "address[]"
       }
     ],
     "name": "initialize",

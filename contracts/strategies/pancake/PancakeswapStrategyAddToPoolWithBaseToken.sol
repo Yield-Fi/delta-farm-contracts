@@ -100,7 +100,6 @@ contract PancakeswapStrategyAddToPoolWithBaseToken is
     uint256 amount
   )
     external
-    view
     override
     returns (
       uint256,

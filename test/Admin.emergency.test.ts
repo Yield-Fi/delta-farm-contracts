@@ -172,7 +172,9 @@ describe("Admin contract - emergency withdrawal", async () => {
     );
 
     // Setup strategies
-    [addStrat, addStratNoBase, liqStrat] = await deployPancakeStrategies(router, deployer);
+    [addStrat, addStratNoBase, liqStrat] = await deployPancakeStrategies(router, deployer, [
+      mockWBNB.address,
+    ]);
 
     // Setup BTOKEN-FTOKEN pair on Pancakeswap
     // Add lp to masterChef's pool
@@ -368,10 +370,10 @@ describe("Admin contract - emergency withdrawal", async () => {
         [exampleClient.address, yieldFiAddress /* Treasury address! */]
       );
 
-      // 20 CAKE ~= 20 BUSD since 1:1 initial ratio -  2 * 10% fee * 10 CAKE  + 6 USD initial ->  ~= 21.538796449897046799 (price offset due to pool swap)
+      // 20 CAKE ~= 20 BUSD since 1:1 initial ratio -  2 * 10% fee * 10 CAKE  + 6 USD initial ->  ~= 21.551730735667670275 (price offset due to pool swap)
       // Alice should get her assets back
       expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.eql(
-        ethers.utils.parseEther("21.538796449897046799")
+        ethers.utils.parseEther("21.551730735667670275")
       );
 
       // All rewards should have been paid out
@@ -397,12 +399,12 @@ describe("Admin contract - emergency withdrawal", async () => {
 
       // Client fee should have been paid out as well - ~ 2 CAKE since 10 % * 10 CAKE total * 2 (may be less)
       expect(await baseToken.balanceOf(exampleClient.address)).to.be.bignumber.that.eql(
-        ethers.utils.parseEther("1.945152730923840033")
+        ethers.utils.parseEther("1.947079919050426485")
       );
 
       // YieldFee treasury address has already been supplied with fee, same formula above since both yieldFi and client have 10% fee set
       expect(await baseToken.balanceOf(yieldFiAddress)).to.be.bignumber.that.eql(
-        ethers.utils.parseEther("1.945152730923840033")
+        ethers.utils.parseEther("1.947079919050426485")
       );
     });
   });

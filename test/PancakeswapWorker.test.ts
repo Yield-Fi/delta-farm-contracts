@@ -178,7 +178,7 @@ describe("PancakeswapWorker", () => {
     await PancakeMasterChef.add(1, lpTOK0_TOK1__deployer.address, true);
 
     [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, LiquidateStrategy] =
-      await deployPancakeStrategies(PancakeRouterV2, deployer);
+      await deployPancakeStrategies(PancakeRouterV2, deployer, [MockWBNB.address]);
 
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 
@@ -458,7 +458,7 @@ describe("PancakeswapWorker", () => {
       */
       assertAlmostEqual(
         (await BaseToken.balanceOf(MockVault.address)).toString(),
-        parseEther("9.755679966928919588").toString()
+        parseEther("9.757442958099992462").toString()
       );
 
       /// Withdraw all funds from pool via LiquidateStrategy
@@ -490,7 +490,7 @@ describe("PancakeswapWorker", () => {
 
       assertAlmostEqual(
         (await BaseToken.balanceOf(MockVault.address)).toString(),
-        parseEther("9.855429985630498983").toString()
+        parseEther("9.856934582015493050").toString()
       );
     });
   });

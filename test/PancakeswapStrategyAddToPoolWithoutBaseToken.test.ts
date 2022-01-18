@@ -144,7 +144,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
 
     strategy = (await deployProxyContract(
       "PancakeswapStrategyAddToPoolWithoutBaseToken",
-      [PancakeRouterV2.address],
+      [PancakeRouterV2.address, [MockWBNB.address]],
       deployer
     )) as PancakeswapStrategyAddToPoolWithoutBaseToken;
   }
@@ -215,7 +215,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
 
   it("Should estimate amounts of base token after split and converting to token0 and token1", async () => {
     const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
-      await strategy.estimateAmounts(
+      await strategy.callStatic.estimateAmounts(
         BaseToken.address,
         Token0.address,
         Token1.address,

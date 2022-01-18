@@ -3,6 +3,7 @@ import "@openzeppelin/test-helpers";
 import {
   MockToken,
   MockToken__factory,
+  MockWBNB,
   PancakeFactory,
   PancakeFactory__factory,
   PancakePair,
@@ -110,6 +111,7 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     )) as PancakeswapStrategyLiquidate__factory;
     strat = (await upgrades.deployProxy(PancakeswapV2StrategyLiquidate, [
       routerV2.address,
+      [wbnb.address],
     ])) as PancakeswapStrategyLiquidate;
     await strat.deployed();
 

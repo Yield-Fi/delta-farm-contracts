@@ -216,7 +216,7 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     );
 
     const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
-      await strat.estimateAmounts(
+      await strat.callStatic.estimateAmounts(
         baseToken.address,
         baseToken.address,
         farmingToken.address,

@@ -172,7 +172,9 @@ describe("Client contract", async () => {
     );
 
     // Setup strategies
-    [addStrat, addStratNoBase, liqStrat] = await deployPancakeStrategies(router, deployer);
+    [addStrat, addStratNoBase, liqStrat] = await deployPancakeStrategies(router, deployer, [
+      mockWBNB.address,
+    ]);
 
     // Setup BTOKEN-FTOKEN pair on Pancakeswap
     // Add lp to masterChef's pool
@@ -375,7 +377,10 @@ describe("Client contract", async () => {
 
     it("should estimate deposit correctly", async () => {
       const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
-        await exampleClient.estimateDeposit(pancakeswapWorker01.address, parseEther("2"));
+        await exampleClient.callStatic.estimateDeposit(
+          pancakeswapWorker01.address,
+          parseEther("2")
+        );
 
       expect(firstPartOfBaseToken.toString()).to.be.eq(
         parseEther("1.000751439456838049").toString()
@@ -434,7 +439,10 @@ describe("Client contract", async () => {
 
     it("should estimate deposit correctly", async () => {
       const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
-        await exampleClient.estimateDeposit(pancakeswapWorker02.address, parseEther("2"));
+        await exampleClient.callStatic.estimateDeposit(
+          pancakeswapWorker02.address,
+          parseEther("2")
+        );
 
       expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("1").toString());
       expect(secondPartOfBaseToken.toString()).to.be.eq(parseEther("1").toString());
