@@ -30,7 +30,7 @@ export const deployPancakeStrategies = async (
   )) as PancakeswapStrategyAddToPoolWithBaseToken__factory;
   const PancakeswapStrategyAddToPoolWithBaseToken = (await upgrades.deployProxy(
     PancakeswapStrategyAddToPoolWithBaseTokenFactory,
-    [router.address]
+    [router.address, tokens]
   )) as PancakeswapStrategyAddToPoolWithBaseToken;
   await PancakeswapStrategyAddToPoolWithBaseToken.deployed();
 

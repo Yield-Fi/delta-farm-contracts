@@ -330,7 +330,7 @@ describe("PancakeswapWorker", () => {
       /// expected ~ 0.1 Base Token (minus some trading fee) ~ 0.099 BASE TOKEN
       assertAlmostEqual(
         (await WorkerBUSD_TOK0.tokensToReceive(1)).toString(),
-        parseEther("0.0997518").toString()
+        parseEther("0.099872512608433641").toString()
       );
 
       const latestBlock = await time.latestBlockNumber();
@@ -340,7 +340,7 @@ describe("PancakeswapWorker", () => {
       // Harvest rewards and send them to the operating vault in Base token
       await worker__deployer.harvestRewards(); /// + 1 BLOCK
 
-      expect(await MockVault.rewards(1)).to.be.eq(parseEther("9.755679966928919588").toString());
+      expect(await MockVault.rewards(1)).to.be.eq(parseEther("9.756649592554072839").toString());
 
       /*
       There are two positions in pancakeMasterChef with the same alloc points, so 0.5 CAKE per block is generated for the given position.
@@ -382,7 +382,7 @@ describe("PancakeswapWorker", () => {
 
       assertAlmostEqual(
         (await BaseToken.balanceOf(MockVault.address)).toString(),
-        parseEther("9.855429985630498983").toString()
+        parseEther("9.856522105162506480").toString()
       );
     });
   });

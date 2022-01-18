@@ -353,9 +353,9 @@ describe("Client contract", async () => {
       expect(position.owner).to.be.eql(aliceAddress);
       expect(position.client).to.be.eql(exampleClient.address);
 
-      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.999649838808597569;
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.996503741585422602;
       expect(positionInfo.toString()).to.be.eql(
-        ethers.utils.parseEther("0.997501868759355536").toString()
+        ethers.utils.parseEther("0.996503741585422602").toString()
       );
     });
 
@@ -383,16 +383,16 @@ describe("Client contract", async () => {
         );
 
       expect(firstPartOfBaseToken.toString()).to.be.eq(
-        parseEther("1.000751439456838049").toString()
+        parseEther("1.000000000000000000").toString()
       );
       expect(secondPartOfBaseToken.toString()).to.be.eq(
-        parseEther("0.999248560543161951").toString()
+        parseEther("1.000000000000000000").toString()
       );
       expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
         parseEther("2").toString()
       );
-      expect(amountOfToken0.toString()).to.be.eq(parseEther("0.997254052438285379").toString());
-      expect(amountOfToken1.toString()).to.be.eq(parseEther("0.999248560543161951").toString());
+      expect(amountOfToken0.toString()).to.be.eq(parseEther("0.996505985279683515").toString());
+      expect(amountOfToken1.toString()).to.be.eq(parseEther("0.1000000000000000000").toString());
     });
   });
 
@@ -470,14 +470,14 @@ describe("Client contract", async () => {
 
       expect(
         (await exampleClient.amountToWithdraw(pancakeswapWorker01.address, aliceAddress)).toString()
-      ).to.be.eq(parseEther("0.997501868759355536").toString());
+      ).to.be.eq(parseEther("0.996503741585422602").toString());
 
       // Execute withdrawal flow
       await exampleClientAsAlice.withdraw(aliceAddress, pancakeswapWorker01.address, 0);
 
       // Alice received ~= 1 base token after withdraw
       expect((await baseToken.balanceOf(aliceAddress)).toString()).to.be.eql(
-        ethers.utils.parseEther("0.997501868759355536").toString()
+        ethers.utils.parseEther("0.996503741585422602").toString()
       );
     });
 
@@ -689,23 +689,23 @@ describe("Client contract", async () => {
       // 40 BASE TOKEN - 15 % (10% treasury fee + 5% client fee) = 34 BASE TOKEN + some additional rewards generated during execute test
       expect(
         (await exampleClient.allRewardToCollect(aliceAddress, baseToken.address)).toString()
-      ).to.be.eq(parseEther("34.820649428126150303"));
+      ).to.be.eq(parseEther("34.820649428128021984"));
 
       await exampleClient.collectAllRewards(aliceAddress, baseToken.address);
 
       expect((await baseToken.balanceOf(aliceAddress)).toString()).to.be.eq(
-        parseEther("34.820649428126150303").toString()
+        parseEther("34.820649428128021984").toString()
       );
 
       // Operator can collect fee from harvested rewards
       expect((await exampleClient.feeToCollect()).toString()).to.be.eq(
-        parseEther("1.947955231928415704").toString()
+        parseEther("1.947955231928522143").toString()
       );
 
       await exampleClientAsOperator.collectFee(clientOperatorAddress);
 
       expect((await baseToken.balanceOf(clientOperatorAddress)).toString()).to.be.eq(
-        parseEther("1.947955231928415704").toString()
+        parseEther("1.947955231928522143").toString()
       );
     });
 

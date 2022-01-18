@@ -20,6 +20,7 @@ import { Signer } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 import { parseEther } from "@ethersproject/units";
+import { formatEther } from "ethers/lib/utils";
 
 chai.use(solidity);
 const { expect } = chai;
@@ -106,6 +107,7 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     )) as PancakeswapStrategyAddToPoolWithBaseToken__factory;
     strat = (await upgrades.deployProxy(PancakeswapStrategyAddToPoolWithBaseToken, [
       routerV2.address,
+      [wbnb.address],
     ])) as PancakeswapStrategyAddToPoolWithBaseToken;
     await strat.deployed();
 
@@ -159,13 +161,10 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     );
 
     expect(await (await lpV2.balanceOf(await bob.getAddress())).toString()).to.eq(
-      parseEther("0.015415396042372718").toString()
+      parseEther("0.015058465048420853").toString()
     );
 
     expect(await (await lpV2.balanceOf(strat.address)).toString()).to.eq(
-      parseEther("0").toString()
-    );
-    expect(await (await farmingToken.balanceOf(strat.address)).toString()).to.be.bignumber.eq(
       parseEther("0").toString()
     );
 
@@ -223,16 +222,16 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
         parseEther("1")
       );
 
-    expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("0.499499311482782575").toString());
+    expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("0.500000000000000000").toString());
     expect(secondPartOfBaseToken.toString()).to.be.eq(
-      parseEther("0.500500688517217425").toString()
+      parseEther("0.500000000000000000").toString()
     );
     expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
       parseEther("1").toString()
     );
-    expect(amountOfToken0.toString()).to.be.eq(parseEther("0.499499311482782575").toString());
+    expect(amountOfToken0.toString()).to.be.eq(parseEther("0.500000000000000000").toString());
     /// 1 BASE TOKEN = 10 TOKEN1
     /// 0.5 BASE TOKEN ~= 0.5 TOKEN0 - some trading fee
-    expect(amountOfToken1.toString()).to.be.eq(parseEther("4.990003111716109636").toString());
+    expect(amountOfToken1.toString()).to.be.eq(parseEther("4.985013724404953029").toString());
   });
 });

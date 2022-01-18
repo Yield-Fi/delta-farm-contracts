@@ -27,15 +27,17 @@ contract PancakeswapStrategyAddToPoolWithBaseToken is
 
   IPancakeFactory public factory;
   IPancakeRouterV2 public router;
+  address[] stables;
 
   /// @dev Create a new add Token only strategy instance.
   /// @param _router The PancakeSwap Router smart contract.
-  function initialize(IPancakeRouterV2 _router) external initializer {
+  function initialize(IPancakeRouterV2 _router, address[] calldata _stables) external initializer {
     __Ownable_init();
     __ReentrancyGuard_init();
 
     factory = IPancakeFactory(_router.factory());
     router = _router;
+    stables = _stables;
   }
 
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
@@ -55,9 +57,7 @@ contract PancakeswapStrategyAddToPoolWithBaseToken is
     uint256 aIn = calculateBaseTokenAmountToSwap(baseToken, farmingToken, baseToken.myBalance());
 
     // 4. Convert that portion of baseToken to farmingToken.
-    address[] memory path = new address[](2);
-    path[0] = baseToken;
-    path[1] = farmingToken;
+    address[] memory path = _getBestPath(aIn, baseToken, farmingToken);
 
     router.swapExactTokensForTokens(aIn, 0, path, address(this), block.timestamp);
     // 5. Mint more LP tokens and return all LP tokens to the sender.
@@ -138,18 +138,120 @@ contract PancakeswapStrategyAddToPoolWithBaseToken is
     address farmingToken,
     uint256 amount
   ) internal view returns (uint256) {
-    (uint256 rIn, ) = PancakeLibraryV2.getReserves(address(factory), baseToken, farmingToken);
+    // Calculate ratio in which base token will be swapped to token0 and token1
+    (uint256 x, uint256 y) = _estimateSplit(baseToken, farmingToken);
 
-    // find how many baseToken need to be converted to farmingToken
-    // Constants come from
-    // 2-f = 2-0.0025 = 19975
-    // 4(1-f) = 4*9975*10000 = 399000000, where f = 0.0025 and 10,000 is a way to avoid floating point
-    // 19975^2 = 399000625
-    // 9975*2 = 19950
+    return amount.mul(x).div(x.add(y));
+  }
 
-    return
-      CustomMath.sqrt(rIn.mul(amount.mul(399000000).add(rIn.mul(399000625)))).sub(rIn.mul(19975)) /
-      19950;
+  function _estimateSplit(address baseToken, address farmingToken)
+    internal
+    view
+    returns (uint256, uint256)
+  {
+    (uint256 reserveIn, uint256 reserveOut) = PancakeLibraryV2.getReserves(
+      address(factory),
+      baseToken,
+      farmingToken
+    );
+
+    address[] memory path = _getBestPath(1 ether, farmingToken, baseToken);
+
+    uint256 equivalentOut = reserveOut;
+
+    for (uint256 i = 1; i < path.length; i++) {
+      (uint256 res0, uint256 res1) = PancakeLibraryV2.getReserves(
+        address(factory),
+        path[i - 1],
+        path[i]
+      );
+
+      equivalentOut = equivalentOut.mul(res1).div(res0);
+    }
+
+    return (reserveIn, equivalentOut);
+  }
+
+  function _getBestPath(
+    uint256 amountIn,
+    address token0,
+    address token1
+  ) internal view returns (address[] memory) {
+    uint256 l = stables.length;
+
+    address[] memory bestPath = new address[](3);
+
+    (uint256 reserveIn, uint256 reserveOut) = PancakeLibraryV2.getReserves(
+      address(factory),
+      token0,
+      token1
+    );
+
+    uint256 bestAmountOut = PancakeLibraryV2.getAmountOut(amountIn, reserveIn, reserveOut);
+    bestPath[0] = token0;
+    bestPath[1] = token1;
+
+    for (uint8 i = 0; i < l; i++) {
+      address[] memory path = new address[](3);
+
+      address stable = stables[i];
+
+      if (token0 != stable && token1 != stable && _hopsValid(token0, stable, token1)) {
+        path[0] = token0;
+        path[1] = stable;
+        path[2] = token1;
+
+        uint256[] memory tempAmountOut = PancakeLibraryV2.getAmountsOut(
+          address(factory),
+          amountIn,
+          path
+        );
+
+        if (tempAmountOut[2] > bestAmountOut) {
+          bestAmountOut = tempAmountOut[2];
+
+          bestPath[0] = token0;
+          bestPath[1] = stables[i];
+          bestPath[2] = token1;
+        }
+      }
+    }
+
+    return _trimPath(bestPath);
+  }
+
+  function _getBestAmount(address[] memory _path, uint256 amountIn)
+    internal
+    view
+    returns (uint256)
+  {
+    uint256[] memory amounts = PancakeLibraryV2.getAmountsOut(address(factory), amountIn, _path);
+
+    return amounts[amounts.length - 1];
+  }
+
+  function _trimPath(address[] memory _path) internal pure returns (address[] memory) {
+    if (_path[2] == address(0)) {
+      address[] memory path = new address[](2);
+
+      path[0] = _path[0];
+      path[1] = _path[1];
+
+      return path;
+    }
+
+    return _path;
+  }
+
+  function _hopsValid(
+    address token0,
+    address stable,
+    address token1
+  ) internal view returns (bool) {
+    bool firstHopValid = factory.getPair(token0, stable) != address(0);
+    bool secondHopValid = factory.getPair(stable, token1) != address(0);
+
+    return firstHopValid && secondHopValid;
   }
 
   function _getAmountOutHelper(
