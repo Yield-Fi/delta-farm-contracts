@@ -26,3 +26,6 @@
 2022-01-19 17:56:08 ||| - New strategies set successfully for farm BTCB-BUSD Farm
 2022-01-19 17:56:08 ||| - Setting new strategies for farm UST-BUSD Farm (0x67fAE3cB68947e02B2A0Fd06DE45aF34B468c86f)
 2022-01-19 17:56:10 ||| - New strategies set successfully for farm UST-BUSD Farm
+2022-01-19 17:59:31 ||| --> Upgrading implementation of client contracts... <--
+2022-01-19 17:59:31 |||   -> Upgrading contract of Client A...
+2022-01-19 18:00:04 |||   New implementation of contract of Client A deployed at 0x18EC0bF18d727aF80DdD51944255f2f12ECb9744
