@@ -101,9 +101,9 @@
         "type": "address"
       },
       {
-        "internalType": "address[]",
-        "name": "_stables",
-        "type": "address[]"
+        "internalType": "contract IProtocolManager",
+        "name": "_protocolManager",
+        "type": "address"
       }
     ],
     "name": "initialize",
@@ -117,6 +117,19 @@
     "outputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "protocolManager",
+    "outputs": [
+      {
+        "internalType": "contract IProtocolManager",
         "name": "",
         "type": "address"
       }

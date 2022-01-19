@@ -147,6 +147,8 @@ describe("Admin contract - emergency withdrawal", async () => {
       deployer
     )) as ProtocolManager;
 
+    await protocolManager.setStables([mockWBNB.address]);
+
     feeCollector = (await deployProxyContract(
       "FeeCollector",
       [baseToken.address, "500", protocolManager.address],
@@ -172,9 +174,11 @@ describe("Admin contract - emergency withdrawal", async () => {
     );
 
     // Setup strategies
-    [addStrat, addStratNoBase, liqStrat] = await deployPancakeStrategies(router, deployer, [
-      mockWBNB.address,
-    ]);
+    [addStrat, addStratNoBase, liqStrat] = await deployPancakeStrategies(
+      router,
+      deployer,
+      protocolManager
+    );
 
     // Setup BTOKEN-FTOKEN pair on Pancakeswap
     // Add lp to masterChef's pool

@@ -126,6 +126,8 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
 
   mapping(address => bool) public override approvedHarvesters;
 
+  address[] stables;
+
   /// @dev initialize the owner and operators of Protocol
   function initialize(address[] calldata initialOperators) external initializer {
     __Ownable_init();
@@ -335,5 +337,13 @@ contract ProtocolManager is OwnableUpgradeSafe, IProtocolManager {
     }
 
     emit ApproveHarvesters(msg.sender, harvesters, isApprove);
+  }
+
+  function setStables(address[] calldata _stables) external override onlyWhitelistedOperators {
+    stables = _stables;
+  }
+
+  function getStables() external view override returns (address[] memory) {
+    return stables;
   }
 }

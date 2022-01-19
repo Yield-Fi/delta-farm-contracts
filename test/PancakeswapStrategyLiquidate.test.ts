@@ -12,6 +12,7 @@ import {
   PancakeRouterV2__factory,
   PancakeswapStrategyLiquidate,
   PancakeswapStrategyLiquidate__factory,
+  ProtocolManager,
   WBNB,
   WBNB__factory,
 } from "../typechain";
@@ -21,12 +22,15 @@ import { Signer } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 import { parseEther } from "@ethersproject/units";
+import { deployProxyContract } from "./helpers";
 
 chai.use(solidity);
 const { expect } = chai;
 
 describe("Pancakeswap - StrategyLiquidate", () => {
   const FOREVER = "2000000000";
+
+  let protocolManager: ProtocolManager;
 
   /// Pancake-related instance(s)
   let factoryV2: PancakeFactory;
@@ -65,6 +69,12 @@ describe("Pancakeswap - StrategyLiquidate", () => {
   async function fixture() {
     [deployer, alice, bob, worker] = await ethers.getSigners();
 
+    protocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [[await deployer.getAddress()]],
+      deployer
+    )) as ProtocolManager;
+
     // Setup Pancakeswap
     const PancakeFactoryV2 = (await ethers.getContractFactory(
       "PancakeFactory",
@@ -76,6 +86,8 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     const WBNB = (await ethers.getContractFactory("WBNB", deployer)) as WBNB__factory;
     wbnb = await WBNB.deploy();
     await wbnb.deployed();
+
+    await protocolManager.setStables([wbnb.address]);
 
     const PancakeRouterV2 = (await ethers.getContractFactory(
       "PancakeRouterV2",
@@ -111,7 +123,7 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     )) as PancakeswapStrategyLiquidate__factory;
     strat = (await upgrades.deployProxy(PancakeswapV2StrategyLiquidate, [
       routerV2.address,
-      [wbnb.address],
+      protocolManager.address,
     ])) as PancakeswapStrategyLiquidate;
     await strat.deployed();
 

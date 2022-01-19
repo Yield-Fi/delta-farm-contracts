@@ -10,6 +10,7 @@ import {
   PancakeRouterV2,
   PancakeswapStrategyAddToPoolWithoutBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken__factory,
+  ProtocolManager,
 } from "../typechain";
 import { ethers, waffle } from "hardhat";
 
@@ -27,6 +28,8 @@ const { expect } = chai;
 
 describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
   const CAKE_PER_BLOCK = parseEther("1");
+
+  let protocolManager: ProtocolManager;
 
   let deployer: Signer;
   let deployerAddress: string;
@@ -51,6 +54,12 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
       deployer.getAddress(),
       account1.getAddress(),
     ]);
+
+    protocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [[await deployer.getAddress()]],
+      deployer
+    )) as ProtocolManager;
 
     [BaseToken, Token0, Token1] = await deployTokens(
       [
@@ -109,6 +118,8 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
       deployer
     );
 
+    await protocolManager.setStables([MockWBNB.address]);
+
     await PancakeFactory.createPair(Token0.address, Token1.address);
     const lp = await PancakeFactory.getPair(Token0.address, Token1.address);
 
@@ -144,7 +155,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
 
     strategy = (await deployProxyContract(
       "PancakeswapStrategyAddToPoolWithoutBaseToken",
-      [PancakeRouterV2.address, [MockWBNB.address]],
+      [PancakeRouterV2.address, protocolManager.address],
       deployer
     )) as PancakeswapStrategyAddToPoolWithoutBaseToken;
   }

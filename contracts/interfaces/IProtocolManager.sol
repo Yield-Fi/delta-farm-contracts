@@ -56,4 +56,8 @@ interface IProtocolManager {
   function approvedHarvesters(address _harvester) external returns (bool);
 
   function approveHarvesters(address[] calldata harvesters, bool isApprove) external;
+
+  function setStables(address[] calldata _stables) external;
+
+  function getStables() external view returns (address[] memory);
 }

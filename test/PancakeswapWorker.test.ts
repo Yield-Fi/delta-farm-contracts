@@ -157,6 +157,8 @@ describe("PancakeswapWorker", () => {
 
     const MockWBNB = (await deployContract("MockWBNB", [], deployer)) as MockWBNB;
 
+    await ProtocolManager.setStables([MockWBNB.address]);
+
     MockVault = (await deployContract("MockVault", [BaseToken.address], deployer)) as MockVault;
 
     [PancakeFactory, PancakeRouterV2, CakeToken, , PancakeMasterChef] = await deployPancakeV2(
@@ -178,7 +180,7 @@ describe("PancakeswapWorker", () => {
     await PancakeMasterChef.add(1, lpTOK0_TOK1__deployer.address, true);
 
     [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, LiquidateStrategy] =
-      await deployPancakeStrategies(PancakeRouterV2, deployer, [MockWBNB.address]);
+      await deployPancakeStrategies(PancakeRouterV2, deployer, ProtocolManager);
 
     const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
 

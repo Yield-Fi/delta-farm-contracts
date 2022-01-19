@@ -695,6 +695,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "getStables",
+    "outputs": [
+      {
+        "internalType": "address[]",
+        "name": "",
+        "type": "address[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address[]",
@@ -755,6 +768,19 @@
       }
     ],
     "name": "setNativeRelayer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "_stables",
+        "type": "address[]"
+      }
+    ],
+    "name": "setStables",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

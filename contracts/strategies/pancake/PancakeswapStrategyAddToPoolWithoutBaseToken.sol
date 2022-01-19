@@ -12,6 +12,7 @@ import "../../../contracts/libs/pancake/PancakeLibraryV2.sol";
 
 import "../../interfaces/IStrategy.sol";
 
+import "../../interfaces/IProtocolManager.sol";
 import "../../utils/SafeToken.sol";
 import "../../utils/CustomMath.sol";
 
@@ -26,18 +27,20 @@ contract PancakeswapStrategyAddToPoolWithoutBaseToken is
 
   IPancakeFactory public factory;
   IPancakeRouterV2 public router;
-
-  address[] stables;
+  IProtocolManager public protocolManager;
 
   /// @dev Create a new add to pool without base token strategy instance.
   /// @param _router The PancakeSwap Router smart contract.
-  function initialize(IPancakeRouterV2 _router, address[] calldata _stables) external initializer {
+  function initialize(IPancakeRouterV2 _router, IProtocolManager _protocolManager)
+    external
+    initializer
+  {
     __Ownable_init();
     __ReentrancyGuard_init();
 
     factory = IPancakeFactory(_router.factory());
     router = _router;
-    stables = _stables;
+    protocolManager = _protocolManager;
   }
 
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
@@ -217,6 +220,8 @@ contract PancakeswapStrategyAddToPoolWithoutBaseToken is
     address token0,
     address token1
   ) internal view returns (address[] memory) {
+    address[] memory stables = protocolManager.getStables();
+
     uint256 l = stables.length;
 
     address[] memory bestPath = new address[](3);
