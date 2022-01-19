@@ -52,6 +52,7 @@
     "upgrade:mainnet:vaults": "hardhat --network mainnet deploy --reset --tags VaultUpgrade",
     "deploy:testnet:strategies:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapStrategies",
     "upgrade:testnet:strategies:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapStrategiesUpgrade",
+    "reconfigure:mainnet:strategies:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapStrategiesReconfiguration",
     "deploy:testnet-dev:strategies:pancake": "hardhat --network testnet-dev deploy --reset --tags PancakeswapStrategies",
     "upgrade:testnet-dev:strategies:pancake": "hardhat --network testnet-dev deploy --reset --tags PancakeswapStrategiesUpgrade",
     "deploy:mainnet:strategies:pancake": "hardhat --network mainnet deploy --reset --tags PancakeswapStrategies",

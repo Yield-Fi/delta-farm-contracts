@@ -13,6 +13,9 @@ import "../../libs/pancake/interfaces/IPancakeRouterV2.sol";
 import "../../../contracts/libs/pancake/PancakeLibraryV2.sol";
 import "../../interfaces/IStrategy.sol";
 import "../../utils/SafeToken.sol";
+
+import "../../interfaces/IProtocolManager.sol";
+
 import "../../utils/CustomMath.sol";
 
 contract PancakeswapStrategyLiquidate is
@@ -26,15 +29,20 @@ contract PancakeswapStrategyLiquidate is
 
   IPancakeFactory public factory;
   IPancakeRouterV2 public router;
+  IProtocolManager public protocolManager;
 
   /// @dev Create a new liquidate strategy instance.
   /// @param _router The PancakeSwap Router smart contract.
-  function initialize(IPancakeRouterV2 _router) external initializer {
+  function initialize(IPancakeRouterV2 _router, IProtocolManager _protocolManager)
+    external
+    initializer
+  {
     __Ownable_init();
     __ReentrancyGuard_init();
 
     factory = IPancakeFactory(_router.factory());
     router = _router;
+    protocolManager = _protocolManager;
   }
 
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
@@ -88,12 +96,12 @@ contract PancakeswapStrategyLiquidate is
 
   // Swap all tokens to base token using pancakeswap router
   function _convertTokenToBaseToken(address token, address baseToken) internal {
+    uint256 amount = token.myBalance();
+
     token.safeApprove(address(router), uint256(-1));
 
-    address[] memory path = new address[](2);
-    path[0] = token;
-    path[1] = baseToken;
-    router.swapExactTokensForTokens(token.myBalance(), 0, path, address(this), block.timestamp);
+    address[] memory path = _getBestPath(amount, token, baseToken);
+    router.swapExactTokensForTokens(amount, 0, path, address(this), block.timestamp);
 
     token.safeApprove(address(router), 0);
   }
@@ -184,5 +192,89 @@ contract PancakeswapStrategyLiquidate is
         totalTokenIn.sub(reserveInToSubtract),
         totalTokenOut.sub(reserveOutToSubtract)
       );
+  }
+
+  function _getBestPath(
+    uint256 amountIn,
+    address token0,
+    address token1
+  ) internal view returns (address[] memory) {
+    address[] memory stables = protocolManager.getStables();
+
+    uint256 l = stables.length;
+
+    address[] memory bestPath = new address[](3);
+
+    (uint256 reserveIn, uint256 reserveOut) = PancakeLibraryV2.getReserves(
+      address(factory),
+      token0,
+      token1
+    );
+
+    uint256 bestAmountOut = PancakeLibraryV2.getAmountOut(amountIn, reserveIn, reserveOut);
+    bestPath[0] = token0;
+    bestPath[1] = token1;
+
+    for (uint8 i = 0; i < l; i++) {
+      address[] memory path = new address[](3);
+
+      address stable = stables[i];
+
+      if (token0 != stable && token1 != stable && hopsValid(token0, stable, token1)) {
+        path[0] = token0;
+        path[1] = stable;
+        path[2] = token1;
+
+        uint256[] memory tempAmountOut = PancakeLibraryV2.getAmountsOut(
+          address(factory),
+          amountIn,
+          path
+        );
+
+        if (tempAmountOut[2] > bestAmountOut) {
+          bestAmountOut = tempAmountOut[2];
+
+          bestPath[0] = token0;
+          bestPath[1] = stable;
+          bestPath[2] = token1;
+        }
+      }
+    }
+
+    return _trimPath(bestPath);
+  }
+
+  function _getBestAmount(address[] memory _path, uint256 amountIn)
+    internal
+    view
+    returns (uint256)
+  {
+    uint256[] memory amounts = PancakeLibraryV2.getAmountsOut(address(factory), amountIn, _path);
+
+    return amounts[amounts.length - 1];
+  }
+
+  function _trimPath(address[] memory _path) internal pure returns (address[] memory) {
+    if (_path[2] == address(0)) {
+      address[] memory path = new address[](2);
+
+      path[0] = _path[0];
+      path[1] = _path[1];
+
+      return path;
+    }
+
+    return _path;
+  }
+
+  function hopsValid(
+    address token0,
+    address stable,
+    address token1
+  ) internal view returns (bool) {
+    bool firstHopValid = factory.getPair(token0, stable) != address(0);
+    bool secondHopValid = factory.getPair(stable, token1) != address(0);
+
+    return firstHopValid && secondHopValid;
   }
 }

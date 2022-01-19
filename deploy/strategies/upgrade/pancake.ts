@@ -1,5 +1,6 @@
 import { ethers, upgrades } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
+import { ProtocolManager } from "../../../typechain";
 import { getConfig } from "../../utils/config";
 import { logger } from "../../utils/logger";
 
@@ -50,7 +51,7 @@ const upgradeFunc: DeployFunction = async () => {
   );
 
   const AddToPoolWithoutBaseTokenStrategy = await upgrades.upgradeProxy(
-    addToPoolWithBaseTokenStrategyProxyAddress,
+    addToPoolWithoutBaseTokenStrategyProxyAddress,
     AddToPoolWithoutBaseTokenStrategyFactory
   );
 

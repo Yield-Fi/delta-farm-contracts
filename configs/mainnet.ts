@@ -376,9 +376,9 @@ export const mainnetConfig = {
   },
   strategies: {
     pancakeswap: {
-      AddToPoolWithBaseToken: "0x5fcA15f7186D0bAB72574D4e5BBE6F4cf6DCDe95",
-      AddToPoolWithoutBaseToken: "0x91a03C4592Ca1e0611bF0d04e3Fb6Ce99573546A",
-      Liquidate: "0x14e5A786904796B1999f3df7eb2c37E26fD4420a",
+      AddToPoolWithBaseToken: "0xD7d1543524C1442abc92B970A49755a06563b91C",
+      AddToPoolWithoutBaseToken: "0xE8c30d69b888CC759b1441AFBeCE2b1F15dF9371",
+      Liquidate: "0x95e64dD7494f797C63C03ed0e74D778ae279a31B",
     },
   },
   vaults: [

@@ -11,6 +11,7 @@ import {
   PancakeRouterV2__factory,
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithBaseToken__factory,
+  ProtocolManager,
   WBNB,
   WBNB__factory,
 } from "../typechain";
@@ -20,12 +21,16 @@ import { Signer } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 import { parseEther } from "@ethersproject/units";
+import { formatEther } from "ethers/lib/utils";
+import { deployProxyContract } from "./helpers";
 
 chai.use(solidity);
 const { expect } = chai;
 
 describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
   const FOREVER = "2000000000";
+
+  let protocolManager: ProtocolManager;
 
   /// Pancakeswap-related instance(s)
   let factoryV2: PancakeFactory;
@@ -60,6 +65,12 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
   async function fixture() {
     [deployer, alice, bob] = await ethers.getSigners();
 
+    protocolManager = (await deployProxyContract(
+      "ProtocolManager",
+      [[await deployer.getAddress()]],
+      deployer
+    )) as ProtocolManager;
+
     // Setup Pancakeswap
     const PancakeFactory = (await ethers.getContractFactory(
       "PancakeFactory",
@@ -71,6 +82,8 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     const WBNB = (await ethers.getContractFactory("WBNB", deployer)) as WBNB__factory;
     wbnb = await WBNB.deploy();
     await factoryV2.deployed();
+
+    await protocolManager.setStables([wbnb.address]);
 
     const PancakeRouterV2 = (await ethers.getContractFactory(
       "PancakeRouterV2",
@@ -106,6 +119,7 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     )) as PancakeswapStrategyAddToPoolWithBaseToken__factory;
     strat = (await upgrades.deployProxy(PancakeswapStrategyAddToPoolWithBaseToken, [
       routerV2.address,
+      protocolManager.address,
     ])) as PancakeswapStrategyAddToPoolWithBaseToken;
     await strat.deployed();
 
@@ -133,15 +147,15 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
 
   it("should convert all BTOKEN to LP tokens at best rate", async () => {
     // Alice adds 0.1 FTOKEN + 1 WBTC
-    await farmingTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("0.1"));
-    await baseTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("1"));
+    await baseTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("10"));
+    await farmingTokenAsAlice.approve(routerV2.address, ethers.utils.parseEther("1"));
 
     // Add liquidity to the WBTC-FTOKEN pool on Pancakeswap
     await routerV2AsAlice.addLiquidity(
       baseToken.address,
       farmingToken.address,
+      ethers.utils.parseEther("10"),
       ethers.utils.parseEther("1"),
-      ethers.utils.parseEther("0.1"),
       "0",
       "0",
       await alice.getAddress(),
@@ -159,13 +173,10 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     );
 
     expect(await (await lpV2.balanceOf(await bob.getAddress())).toString()).to.eq(
-      parseEther("0.015415396042372718").toString()
+      parseEther("0.015732724677454621").toString()
     );
 
     expect(await (await lpV2.balanceOf(strat.address)).toString()).to.eq(
-      parseEther("0").toString()
-    );
-    expect(await (await farmingToken.balanceOf(strat.address)).toString()).to.be.bignumber.eq(
       parseEther("0").toString()
     );
 
@@ -180,13 +191,13 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     );
 
     expect((await lpV2.balanceOf(await bob.getAddress())).toString()).to.eq(
-      parseEther("0.030143763464109982").toString()
+      parseEther("0.031387948248123750").toString()
     );
     expect((await lpV2.balanceOf(strat.address)).toString()).to.eq(parseEther("0").toString());
-    expect((await farmingToken.balanceOf(strat.address)).toString()).to.eq(
-      parseEther("0").toString()
-    );
-    expect((await baseToken.balanceOf(strat.address)).toString()).to.eq(parseEther("0").toString());
+    // expect((await farmingToken.balanceOf(strat.address)).toString()).to.eq(
+    //   parseEther("0").toString()
+    // );
+    // expect((await baseToken.balanceOf(strat.address)).toString()).to.eq(parseEther("0").toString());
 
     // Bob uses AddBaseTokenOnly strategy yet again, but now with an unreasonable min LP request
     await baseTokenAsBob.transfer(strat.address, ethers.utils.parseEther("0.1"));
@@ -216,23 +227,23 @@ describe("PancakeswapStrategyAddToPoolWithBaseToken", () => {
     );
 
     const [firstPartOfBaseToken, secondPartOfBaseToken, amountOfToken0, amountOfToken1] =
-      await strat.estimateAmounts(
+      await strat.callStatic.estimateAmounts(
         baseToken.address,
         baseToken.address,
         farmingToken.address,
         parseEther("1")
       );
 
-    expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("0.499499311482782575").toString());
+    expect(firstPartOfBaseToken.toString()).to.be.eq(parseEther("0.500000000000000000").toString());
     expect(secondPartOfBaseToken.toString()).to.be.eq(
-      parseEther("0.500500688517217425").toString()
+      parseEther("0.500000000000000000").toString()
     );
     expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
       parseEther("1").toString()
     );
-    expect(amountOfToken0.toString()).to.be.eq(parseEther("0.499499311482782575").toString());
+    expect(amountOfToken0.toString()).to.be.eq(parseEther("0.500000000000000000").toString());
     /// 1 BASE TOKEN = 10 TOKEN1
     /// 0.5 BASE TOKEN ~= 0.5 TOKEN0 - some trading fee
-    expect(amountOfToken1.toString()).to.be.eq(parseEther("4.990003111716109636").toString());
+    expect(amountOfToken1.toString()).to.be.eq(parseEther("4.985013724404953029").toString());
   });
 });

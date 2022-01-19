@@ -1,4 +1,5 @@
 import {
+  PancakeERC20,
   PancakeRouterV2,
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithBaseToken__factory,
@@ -6,6 +7,7 @@ import {
   PancakeswapStrategyAddToPoolWithoutBaseToken__factory,
   PancakeswapStrategyLiquidate,
   PancakeswapStrategyLiquidate__factory,
+  ProtocolManager,
 } from "../../typechain";
 import { ethers, upgrades } from "hardhat";
 
@@ -13,7 +15,8 @@ import { Signer } from "ethers";
 
 export const deployPancakeStrategies = async (
   router: PancakeRouterV2,
-  deployer: Signer
+  deployer: Signer,
+  protocolManager: ProtocolManager
 ): Promise<
   [
     PancakeswapStrategyAddToPoolWithBaseToken,
@@ -28,7 +31,7 @@ export const deployPancakeStrategies = async (
   )) as PancakeswapStrategyAddToPoolWithBaseToken__factory;
   const PancakeswapStrategyAddToPoolWithBaseToken = (await upgrades.deployProxy(
     PancakeswapStrategyAddToPoolWithBaseTokenFactory,
-    [router.address]
+    [router.address, protocolManager.address]
   )) as PancakeswapStrategyAddToPoolWithBaseToken;
   await PancakeswapStrategyAddToPoolWithBaseToken.deployed();
 
@@ -38,7 +41,7 @@ export const deployPancakeStrategies = async (
   )) as PancakeswapStrategyAddToPoolWithoutBaseToken__factory;
   const PancakeswapStrategyAddToPoolWithoutBaseToken = (await upgrades.deployProxy(
     PancakeswapStrategyAddToPoolWithoutBaseTokenFactory,
-    [router.address]
+    [router.address, protocolManager.address]
   )) as PancakeswapStrategyAddToPoolWithoutBaseToken;
   await PancakeswapStrategyAddToPoolWithoutBaseToken.deployed();
 
@@ -48,7 +51,7 @@ export const deployPancakeStrategies = async (
   )) as PancakeswapStrategyLiquidate__factory;
   const PancakeswapStrategyLiquidate = (await upgrades.deployProxy(
     PancakeswapStrategyLiquidateFactory,
-    [router.address]
+    [router.address, protocolManager.address]
   )) as PancakeswapStrategyLiquidate;
   await PancakeswapStrategyLiquidate.deployed();
 

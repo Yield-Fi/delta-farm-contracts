@@ -16,7 +16,6 @@ interface IAddStrategy is IStrategy {
     uint256 amount
   )
     external
-    view
     returns (
       uint256,
       uint256,
