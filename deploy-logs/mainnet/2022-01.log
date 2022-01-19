@@ -1,2 +1,29 @@
-2022-01-10 19:46:46 ||| ProtocolManager whitelist operator operation for addresses: [0xBc29f271C33A38aB8e4020702165f1Bf025b16D3], new state: false
-2022-01-10 19:46:51 ||| ProtocolManager whitelist operation success
+2022-01-19 17:50:58 ||| ---> Initializing strategy reconfiguration <---
+2022-01-19 17:50:58 ||| --> Upgrading protocol manager (stables getter and setter) <--
+2022-01-19 17:51:20 ||| - Protocol manager upgraded successfully.
+2022-01-19 17:51:22 ||| ---> Deploying strategies for the pancakeswap workers... <---
+2022-01-19 17:51:44 ||| - PancakeswapStrategyAddToPoolWithBaseToken deployed at 0xD7d1543524C1442abc92B970A49755a06563b91C
+2022-01-19 17:52:08 ||| - PancakeswapStrategyAddToPoolWithoutBaseToken deployed at 0xE8c30d69b888CC759b1441AFBeCE2b1F15dF9371
+2022-01-19 17:52:27 ||| - LiquidateStrategy deployed at 0x95e64dD7494f797C63C03ed0e74D778ae279a31B
+2022-01-19 17:52:36 ||| - New strategies approved successfully
+2022-01-19 17:52:36 ||| - Setting new strategies for farm CAKE-WBNB Farm (0xBE8dc5171689bE13aB9AC05cbA77aE7e0Be96d1c)
+2022-01-19 17:52:44 ||| - New strategies set successfully for farm CAKE-WBNB Farm
+2022-01-19 17:52:44 ||| - Setting new strategies for farm WBNB-BUSD Farm (0xc5ABD411d063B4F14380ea32a740615d9CA74B6B)
+2022-01-19 17:52:48 ||| - New strategies set successfully for farm WBNB-BUSD Farm
+2022-01-19 17:52:48 ||| - Setting new strategies for farm DAI-BUSD Farm (0x838630108CCCC79186CD57FF5aFC6F902d32d21A)
+2022-01-19 17:52:50 ||| - New strategies set successfully for farm DAI-BUSD Farm
+2022-01-19 17:52:50 ||| - Setting new strategies for farm CAKE-BUSD Farm (0x4A81Fe4bAA5a8839cB6da02e98Ec32Be6D4D8A1e)
+2022-01-19 17:52:52 ||| - New strategies set successfully for farm CAKE-BUSD Farm
+2022-01-19 17:52:52 ||| - Setting new strategies for farm CAKE-USDT Farm (0xd47C209B010054883A2d1B9e124b76e233E35E32)
+2022-01-19 17:55:32 ||| - Setting new strategies for farm CAKE-USDT Farm (0xd47C209B010054883A2d1B9e124b76e233E35E32)
+2022-01-19 17:55:43 ||| - New strategies set successfully for farm CAKE-USDT Farm
+2022-01-19 17:55:43 ||| - Setting new strategies for farm BBT-BNB Farm (0x90f9f27E67CD94e08fEEd763753562B2D521A089)
+2022-01-19 17:55:54 ||| - New strategies set successfully for farm BBT-BNB Farm
+2022-01-19 17:55:54 ||| - Setting new strategies for farm ETERNAL-BNB Farm (0xA646e46dC2eeB0248e61E14C57ee32E112dd7c72)
+2022-01-19 17:55:57 ||| - New strategies set successfully for farm ETERNAL-BNB Farm
+2022-01-19 17:55:57 ||| - Setting new strategies for farm SANTOS-BNB Farm (0xBEF1cC5318a8504Ce7CD382E8010E38FA1861738)
+2022-01-19 17:56:06 ||| - New strategies set successfully for farm SANTOS-BNB Farm
+2022-01-19 17:56:06 ||| - Setting new strategies for farm BTCB-BUSD Farm (0x184f5c9eC49E3e53743CfA47F9d884767a8FdF69)
+2022-01-19 17:56:08 ||| - New strategies set successfully for farm BTCB-BUSD Farm
+2022-01-19 17:56:08 ||| - Setting new strategies for farm UST-BUSD Farm (0x67fAE3cB68947e02B2A0Fd06DE45aF34B468c86f)
+2022-01-19 17:56:10 ||| - New strategies set successfully for farm UST-BUSD Farm
