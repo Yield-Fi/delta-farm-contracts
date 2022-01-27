@@ -449,10 +449,11 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
 
     uint256 positionId = IVault(vaultAddress).getPositionId(recipient, farm, address(this));
 
+    uint256 tokensToReceive = IWorker(farm).tokensToReceive(positionId);
     uint256 tokensToWithdraw;
 
     // If 'howmuch' is equal or greather than available tokens to withdraw, withdraw all tokens by pass 0 as argument
-    if (howmuch >= IWorker(farm).tokensToReceive(positionId)) {
+    if (howmuch >= tokensToReceive) {
       tokensToWithdraw = 0;
     } else {
       tokensToWithdraw = howmuch;
@@ -466,20 +467,14 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
       recipient
     );
 
+    emit Withdraw(recipient, farm, howmuch >= tokensToReceive ? tokensToReceive : howmuch);
+
     IVault(vaultAddress).work(
       positionId,
       farm,
       0,
       recipient,
       abi.encode(IWorker(farm).getStrategies()[2], strategyParams)
-    );
-
-    emit Withdraw(
-      recipient,
-      farm,
-      howmuch >= IWorker(farm).tokensToReceive(positionId)
-        ? IWorker(farm).tokensToReceive(positionId)
-        : howmuch
     );
   }
 
