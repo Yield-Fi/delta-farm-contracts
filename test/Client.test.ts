@@ -357,9 +357,9 @@ describe("Client contract", async () => {
       expect(position.owner).to.be.eql(aliceAddress);
       expect(position.client).to.be.eql(exampleClient.address);
 
-      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.996503741585422602;
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.996503864908163004;
       expect(positionInfo.toString()).to.be.eql(
-        ethers.utils.parseEther("0.996503741585422602").toString()
+        ethers.utils.parseEther("0.996503864908163004").toString()
       );
     });
 
@@ -426,10 +426,10 @@ describe("Client contract", async () => {
       expect(position.owner).to.be.eql(aliceAddress);
       expect(position.client).to.be.eql(exampleClient.address);
 
-      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.995504994395289884 (due to liquidity ratios) [1 BT -> TST -> TT];
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.995008733170845210 (due to liquidity ratios) [1 BT -> TST -> TT];
       assertAlmostEqual(
         positionInfo.toString(),
-        ethers.utils.parseEther("0.995504994395289884").toString()
+        ethers.utils.parseEther("0.995008733170845210").toString()
       );
     });
 
@@ -474,7 +474,7 @@ describe("Client contract", async () => {
 
       expect(
         (await exampleClient.amountToWithdraw(pancakeswapWorker01.address, aliceAddress)).toString()
-      ).to.be.eq(parseEther("0.996503741585422602").toString());
+      ).to.be.eq(parseEther("0.996503864908163004").toString());
 
       // Execute withdrawal flow
       await exampleClientAsAlice.withdraw(aliceAddress, pancakeswapWorker01.address, 0);

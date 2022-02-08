@@ -442,7 +442,7 @@ describe("PancakeswapWorker", () => {
       /// expected ~ 0.1 Base Token (minus some trading fee) ~ 0.099 BASE TOKEN
       assertAlmostEqual(
         (await WorkerTOK0_TOK1.tokensToReceive(1)).toString(),
-        parseEther("0.099508212960711623").toString()
+        parseEther("0.099491623915500588").toString()
       );
 
       const latestBlock = await time.latestBlockNumber();
