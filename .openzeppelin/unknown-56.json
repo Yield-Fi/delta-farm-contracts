@@ -1173,13 +1173,13 @@
           {
             "contract": "PancakeswapWorker",
             "label": "masterChef",
-            "type": "t_contract(IPancakeMasterChef)11425",
+            "type": "t_contract(IPancakeMasterChef)11458",
             "src": "contracts/workers/PancakeswapWorker.sol:90"
           },
           {
             "contract": "PancakeswapWorker",
             "label": "router",
-            "type": "t_contract(IPancakeRouterV2)12057",
+            "type": "t_contract(IPancakeRouterV2)12090",
             "src": "contracts/workers/PancakeswapWorker.sol:91"
           },
           {
@@ -1239,7 +1239,7 @@
           {
             "contract": "PancakeswapWorker",
             "label": "protocolManager",
-            "type": "t_contract(IProtocolManager)6683",
+            "type": "t_contract(IProtocolManager)6716",
             "src": "contracts/workers/PancakeswapWorker.sol:101"
           },
           {
@@ -1325,10 +1325,10 @@
           "t_contract(IPancakeFactory)1305": {
             "label": "contract IPancakeFactory"
           },
-          "t_contract(IPancakeMasterChef)11425": {
+          "t_contract(IPancakeMasterChef)11458": {
             "label": "contract IPancakeMasterChef"
           },
-          "t_contract(IPancakeRouterV2)12057": {
+          "t_contract(IPancakeRouterV2)12090": {
             "label": "contract IPancakeRouterV2"
           },
           "t_contract(IPancakePair)1547": {
@@ -1343,7 +1343,7 @@
           "t_uint256": {
             "label": "uint256"
           },
-          "t_contract(IProtocolManager)6683": {
+          "t_contract(IProtocolManager)6716": {
             "label": "contract IProtocolManager"
           },
           "t_array(t_address)dyn_storage": {
@@ -2385,6 +2385,268 @@
           },
           "t_contract(IFeeCollector)6529": {
             "label": "contract IFeeCollector"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "fcf9f73f65b13f23620938fd7a015e4cee301884dbad865690675141c7c16ee7": {
+      "address": "0xdF125bE59E227Ff1b3Ddc8CbC3263D8C61F38Fc1",
+      "txHash": "0x2746020fb2155213c62fd76546f90e5906aaa62711cb6e1ef6d85e2458e1dea7",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:21"
+          },
+          {
+            "contract": "Initializable",
+            "label": "initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:26"
+          },
+          {
+            "contract": "Initializable",
+            "label": "______gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol:61"
+          },
+          {
+            "contract": "ContextUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/GSN/Context.sol:37"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol:18"
+          },
+          {
+            "contract": "OwnableUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol:78"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "_notEntered",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol:21"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeSafe",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol:63"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "factory",
+            "type": "t_contract(IPancakeFactory)1305",
+            "src": "contracts/workers/PancakeswapWorker.sol:89"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "masterChef",
+            "type": "t_contract(IPancakeMasterChef)11458",
+            "src": "contracts/workers/PancakeswapWorker.sol:90"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "router",
+            "type": "t_contract(IPancakeRouterV2)12090",
+            "src": "contracts/workers/PancakeswapWorker.sol:91"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "lpToken",
+            "type": "t_contract(IPancakePair)1547",
+            "src": "contracts/workers/PancakeswapWorker.sol:92"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "wNative",
+            "type": "t_address",
+            "src": "contracts/workers/PancakeswapWorker.sol:93"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "name",
+            "type": "t_string_storage",
+            "src": "contracts/workers/PancakeswapWorker.sol:94"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "baseToken",
+            "type": "t_address",
+            "src": "contracts/workers/PancakeswapWorker.sol:95"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "token0",
+            "type": "t_address",
+            "src": "contracts/workers/PancakeswapWorker.sol:96"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "token1",
+            "type": "t_address",
+            "src": "contracts/workers/PancakeswapWorker.sol:97"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "cake",
+            "type": "t_address",
+            "src": "contracts/workers/PancakeswapWorker.sol:98"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "operatingVault",
+            "type": "t_address",
+            "src": "contracts/workers/PancakeswapWorker.sol:99"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "pid",
+            "type": "t_uint256",
+            "src": "contracts/workers/PancakeswapWorker.sol:100"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "protocolManager",
+            "type": "t_contract(IProtocolManager)6716",
+            "src": "contracts/workers/PancakeswapWorker.sol:101"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "fee",
+            "type": "t_uint256",
+            "src": "contracts/workers/PancakeswapWorker.sol:103"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "feeDenom",
+            "type": "t_uint256",
+            "src": "contracts/workers/PancakeswapWorker.sol:104"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "harvestThreshold",
+            "type": "t_uint256",
+            "src": "contracts/workers/PancakeswapWorker.sol:107"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "harvestPath",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "contracts/workers/PancakeswapWorker.sol:108"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "strategies",
+            "type": "t_array(t_address)dyn_storage",
+            "src": "contracts/workers/PancakeswapWorker.sol:111"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "approvedStrategies",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts/workers/PancakeswapWorker.sol:112"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "shares",
+            "type": "t_mapping(t_uint256,t_uint256)",
+            "src": "contracts/workers/PancakeswapWorker.sol:115"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "totalShare",
+            "type": "t_uint256",
+            "src": "contracts/workers/PancakeswapWorker.sol:116"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "positionIds",
+            "type": "t_array(t_uint256)dyn_storage",
+            "src": "contracts/workers/PancakeswapWorker.sol:117"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "treasuryFeeBps",
+            "type": "t_uint256",
+            "src": "contracts/workers/PancakeswapWorker.sol:118"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "isEnabled",
+            "type": "t_bool",
+            "src": "contracts/workers/PancakeswapWorker.sol:119"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "clientFeesBps",
+            "type": "t_mapping(t_address,t_uint256)",
+            "src": "contracts/workers/PancakeswapWorker.sol:120"
+          },
+          {
+            "contract": "PancakeswapWorker",
+            "label": "okHarvesters",
+            "type": "t_mapping(t_address,t_bool)",
+            "src": "contracts/workers/PancakeswapWorker.sol:121"
+          }
+        ],
+        "types": {
+          "t_contract(IPancakeFactory)1305": {
+            "label": "contract IPancakeFactory"
+          },
+          "t_contract(IPancakeMasterChef)11458": {
+            "label": "contract IPancakeMasterChef"
+          },
+          "t_contract(IPancakeRouterV2)12090": {
+            "label": "contract IPancakeRouterV2"
+          },
+          "t_contract(IPancakePair)1547": {
+            "label": "contract IPancakePair"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_string_storage": {
+            "label": "string"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_contract(IProtocolManager)6716": {
+            "label": "contract IProtocolManager"
+          },
+          "t_array(t_address)dyn_storage": {
+            "label": "address[]"
+          },
+          "t_mapping(t_address,t_bool)": {
+            "label": "mapping(address => bool)"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_mapping(t_uint256,t_uint256)": {
+            "label": "mapping(uint256 => uint256)"
+          },
+          "t_array(t_uint256)dyn_storage": {
+            "label": "uint256[]"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
           },
           "t_array(t_uint256)49_storage": {
             "label": "uint256[49]"

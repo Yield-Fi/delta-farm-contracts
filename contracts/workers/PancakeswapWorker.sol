@@ -320,18 +320,16 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     uint256 userToken1 = lpBalance.mul(totalToken1).div(lpSupply);
     // 4. Estimate and return amount of base token to receive
     if (token0 == baseToken) {
-      return
-        _estimateSwapOutput(token1, baseToken, userToken1, userToken1, userToken0).add(userToken0);
+      return _estimateSwapOutput(token1, baseToken, userToken1).add(userToken0);
     }
 
     if (token1 == baseToken) {
-      return
-        _estimateSwapOutput(token0, baseToken, userToken0, userToken0, userToken1).add(userToken1);
+      return _estimateSwapOutput(token0, baseToken, userToken0).add(userToken1);
     }
 
     return
-      _estimateSwapOutput(token0, baseToken, userToken0, userToken0, 0).add(
-        _estimateSwapOutput(token1, baseToken, userToken1, userToken1, 0)
+      _estimateSwapOutput(token0, baseToken, userToken0).add(
+        _estimateSwapOutput(token1, baseToken, userToken1)
       );
   }
 
@@ -339,27 +337,15 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   function _estimateSwapOutput(
     address tokenIn,
     address tokenOut,
-    uint256 amountIn,
-    uint256 reserveInToSubtract,
-    uint256 reserveOutToSubtract
+    uint256 amountIn
   ) internal view returns (uint256) {
     if (amountIn <= 0) {
       return 0;
     }
-    // 1. Get the reserves of tokenIn and tokenOut
-    IPancakePair Tin_Tout_LP = IPancakePair(factory.getPair(tokenIn, tokenOut));
-    (uint256 r0, uint256 r1, ) = Tin_Tout_LP.getReserves();
-    (uint256 totalTokenIn, uint256 totalTokenOut) = Tin_Tout_LP.token0() == tokenIn
-      ? (r0, r1)
-      : (r1, r0);
 
-    // 2. Get amountOut from pancakeswap
-    return
-      PancakeLibraryV2.getAmountOut(
-        amountIn,
-        totalTokenIn.sub(reserveInToSubtract),
-        totalTokenOut.sub(reserveOutToSubtract)
-      );
+    address[] memory path = _getBestPath(amountIn, tokenIn, tokenOut);
+
+    return _getBestAmount(path, amountIn);
   }
 
   /// Internal function to stake all outstanding LP tokens to the given position ID.
@@ -585,5 +571,89 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     _addShare(positionId);
     // 4. Return any remaining BaseToken back to the operatingVault.
     baseToken.safeTransfer(msg.sender, baseToken.myBalance());
+  }
+
+  function _getBestPath(
+    uint256 amountIn,
+    address _token0,
+    address _token1
+  ) internal view returns (address[] memory) {
+    address[] memory stables = protocolManager.getStables();
+
+    uint256 l = stables.length;
+
+    address[] memory bestPath = new address[](3);
+
+    (uint256 reserveIn, uint256 reserveOut) = PancakeLibraryV2.getReserves(
+      address(factory),
+      _token0,
+      _token1
+    );
+
+    uint256 bestAmountOut = PancakeLibraryV2.getAmountOut(amountIn, reserveIn, reserveOut);
+    bestPath[0] = _token0;
+    bestPath[1] = _token1;
+
+    for (uint8 i = 0; i < l; i++) {
+      address[] memory path = new address[](3);
+
+      address stable = stables[i];
+
+      if (_token0 != stable && _token1 != stable && hopsValid(_token0, stable, _token1)) {
+        path[0] = _token0;
+        path[1] = stable;
+        path[2] = _token1;
+
+        uint256[] memory tempAmountOut = PancakeLibraryV2.getAmountsOut(
+          address(factory),
+          amountIn,
+          path
+        );
+
+        if (tempAmountOut[2] > bestAmountOut) {
+          bestAmountOut = tempAmountOut[2];
+
+          bestPath[0] = _token0;
+          bestPath[1] = stable;
+          bestPath[2] = _token1;
+        }
+      }
+    }
+
+    return _trimPath(bestPath);
+  }
+
+  function _getBestAmount(address[] memory _path, uint256 amountIn)
+    internal
+    view
+    returns (uint256)
+  {
+    uint256[] memory amounts = PancakeLibraryV2.getAmountsOut(address(factory), amountIn, _path);
+
+    return amounts[amounts.length - 1];
+  }
+
+  function _trimPath(address[] memory _path) internal pure returns (address[] memory) {
+    if (_path[2] == address(0)) {
+      address[] memory path = new address[](2);
+
+      path[0] = _path[0];
+      path[1] = _path[1];
+
+      return path;
+    }
+
+    return _path;
+  }
+
+  function hopsValid(
+    address _token0,
+    address stable,
+    address _token1
+  ) internal view returns (bool) {
+    bool firstHopValid = factory.getPair(_token0, stable) != address(0);
+    bool secondHopValid = factory.getPair(stable, _token1) != address(0);
+
+    return firstHopValid && secondHopValid;
   }
 }
