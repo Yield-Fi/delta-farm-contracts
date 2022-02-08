@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "hardhat test --network mainnet",
+    "test": "hardhat test",
     "compile": "hardhat compile",
     "compile:clean": "npm run clean && hardhat compile",
     "coverage": "hardhat coverage",
@@ -75,8 +75,7 @@
     "deploy:testnet:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapV2",
     "deploy:testnet-dev:pancake": "hardhat --network testnet-dev deploy --reset --tags PancakeswapV2",
     "testnet:pancake:addFarms": "hardhat --network testnet-dev deploy --reset --tags PancakeAddFarms",
-    "testnet-dev:pancake:addFarms": "hardhat --network testnet-dev deploy --reset --tags PancakeAddFarms",
-    "debug": "hardhat --network mainnet deploy --reset --tags debug"
+    "testnet-dev:pancake:addFarms": "hardhat --network testnet-dev deploy --reset --tags PancakeAddFarms"
   },
   "repository": {
     "type": "git",
