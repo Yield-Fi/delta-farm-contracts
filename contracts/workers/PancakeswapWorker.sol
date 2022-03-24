@@ -278,6 +278,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     override
     onlyOperatingVault
     nonReentrant
+    returns (uint256)
   {
     (address strategy, bytes memory stratParams) = abi.decode(data, (address, bytes));
 
@@ -297,13 +298,16 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     );
 
     baseToken.safeTransfer(strategy, baseToken.myBalance());
-    IStrategy(strategy).execute(stratParams);
+
+    uint256 amount_to_receive = IStrategy(strategy).execute(stratParams);
+    
     // 3. Add LP tokens back to the farming pool.
     _addShare(positionId);
     // 4. Return any remaining BaseToken back to the operatingVault.
     baseToken.safeTransfer(msg.sender, baseToken.myBalance());
 
     emit Work(operatingVault, positionId, strategy, stratParams);
+    return amount_to_receive;
   }
 
   /// @dev Return the amount of BaseToken to receive if we are to liquidate the given position.

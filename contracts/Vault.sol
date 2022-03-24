@@ -200,7 +200,7 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     uint256 amount,
     address recipient,
     bytes calldata data
-  ) external payable override onlyClientContract transferTokenToVault(amount) nonReentrant {
+  ) external payable override onlyClientContract transferTokenToVault(amount) nonReentrant returns(uint256){
     // 1. Sanity check the input position, or add a new position of ID is 0.
     Position storage pos;
     if (positionId == 0) {
@@ -225,10 +225,11 @@ contract Vault is IVault, Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgr
     require(amount <= SafeToken.myBalance(token), "insufficient funds in the vault");
 
     SafeToken.safeTransfer(token, worker, amount);
-    IWorker(worker).work(positionId, data);
+    uint256 amounnt_to_recieve = IWorker(worker).work(positionId, data);
     // 5. Release execution scope
     POSITION_ID = _NO_ID;
     STRATEGY = _NO_ADDRESS;
+    return amounnt_to_recieve;
   }
 
   /// @dev Update bank configuration to a new address. Must only be called by owner.

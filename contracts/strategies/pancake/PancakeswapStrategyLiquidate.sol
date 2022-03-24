@@ -47,7 +47,7 @@ contract PancakeswapStrategyLiquidate is
 
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
   /// @param data Encoded strategy params.
-  function execute(bytes calldata data) external override nonReentrant {
+  function execute(bytes calldata data) external override nonReentrant returns (uint256){
     // 1. Decode strategy params and find lp token.
     (
       address baseToken,
@@ -92,6 +92,8 @@ contract PancakeswapStrategyLiquidate is
       lpToken.approve(address(router), 0),
       "PancakeswapStrategyLiquidate->execute: unable to reset LP token approval"
     );
+
+    return balance;
   }
 
   // Swap all tokens to base token using pancakeswap router

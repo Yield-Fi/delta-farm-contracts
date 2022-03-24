@@ -1,11 +1,11 @@
 import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
-import "@openzeppelin/hardhat-upgrades";
+// import "@openzeppelin/hardhat-upgrades";
 import "hardhat-deploy";
 import "solidity-coverage";
-import "hardhat-contract-sizer";
-import "hardhat-abi-exporter";
+// import "hardhat-contract-sizer";
+// import "hardhat-abi-exporter";
 
 import { config as dotEnvConfig } from "dotenv";
 import { task } from "hardhat/config";
@@ -28,6 +28,7 @@ const testnet = {
 const mainnet = {
   url: "https://bsc-dataseed.binance.org/",
   accounts: [process.env.TESTNET_PRIVATE_KEY ?? "0000"],
+  gasPrice: 20000000000,
 };
 
 export default {

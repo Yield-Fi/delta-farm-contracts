@@ -6,7 +6,7 @@ import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.so
 
 interface IWorker {
   /// @dev Work on a (potentially new) position. Optionally send token back to Vault.
-  function work(uint256 positionId, bytes calldata data) external;
+  function work(uint256 positionId, bytes calldata data) external returns (uint256);
 
   /// @dev Harvest reward tokens, swap them on base token and send to the Vault.
   function harvestRewards() external;

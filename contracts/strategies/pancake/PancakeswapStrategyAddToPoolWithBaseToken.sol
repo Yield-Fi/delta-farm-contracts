@@ -46,7 +46,7 @@ contract PancakeswapStrategyAddToPoolWithBaseToken is
 
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
   /// @param data Extra calldata information passed along to this strategy.
-  function execute(bytes calldata data) external override nonReentrant {
+  function execute(bytes calldata data) external override nonReentrant returns(uint256){
     // 1. Find out what farming token we are dealing with and min additional LP tokens.
     (address baseToken, address farmingToken, uint256 minLPAmount) = abi.decode(
       data,
@@ -86,6 +86,7 @@ contract PancakeswapStrategyAddToPoolWithBaseToken is
     // 6. Reset approval for safety reason
     baseToken.safeApprove(address(router), 0);
     farmingToken.safeApprove(address(router), 0);
+    return lpToken.balanceOf(address(this));
   }
 
   /// @dev Function to estimate amounts of split and swap of the base token

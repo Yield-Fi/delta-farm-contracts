@@ -467,15 +467,15 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
       recipient
     );
 
-    emit Withdraw(recipient, farm, howmuch >= tokensToReceive ? tokensToReceive : howmuch);
-
-    IVault(vaultAddress).work(
+    uint256 amount_receive = IVault(vaultAddress).work(
       positionId,
       farm,
       0,
       recipient,
       abi.encode(IWorker(farm).getStrategies()[2], strategyParams)
     );
+
+    emit Withdraw(recipient, farm, amount_receive);
   }
 
   /// @dev Returns estimated amount to withdraw from given farm
