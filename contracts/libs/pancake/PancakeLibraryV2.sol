@@ -84,7 +84,7 @@ library PancakeLibraryV2 {
   function getAmountsOut(
     address factory,
     uint256 amountIn,
-    address[] memory path
+    address[] memory path // [token0, token1, token2]
   ) internal view returns (uint256[] memory amounts) {
     require(path.length >= 2, "PancakeLibrary: INVALID_PATH");
     amounts = new uint256[](path.length);

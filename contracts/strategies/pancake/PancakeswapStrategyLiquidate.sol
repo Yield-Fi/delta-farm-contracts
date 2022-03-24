@@ -187,13 +187,15 @@ contract PancakeswapStrategyLiquidate is
       ? (r0, r1)
       : (r1, r0);
 
+    address[] memory path = _getBestPath(amountIn, tokenIn, tokenOut);
+
     // 2. Get amountOut from pancakeswap
     return
-      PancakeLibraryV2.getAmountOut(
+      PancakeLibraryV2.getAmountsOut(
+        address(factory),
         amountIn,
-        totalTokenIn.sub(reserveInToSubtract),
-        totalTokenOut.sub(reserveOutToSubtract)
-      );
+        path
+      )[path.length - 1];
   }
 
   function _getBestPath(
