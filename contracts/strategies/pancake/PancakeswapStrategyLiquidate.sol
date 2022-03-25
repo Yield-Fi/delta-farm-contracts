@@ -59,7 +59,6 @@ contract PancakeswapStrategyLiquidate is
 
     IPancakePair lpToken = IPancakePair(factory.getPair(token0, token1));
     // 2. Approve router to do their stuffs
-
     require(
       lpToken.approve(address(router), uint256(-1)),
       "PancakeswapStrategyLiquidate->execute: unable to approve LP token"
@@ -68,6 +67,7 @@ contract PancakeswapStrategyLiquidate is
     uint256 lpTokenToRemove = baseTokenToGetBack == 0
       ? lpToken.balanceOf(address(this))
       : estimateLpTokenToRemove(baseToken, lpToken, baseTokenToGetBack);
+
 
     // 3. Remove all liquidity back to token0 and token1.
     router.removeLiquidity(token0, token1, lpTokenToRemove, 0, 0, address(this), block.timestamp);

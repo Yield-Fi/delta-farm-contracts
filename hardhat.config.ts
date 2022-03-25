@@ -1,7 +1,7 @@
 import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
-// import "@openzeppelin/hardhat-upgrades";
+import "@openzeppelin/hardhat-upgrades";
 import "hardhat-deploy";
 import "solidity-coverage";
 // import "hardhat-contract-sizer";
