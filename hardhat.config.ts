@@ -2,7 +2,7 @@ import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@openzeppelin/hardhat-upgrades";
-import "hardhat-deploy";
+// import "hardhat-deploy";
 import "solidity-coverage";
 // import "hardhat-contract-sizer";
 // import "hardhat-abi-exporter";
@@ -45,7 +45,8 @@ export default {
       // allowUnlimitedContractSize: true,
       // timeout: 1800000,
       forking: {
-        url: "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/mainnet",
+        url: "https://bsc-dataseed1.defibit.io/",
+        //  "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/mainnet",
         // blockNumber: 16105426,
       },
     },

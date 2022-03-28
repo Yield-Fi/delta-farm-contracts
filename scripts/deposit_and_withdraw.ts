@@ -69,6 +69,8 @@ async function main() {
     signer
   );
 
+  await BUSD.approve("0xE45fa1f395427B4De97D8d4Ce396D23d5EB611ac", "100000000000000000000");
+
   console.log(
     "BUSD balance before: ",
     formatEther(await BUSD.balanceOf("0x00564541b80c5a065308ca1c93759c5417476f36"))
@@ -80,16 +82,34 @@ async function main() {
     signer
   );
 
+  // check if deposit works
+  await ClientAsAsh.deposit(
+    "0x00564541B80C5A065308cA1C93759c5417476f36",
+    "0xA646e46dC2eeB0248e61E14C57ee32E112dd7c72",
+    "10000000000000000000"
+  );
+
+  // get whole allocation
+  const amount_alloc = formatEther(
+    await ClientAsAsh.amountToWithdraw(
+      "0xA646e46dC2eeB0248e61E14C57ee32E112dd7c72",
+      "0x00564541B80C5A065308cA1C93759c5417476f36"
+    )
+  );
+
+  // withdraw
   await ClientAsAsh.withdraw(
     "0x00564541B80C5A065308cA1C93759c5417476f36",
-    "0xBEF1cC5318a8504Ce7CD382E8010E38FA1861738",
-    "15000000000000000000"
+    "0xA646e46dC2eeB0248e61E14C57ee32E112dd7c72",
+    "0"
   );
 
   console.log(
     "BUSD balance after",
     formatEther(await BUSD.balanceOf("0x00564541b80c5a065308ca1c93759c5417476f36"))
   );
+
+  console.log("BUSD balance from farm:", amount_alloc);
 
   console.log("success");
 }

@@ -75,7 +75,8 @@
     "deploy:testnet:pancake": "hardhat --network testnet deploy --reset --tags PancakeswapV2",
     "deploy:testnet-dev:pancake": "hardhat --network testnet-dev deploy --reset --tags PancakeswapV2",
     "testnet:pancake:addFarms": "hardhat --network testnet-dev deploy --reset --tags PancakeAddFarms",
-    "testnet-dev:pancake:addFarms": "hardhat --network testnet-dev deploy --reset --tags PancakeAddFarms"
+    "testnet-dev:pancake:addFarms": "hardhat --network testnet-dev deploy --reset --tags PancakeAddFarms",
+    "fork:node": "hardhat node --fork https://bsc-dataseed1.defibit.io/"
   },
   "repository": {
     "type": "git",

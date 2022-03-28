@@ -595,7 +595,6 @@ contract Client is Initializable, OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe
   {
     IWorker _worker = IWorker(farm);
     IAddStrategy strategy = IAddStrategy(chooseStrategy(_worker));
-
     return
       strategy.estimateAmounts(_worker.baseToken(), _worker.token0(), _worker.token1(), amount);
   }

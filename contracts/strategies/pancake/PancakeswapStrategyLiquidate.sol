@@ -47,7 +47,7 @@ contract PancakeswapStrategyLiquidate is
 
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
   /// @param data Encoded strategy params.
-  function execute(bytes calldata data) external override nonReentrant returns (uint256){
+  function execute(bytes calldata data) external override nonReentrant returns (uint256) {
     // 1. Decode strategy params and find lp token.
     (
       address baseToken,
@@ -67,7 +67,6 @@ contract PancakeswapStrategyLiquidate is
     uint256 lpTokenToRemove = baseTokenToGetBack == 0
       ? lpToken.balanceOf(address(this))
       : estimateLpTokenToRemove(baseToken, lpToken, baseTokenToGetBack);
-
 
     // 3. Remove all liquidity back to token0 and token1.
     router.removeLiquidity(token0, token1, lpTokenToRemove, 0, 0, address(this), block.timestamp);
@@ -181,21 +180,11 @@ contract PancakeswapStrategyLiquidate is
       return 0;
     }
     // 1. Get the reserves of tokenIn and tokenOut
-    IPancakePair Tin_Tout_LP = IPancakePair(factory.getPair(tokenIn, tokenOut));
-    (uint256 r0, uint256 r1, ) = Tin_Tout_LP.getReserves();
-    (uint256 totalTokenIn, uint256 totalTokenOut) = Tin_Tout_LP.token0() == tokenIn
-      ? (r0, r1)
-      : (r1, r0);
 
     address[] memory path = _getBestPath(amountIn, tokenIn, tokenOut);
 
     // 2. Get amountOut from pancakeswap
-    return
-      PancakeLibraryV2.getAmountsOut(
-        address(factory),
-        amountIn,
-        path
-      )[path.length - 1];
+    return PancakeLibraryV2.getAmountsOut(address(factory), amountIn, path)[path.length - 1];
   }
 
   function _getBestPath(
