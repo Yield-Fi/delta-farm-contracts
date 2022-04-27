@@ -9,6 +9,8 @@ export const getConfig = () => {
       return mainnetConfig;
     case "testnet-dev":
       return testnetDevConfig;
+    case "hardhat":
+      return mainnetConfig;
     default:
       throw Error("Config file not found");
   }

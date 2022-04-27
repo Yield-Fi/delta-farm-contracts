@@ -387,16 +387,25 @@ describe("Client contract", async () => {
         );
 
       expect(firstPartOfBaseToken.toString()).to.be.eq(
-        parseEther("1.000000000000000000").toString()
+        parseEther("1.000000000000000000").toString(),
+        "firstPartOfBaseToken not eq 1 ETH"
       );
       expect(secondPartOfBaseToken.toString()).to.be.eq(
-        parseEther("1.000000000000000000").toString()
+        parseEther("1.000000000000000000").toString(),
+        "secondPartOfBaseToken not eq 1 ETH"
       );
       expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
-        parseEther("2").toString()
+        parseEther("2").toString(),
+        "first + second not eq 2 ETH"
       );
-      expect(amountOfToken0.toString()).to.be.eq(parseEther("0.996505985279683515").toString());
-      expect(amountOfToken1.toString()).to.be.eq(parseEther("0.1000000000000000000").toString());
+      expect(amountOfToken0.toString()).to.be.eq(
+        parseEther("1.0000000000000000000").toString(),
+        "amountOfToken0 not eq 1 ETH"
+      );
+      expect(amountOfToken1.toString()).to.be.eq(
+        parseEther("0.996505985279683515").toString(),
+        "amountOfToken1 not eq 0.1 ETH"
+      );
     });
   });
 

@@ -47,7 +47,7 @@ contract PancakeswapStrategyLiquidate is
 
   /// @dev Execute worker strategy. Take LP token. Return  BaseToken.
   /// @param data Encoded strategy params.
-  function execute(bytes calldata data) external override nonReentrant {
+  function execute(bytes calldata data) external override nonReentrant returns (uint256) {
     // 1. Decode strategy params and find lp token.
     (
       address baseToken,
@@ -59,7 +59,6 @@ contract PancakeswapStrategyLiquidate is
 
     IPancakePair lpToken = IPancakePair(factory.getPair(token0, token1));
     // 2. Approve router to do their stuffs
-
     require(
       lpToken.approve(address(router), uint256(-1)),
       "PancakeswapStrategyLiquidate->execute: unable to approve LP token"
@@ -92,6 +91,8 @@ contract PancakeswapStrategyLiquidate is
       lpToken.approve(address(router), 0),
       "PancakeswapStrategyLiquidate->execute: unable to reset LP token approval"
     );
+
+    return balance;
   }
 
   // Swap all tokens to base token using pancakeswap router
@@ -179,19 +180,11 @@ contract PancakeswapStrategyLiquidate is
       return 0;
     }
     // 1. Get the reserves of tokenIn and tokenOut
-    IPancakePair Tin_Tout_LP = IPancakePair(factory.getPair(tokenIn, tokenOut));
-    (uint256 r0, uint256 r1, ) = Tin_Tout_LP.getReserves();
-    (uint256 totalTokenIn, uint256 totalTokenOut) = Tin_Tout_LP.token0() == tokenIn
-      ? (r0, r1)
-      : (r1, r0);
+
+    address[] memory path = _getBestPath(amountIn, tokenIn, tokenOut);
 
     // 2. Get amountOut from pancakeswap
-    return
-      PancakeLibraryV2.getAmountOut(
-        amountIn,
-        totalTokenIn.sub(reserveInToSubtract),
-        totalTokenOut.sub(reserveOutToSubtract)
-      );
+    return PancakeLibraryV2.getAmountsOut(address(factory), amountIn, path)[path.length - 1];
   }
 
   function _getBestPath(

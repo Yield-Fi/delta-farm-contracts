@@ -45,7 +45,7 @@ contract PancakeswapStrategyAddToPoolWithoutBaseToken is
 
   /// @dev Execute worker strategy. Take BaseToken. Return LP tokens.
   /// @param data Extra calldata information passed along to this strategy.
-  function execute(bytes calldata data) external override nonReentrant {
+  function execute(bytes calldata data) external override nonReentrant returns(uint256) {
     // 1. Decode strategy params
     (address baseToken, address token0, address token1, uint256 minLPAmount) = abi.decode(
       data,
@@ -82,6 +82,8 @@ contract PancakeswapStrategyAddToPoolWithoutBaseToken is
     baseToken.safeApprove(address(router), 0);
     token0.safeApprove(address(router), 0);
     token1.safeApprove(address(router), 0);
+
+    return T0_T1_LP.balanceOf(address(this));
   }
 
   function _addLiquidity(

@@ -277,7 +277,7 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     );
 
     expect(await baseToken.balanceOf(await worker.getAddress())).to.eq(
-      parseEther("15.068737002192638083").toString()
+      parseEther("15.068005054307068605").toString()
     );
   });
 });

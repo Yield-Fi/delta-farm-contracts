@@ -2,8 +2,12 @@
 
 pragma solidity 0.6.6;
 
+import "hardhat/console.sol";
+
 interface ERC20Interface {
   function balanceOf(address user) external view returns (uint256);
+
+  function approve(address _address, uint256 amount) external;
 }
 
 library SafeToken {
@@ -41,6 +45,7 @@ library SafeToken {
     address to,
     uint256 value
   ) internal {
+    console.log(token, from, to, value);
     // bytes4(keccak256(bytes('transferFrom(address,address,uint256)')));
     (bool success, bytes memory data) = token.call(
       abi.encodeWithSelector(0x23b872dd, from, to, value)

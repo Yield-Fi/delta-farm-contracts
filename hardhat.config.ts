@@ -2,15 +2,17 @@ import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@openzeppelin/hardhat-upgrades";
-import "hardhat-deploy";
+// import "hardhat-deploy";
 import "solidity-coverage";
-import "hardhat-contract-sizer";
-import "hardhat-abi-exporter";
+// import "hardhat-contract-sizer";
+// import "hardhat-abi-exporter";
 
 import { config as dotEnvConfig } from "dotenv";
 import { task } from "hardhat/config";
 
 dotEnvConfig();
+
+const fallbackKey = "0000000000000000000000000000000000000000000000000000000000000000";
 
 task("accounts", "Prints the list of accounts", async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -22,12 +24,13 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 
 const testnet = {
   url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
-  accounts: [process.env.TESTNET_PRIVATE_KEY ?? "0000"],
+  accounts: [process.env.TESTNET_PRIVATE_KEY ?? fallbackKey],
 };
 
 const mainnet = {
   url: "https://bsc-dataseed.binance.org/",
-  accounts: [process.env.TESTNET_PRIVATE_KEY ?? "0000"],
+  accounts: [process.env.TESTNET_PRIVATE_KEY ?? fallbackKey],
+  gasPrice: 20000000000,
 };
 
 export default {
@@ -36,11 +39,16 @@ export default {
     testnet,
     ["testnet-dev"]: testnet,
     hardhat: {
-      chainId: 31337,
-      gas: 12000000,
-      blockGasLimit: 0x1fffffffffffff,
-      allowUnlimitedContractSize: true,
-      timeout: 1800000,
+      // chainId: 31337,
+      // gas: 12000000,
+      // blockGasLimit: 0x1fffffffffffff,
+      // allowUnlimitedContractSize: true,
+      // timeout: 1800000,
+      forking: {
+        url: "https://bsc-dataseed1.defibit.io/",
+        //  "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/mainnet",
+        // blockNumber: 16105426,
+      },
     },
   },
   solidity: {

@@ -35,7 +35,7 @@ interface IVault {
     uint256 amount,
     address recipient,
     bytes calldata data
-  ) external payable;
+  ) external payable returns(uint256);
 
   /// @dev Data gathering
   function getAllPositions(uint256 fromPid)
