@@ -1,0 +1,24 @@
+2022-05-06 15:36:36 ||| Alloc point for pool with id 0 updated
+2022-05-06 15:36:37 ||| Alloc point for pool with id 1 updated
+2022-05-06 15:36:38 ||| Alloc point for pool with id 2 updated
+2022-05-06 15:36:39 ||| Alloc point for pool with id 3 updated
+2022-05-06 15:36:40 ||| Alloc point for pool with id 4 updated
+2022-05-06 15:36:41 ||| Alloc point for pool with id 5 updated
+2022-05-06 15:36:42 ||| Alloc point for pool with id 6 updated
+2022-05-06 15:36:44 ||| Alloc point for pool with id 7 updated
+2022-05-06 15:36:45 ||| Alloc point for pool with id 8 updated
+2022-05-06 15:36:46 ||| Alloc point for pool with id 9 updated
+2022-05-06 15:37:05 |||  - DummyToken deployed at 0xDE638dBb6a45d45B712b4480895c94fb093A35F2 and minted
+2022-05-06 15:37:08 |||  - Master pool was set on MasterChefV1
+2022-05-06 16:07:14 |||  - Pancake MasterChefV2 deployed at 0xcCB54b0af0Dbf77f3c31934e01715878D51BE06D
+2022-05-06 16:07:30 |||  - MasterChefV2 initialized
+2022-05-06 16:07:37 ||| Pool with id 1 and lpToken 0xb8DA25cFB4E913eA665426232abDc32676346847 migrated. Id of pool on MasterChefV2 is 0
+2022-05-06 16:07:43 ||| Pool with id 2 and lpToken 0xd7F35c7B2E9840C63d120EcaE0c501b57c4dCcA4 migrated. Id of pool on MasterChefV2 is 1
+2022-05-06 16:07:50 ||| Pool with id 3 and lpToken 0xdae2342f5DB3d5a460d092C26886bd882c8fBec8 migrated. Id of pool on MasterChefV2 is 2
+2022-05-06 16:07:56 ||| Pool with id 4 and lpToken 0x90b04A7f9681b3759bc0342F8EC6FaD765F98a2c migrated. Id of pool on MasterChefV2 is 3
+2022-05-06 16:08:06 ||| Pool with id 5 and lpToken 0x113f70dDE380C7e16cceaEfca24Cb11C5f98F358 migrated. Id of pool on MasterChefV2 is 4
+2022-05-06 16:08:12 ||| Pool with id 6 and lpToken 0x13270e75B15384aeb8d92BB27ca5ECfAF1870558 migrated. Id of pool on MasterChefV2 is 5
+2022-05-06 16:08:19 ||| Pool with id 7 and lpToken 0xFb3761BD647C594502F8e8194c044F39A600A061 migrated. Id of pool on MasterChefV2 is 6
+2022-05-06 16:08:25 ||| Pool with id 8 and lpToken 0x891Cc7BE028F310d0Bb1D316eb87ffC51a377E32 migrated. Id of pool on MasterChefV2 is 7
+2022-05-06 16:08:31 ||| Pool with id 9 and lpToken 0x7E60cB2a97CF7f2294fdfF5329055b88a212D211 migrated. Id of pool on MasterChefV2 is 8
+2022-05-06 16:08:38 ||| Pool with id 10 and lpToken 0xDE638dBb6a45d45B712b4480895c94fb093A35F2 migrated. Id of pool on MasterChefV2 is 9

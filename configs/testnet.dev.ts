@@ -34,39 +34,47 @@ export const testnetDevConfig: ProjectConfigType = {
       FactoryV2: "0xAC3749a4A2Cd8BF04D14C98eE08f74B9f5a7Cf5c",
       RouterV2: "0x0e9c1DfbA7A440504A0e4ED311fad2154dDd3A70",
       MasterChef: "0x3Fb6e0aaF321dca70B66ED22815DBD713fc63BBb",
+      MasterChefV2: "",
       LpTokens: [
         {
           pId: 0,
+          pIdV2: 0,
           name: "CAKE-WBNB LP (Legacy)",
           address: "0x688B1909314700c6D759Db7D046a1483FF68800c",
         },
         {
           pId: 1,
+          pIdV2: 0,
           name: "BUSD-USDT LP",
           address: "0x2f17a541Ba6fCe9d98b67061815e58cdC945f803",
         },
         {
           pId: 2,
+          pIdV2: 0,
           name: "BUSD-DAI LP",
           address: "0x1B1eFd3f17fdB551eCA85cCC564c887f4F8Da843",
         },
         {
           pId: 3,
+          pIdV2: 0,
           name: "USDT-DAI LP",
           address: "0x932520F6628ccE27dc61ca0668F9E342A1ecB0f8",
         },
         {
           pId: 4,
+          pIdV2: 0,
           name: "WBNB-BUSD LP",
           address: "0x33Ce97DcE79688124233378857d47ac22CE1FF2D",
         },
         {
           pId: 5,
+          pIdV2: 0,
           name: "WBNB-USDT LP",
           address: "0x33E4b9D28FE9D08Fd462783307aBCCd2084f7914",
         },
         {
           pId: 6,
+          pIdV2: 0,
           name: "WBNB-Cake LP",
           address: "0x4866bB7A9811143F1F1CD1a7CAf0648776da88A4",
         },
