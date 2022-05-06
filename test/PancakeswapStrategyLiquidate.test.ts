@@ -3,7 +3,6 @@ import "@openzeppelin/test-helpers";
 import {
   MockToken,
   MockToken__factory,
-  MockWBNB,
   PancakeFactory,
   PancakeFactory__factory,
   PancakePair,
@@ -97,15 +96,15 @@ describe("Pancakeswap - StrategyLiquidate", () => {
     await routerV2.deployed();
 
     /// Setup token stuffs
-    const MockToken = (await ethers.getContractFactory(
+    const MockTokenFactory = (await ethers.getContractFactory(
       "MockToken",
       deployer
     )) as MockToken__factory;
-    baseToken = (await upgrades.deployProxy(MockToken, ["BTOKEN", "BTOKEN"])) as MockToken;
+    baseToken = await MockTokenFactory.deploy("BTOKEN", "BTOKEN");
     await baseToken.deployed();
     await baseToken.mint(await alice.getAddress(), ethers.utils.parseEther("100000"));
     await baseToken.mint(await bob.getAddress(), ethers.utils.parseEther("100000"));
-    farmingToken = (await upgrades.deployProxy(MockToken, ["FTOKEN", "FTOKEN"])) as MockToken;
+    farmingToken = await MockTokenFactory.deploy("FTOKEN", "FTOKEN");
     await farmingToken.deployed();
     await farmingToken.mint(await alice.getAddress(), ethers.utils.parseEther("100000"));
     await farmingToken.mint(await bob.getAddress(), ethers.utils.parseEther("100000"));

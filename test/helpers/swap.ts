@@ -51,15 +51,7 @@ export class SwapHelper {
   }
 
   public async addLiquidities(liquidities: Array<ILiquidity>) {
-    const wbnbAddress = await this.router.WETH();
-
     for (const liq of liquidities) {
-      if (liq.token0.address === wbnbAddress)
-        this.signer.sendTransaction({ to: wbnbAddress, value: liq.amount0desired });
-
-      if (liq.token1.address === wbnbAddress)
-        this.signer.sendTransaction({ to: wbnbAddress, value: liq.amount1desired });
-
       await liq.token0.approve(this.router.address, liq.amount0desired);
       await liq.token1.approve(this.router.address, liq.amount1desired);
 

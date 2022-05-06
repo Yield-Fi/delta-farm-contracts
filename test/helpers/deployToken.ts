@@ -26,11 +26,7 @@ export const deployTokens = async (tokens: IMockTokenConfig[], deployer: Signer)
 
 export const deployToken = async (token: IMockTokenConfig, deployer: Signer) => {
   const MockTokenFactory = await ethers.getContractFactory("MockToken", deployer);
-  const MockToken = (await upgrades.deployProxy(MockTokenFactory, [
-    token.name,
-    token.symbol,
-  ])) as MockToken;
-  await MockToken.deployed();
+  const MockToken = await MockTokenFactory.deploy(token.name, token.symbol);
 
   if (token.holders !== undefined) {
     token.holders.forEach(async (holder) => await MockToken.mint(holder.address, holder.amount));

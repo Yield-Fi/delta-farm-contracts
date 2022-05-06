@@ -6,7 +6,6 @@ import {
   FeeCollector,
   MockWBNB,
   PancakeFactory,
-  PancakeMasterChef,
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
@@ -15,27 +14,26 @@ import {
   PancakeswapWorker,
   ProtocolManager,
   Client,
+  PancakeMasterChefV2,
 } from "../typechain";
 import { ethers, waffle } from "hardhat";
 import { deployToken, deployWBNB } from "./helpers/deployToken";
 import chai from "chai";
 import { deployPancakeV2, deployProxyContract } from "./helpers";
-import { deployPancakeWorker } from "./helpers/deployWorker";
+import { deployPancakeWorkerV2 } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
-import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
 
 chai.use(solidity);
 const { expect } = chai;
 describe("ProtocolManager", async () => {
-  const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("0.076");
-  const POOL_ID = 1;
+  const POOL_ID = 0;
   const REINVEST_BOUNTY_BPS = "100";
 
   // DEX (PCS)
   let factory: PancakeFactory;
   let router: PancakeRouterV2;
-  let masterChef: PancakeMasterChef;
+  let masterChef: PancakeMasterChefV2;
   let pancakeswapWorker01: PancakeswapWorker;
   let pancakeswapWorker02: PancakeswapWorker;
   let lp: PancakePair;
@@ -94,7 +92,6 @@ describe("ProtocolManager", async () => {
 
     [factory, router, cake, , masterChef] = await deployPancakeV2(
       mockWBNB,
-      CAKE_REWARD_PER_BLOCK,
       [{ address: deployerAddress, amount: ethers.utils.parseEther("100") }],
       deployer
     );
@@ -129,10 +126,10 @@ describe("ProtocolManager", async () => {
       deployer
     );
 
-    await masterChef.add(1, lp.address, true);
+    await masterChef.add(1, lp.address, true, true);
 
     /// Setup PancakeswapWorker
-    pancakeswapWorker01 = await deployPancakeWorker(
+    pancakeswapWorker01 = await deployPancakeWorkerV2(
       vault,
       "pancakeswapWorker01",
       baseToken,
@@ -146,7 +143,7 @@ describe("ProtocolManager", async () => {
       deployer
     );
 
-    pancakeswapWorker02 = await deployPancakeWorker(
+    pancakeswapWorker02 = await deployPancakeWorkerV2(
       vault,
       "pancakeswapWorker02",
       baseToken,

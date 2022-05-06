@@ -4,8 +4,8 @@ import {
   MockToken,
   MockToken__factory,
   PancakeFactory,
-  PancakeMasterChef,
-  PancakeMasterChef__factory,
+  PancakeMasterChefV2,
+  PancakeMasterChefV2__factory,
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
@@ -23,7 +23,7 @@ import { solidity } from "ethereum-waffle";
 import {
   deployContract,
   deployPancakeStrategies,
-  deployPancake,
+  deployPancakeV2,
   deployProxyContract,
   deployTokens,
   time,
@@ -37,8 +37,8 @@ import { MockVault } from "../typechain/MockVault";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("PancakeswapWorker", () => {
-  const CAKE_PER_BLOCK = parseEther("1");
+describe("PancakeswapWorkerV2", () => {
+  const CAKE_PER_BLOCK = parseEther("2.514");
   const DEFI_FEE_BPS = "100";
 
   let deployer: Signer;
@@ -55,9 +55,9 @@ describe("PancakeswapWorker", () => {
   let WorkerBUSD_TOK0: PancakeswapWorker;
   let WorkerTOK0_TOK1: PancakeswapWorker;
   let PancakeFactory: PancakeFactory;
-  let PancakeMasterChef: PancakeMasterChef;
-  let PancakeMasterChef__account1: PancakeMasterChef;
-  let PancakeMasterChef__account2: PancakeMasterChef;
+  let MasterChefV2: PancakeMasterChefV2;
+  let MasterChefV2__account1: PancakeMasterChefV2;
+  let MasterChefV2__account2: PancakeMasterChefV2;
   let PancakeRouterV2: PancakeRouterV2;
   let CakeToken: CakeToken;
 
@@ -163,10 +163,9 @@ describe("PancakeswapWorker", () => {
 
     MockVault = (await deployContract("MockVault", [BaseToken.address], deployer)) as MockVault;
 
-    [PancakeFactory, PancakeRouterV2, CakeToken, , PancakeMasterChef] = await deployPancake(
+    [PancakeFactory, PancakeRouterV2, CakeToken, , MasterChefV2] = await deployPancakeV2(
       MockWBNB,
-      CAKE_PER_BLOCK,
-      [{ address: deployerAddress, amount: parseEther("200") }],
+      [{ address: deployerAddress, amount: parseEther("200000") }],
       deployer
     );
 
@@ -178,21 +177,24 @@ describe("PancakeswapWorker", () => {
     const lpTOK0_TOK1 = await PancakeFactory.getPair(Token0.address, Token1.address);
     lpTOK0_TOK1__deployer = PancakePair__factory.connect(lpTOK0_TOK1, deployer);
 
-    await PancakeMasterChef.add(1, lpBUSD_TOK0__deployer.address, true);
-    await PancakeMasterChef.add(1, lpTOK0_TOK1__deployer.address, true);
+    await MasterChefV2.add(1, lpBUSD_TOK0__deployer.address, true, true);
+    await MasterChefV2.add(1, lpTOK0_TOK1__deployer.address, true, true);
 
     [AddToPoolWithBaseToken, AddToPoolWithoutBaseToken, LiquidateStrategy] =
       await deployPancakeStrategies(PancakeRouterV2, deployer, ProtocolManager);
 
-    const PancakeswapWorkerFactory = await ethers.getContractFactory("PancakeswapWorker", deployer);
+    const PancakeswapWorkerFactory = await ethers.getContractFactory(
+      "PancakeswapWorkerV2",
+      deployer
+    );
 
     WorkerBUSD_TOK0 = (await upgrades.deployProxy(PancakeswapWorkerFactory, [
       "WorkerBUSD_TOK0",
       MockVault.address,
       BaseToken.address,
-      PancakeMasterChef.address,
+      MasterChefV2.address,
       PancakeRouterV2.address,
-      1,
+      0,
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
@@ -205,9 +207,9 @@ describe("PancakeswapWorker", () => {
       "WorkerTOK0_TOK1",
       MockVault.address,
       BaseToken.address,
-      PancakeMasterChef.address,
+      MasterChefV2.address,
       PancakeRouterV2.address,
-      2,
+      1,
       [CakeToken.address, MockWBNB.address, BaseToken.address],
       0,
       DEFI_FEE_BPS,
@@ -227,51 +229,45 @@ describe("PancakeswapWorker", () => {
       {
         token0: BaseToken,
         token1: Token0,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("100"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("1000"),
       },
       {
         token0: CakeToken,
         token1: MockWBNB,
-        amount0desired: ethers.utils.parseEther("100"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: BaseToken,
         token1: MockWBNB,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: Token0,
         token1: MockWBNB,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: Token0,
         token1: Token1,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: BaseToken,
         token1: Token1,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
     ]);
 
     lpBUSD_TOK0__account1 = PancakePair__factory.connect(lpBUSD_TOK0, account1);
     lpBUSD_TOK0__account2 = PancakePair__factory.connect(lpBUSD_TOK0, account2);
-    PancakeMasterChef__account1 = PancakeMasterChef__factory.connect(
-      PancakeMasterChef.address,
-      account1
-    );
-    PancakeMasterChef__account2 = PancakeMasterChef__factory.connect(
-      PancakeMasterChef.address,
-      account2
-    );
+    MasterChefV2__account1 = PancakeMasterChefV2__factory.connect(MasterChefV2.address, account1);
+    MasterChefV2__account2 = PancakeMasterChefV2__factory.connect(MasterChefV2.address, account2);
 
     BaseToken__account1 = MockToken__factory.connect(BaseToken.address, account1);
   }
@@ -303,7 +299,7 @@ describe("PancakeswapWorker", () => {
       ]);
 
       /// send 0.1 base token to the worker
-      await BaseToken__account1.transfer(WorkerBUSD_TOK0.address, parseEther("0.1"));
+      await BaseToken__account1.transfer(WorkerBUSD_TOK0.address, parseEther("10"));
 
       /// Initially the amount of tokens to receive from a given position should equal 0
       expect((await WorkerBUSD_TOK0.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
@@ -331,10 +327,10 @@ describe("PancakeswapWorker", () => {
         )
       );
 
-      /// expected ~ 0.1 Base Token (minus some trading fee) ~ 0.099 BASE TOKEN
+      /// expected ~ 10 Base Token (minus some trading fee) ~ 9.9 BASE TOKEN
       assertAlmostEqual(
         (await WorkerBUSD_TOK0.tokensToReceive(1)).toString(),
-        parseEther("0.099872512608433641").toString()
+        parseEther("9.985014966302405458").toString()
       );
 
       const latestBlock = await time.latestBlockNumber();
@@ -344,17 +340,17 @@ describe("PancakeswapWorker", () => {
       // Harvest rewards and send them to the operating vault in Base token
       await worker__deployer.harvestRewards(); /// + 1 BLOCK
 
-      expect(await MockVault.rewards(1)).to.be.eq(parseEther("9.756649592554072839").toString());
-
       /*
-      There are two positions in pancakeMasterChef with the same alloc points, so 0.5 CAKE per block is generated for the given position.
-      2 BLOCK = 2 * 0.5 CAKE = 1 CAKE
-      1 CAKE ~ 10 BASE TOKEN (without trading fee)
-      10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
+      Pancakeswap MasterChefV2 generates 2.514 CAKE per block for regular pools
+      There are two positions in pancakeMasterChef with the same alloc points, so 1.257 CAKE per block is generated for the given position.
+      2 BLOCK = 2 * 1.257 CAKE = 2.514 CAKE
+      2.514 CAKE ~ 25.14 BASE TOKEN (without trading fee)
+      25.14 BASE TOKEN - some trading fees ~ 24.9 BASE TOKEN
       */
+      expect(await MockVault.rewards(1)).to.be.eq(parseEther("24.913518501859800611").toString());
       assertAlmostEqual(
         (await BaseToken.balanceOf(MockVault.address)).toString(),
-        parseEther("9.755679966928919588").toString()
+        parseEther("24.913518501859800611").toString()
       );
 
       /// Withdraw all funds from pool via LiquidateStrategy
@@ -381,12 +377,12 @@ describe("PancakeswapWorker", () => {
       );
 
       /*
-      9.75 BASE TOKEN + 0.099 BASE TOKEN ~= 9.85 BASE TOKEN
+      9.75 BASE TOKEN + 25.14 BASE TOKEN ~= 34.898532226264753626
       */
 
       assertAlmostEqual(
         (await BaseToken.balanceOf(MockVault.address)).toString(),
-        parseEther("9.856522105162506480").toString()
+        parseEther("34.898532226264753626").toString()
       );
     });
   });
@@ -412,8 +408,8 @@ describe("PancakeswapWorker", () => {
         LiquidateStrategy.address,
       ]);
 
-      /// send 0.1 base token to the worker
-      await BaseToken__account1.transfer(WorkerTOK0_TOK1.address, parseEther("0.1"));
+      /// send 10 base token to the worker
+      await BaseToken__account1.transfer(WorkerTOK0_TOK1.address, parseEther("10"));
 
       /// Initially the amount of tokens to receive from a given position should equal 0
       expect((await WorkerTOK0_TOK1.tokensToReceive(1)).toString()).to.eq(parseEther("0"));
@@ -441,10 +437,10 @@ describe("PancakeswapWorker", () => {
         )
       );
 
-      /// expected ~ 0.1 Base Token (minus some trading fee) ~ 0.099 BASE TOKEN
+      /// expected ~ 10 Base Token (minus some trading fee) ~ 9.9 BASE TOKEN
       assertAlmostEqual(
         (await WorkerTOK0_TOK1.tokensToReceive(1)).toString(),
-        parseEther("0.099491623915500588").toString()
+        parseEther("9.941069470177002166").toString()
       );
 
       const latestBlock = await time.latestBlockNumber();
@@ -455,14 +451,14 @@ describe("PancakeswapWorker", () => {
       await worker__deployer.harvestRewards(); /// + 1 BLOCK
 
       /*
-      There are two positions in pancakeMasterChef with the same alloc points, so 0.5 CAKE per block is generated for the given position.
-      2 BLOCK = 2 * 0.5 CAKE = 1 CAKE
-      1 CAKE ~ 10 BASE TOKEN (without trading fee)
-      10 BASE TOKEN - some trading fees ~ 9.75 BASE TOKEN
+      There are two positions in pancakeMasterChef with the same alloc points, so 1.257 CAKE per block is generated for the given position.
+      2 BLOCK = 2 * 1.257 CAKE = 2.514 CAKE
+      2.514 CAKE ~ 25.14 BASE TOKEN (without trading fee)
+      25.14 BASE TOKEN - some trading fees ~ 24.93 BASE TOKEN
       */
       assertAlmostEqual(
         (await BaseToken.balanceOf(MockVault.address)).toString(),
-        parseEther("9.757442958099992462").toString()
+        parseEther("24.933845479973450901").toString()
       );
 
       /// Withdraw all funds from pool via LiquidateStrategy
@@ -489,32 +485,13 @@ describe("PancakeswapWorker", () => {
       );
 
       /*
-      9.75 BASE TOKEN + 0.099 BASE TOKEN ~= 9.85 BASE TOKEN
+      24.93 BASE TOKEN + 9.9 BASE TOKEN ~= 34.8 BASE TOKEN
       */
-
       assertAlmostEqual(
         (await BaseToken.balanceOf(MockVault.address)).toString(),
-        parseEther("9.856934582015493050").toString()
+        parseEther("34.874914950150453067").toString()
       );
     });
-  });
-
-  it("should give rewards out when you stake LP tokens", async () => {
-    // Distribute lp tokens to the accounts
-    await lpBUSD_TOK0__deployer.transfer(account1Address, parseEther("0.1"));
-    await lpBUSD_TOK0__deployer.transfer(account2Address, parseEther("0.1"));
-
-    // Staking 0.1 Lp tokens by account 1 and account 2
-    await lpBUSD_TOK0__account1.approve(PancakeMasterChef.address, parseEther("0.1"));
-    await lpBUSD_TOK0__account2.approve(PancakeMasterChef.address, parseEther("0.1"));
-    await PancakeMasterChef__account1.deposit(1, parseEther("0.1"));
-    await PancakeMasterChef__account2.deposit(1, parseEther("0.1")); // account 1 + 1 / 2 CAKE
-
-    await PancakeMasterChef__account1.withdraw(1, parseEther("0.1")); // account 1 + 1 / 4 CAKE
-
-    expect((await CakeToken.balanceOf(account1Address)).toString()).to.be.eq(
-      CAKE_PER_BLOCK.mul(3).div(4).toString()
-    );
   });
 
   it("should successfully set a treasury config", async () => {

@@ -6,17 +6,16 @@ import {
   FeeCollector,
   MockWBNB,
   PancakeFactory,
-  PancakeMasterChef,
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
-  SyrupBar,
   Vault,
   VaultConfig,
   Client,
   PancakeswapStrategyAddToPoolWithBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken,
   ProtocolManager,
+  PancakeMasterChefV2,
 } from "../typechain";
 import { ethers, waffle } from "hardhat";
 import { deployToken, deployWBNB } from "./helpers/deployToken";
@@ -28,24 +27,22 @@ import { SwapHelper } from "./helpers/swap";
 import chai from "chai";
 import { deployPancakeStrategies } from "./helpers/deployStrategies";
 import { deployPancakeV2, deployProxyContract } from "./helpers";
-import { deployPancakeWorker } from "./helpers/deployWorker";
+import { deployPancakeWorkerV2 } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
-import { WrappedNativeTokenRelayer } from "../typechain/WrappedNativeTokenRelayer";
 import { assertAlmostEqual } from "./helpers/assert";
 import { parseEther } from "@ethersproject/units";
 
 chai.use(solidity);
 const { expect } = chai;
 describe("Client contract", async () => {
-  const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("0.076");
-  const POOL_ID = 1;
+  const POOL_ID = 0;
   const REINVEST_BOUNTY_BPS = "100";
 
   // DEX (PCS)
   let factory: PancakeFactory;
   let router: PancakeRouterV2;
-  let masterChef: PancakeMasterChef;
+  let masterChef: PancakeMasterChefV2;
   let pancakeswapWorker01: PancakeswapWorker;
   let pancakeswapWorker02: PancakeswapWorker;
   let lp: PancakePair;
@@ -114,7 +111,7 @@ describe("Client contract", async () => {
       {
         name: "BASETOKEN",
         symbol: "BTOKEN",
-        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
+        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("1000000") }],
       },
       deployer
     );
@@ -123,7 +120,7 @@ describe("Client contract", async () => {
       {
         name: "TARGETTOKEN",
         symbol: "TTOKEN",
-        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
+        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("1000000") }],
       },
       deployer
     );
@@ -132,19 +129,18 @@ describe("Client contract", async () => {
       {
         name: "TESTTOKEN",
         symbol: "TSTOKEN",
-        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
+        holders: [{ address: deployerAddress, amount: ethers.utils.parseEther("1000000") }],
       },
       deployer
     );
 
     mockWBNB = await deployWBNB(deployer);
 
-    await mockWBNB.mint(deployerAddress, ethers.utils.parseEther("10000"));
+    await mockWBNB.mint(deployerAddress, ethers.utils.parseEther("1000000"));
 
     [factory, router, cake, , masterChef] = await deployPancakeV2(
       mockWBNB,
-      CAKE_REWARD_PER_BLOCK,
-      [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
+      [{ address: deployerAddress, amount: ethers.utils.parseEther("1000000") }],
       deployer
     );
 
@@ -194,11 +190,11 @@ describe("Client contract", async () => {
       deployer
     );
 
-    await masterChef.add(1, lp.address, true);
-    await masterChef.add(2, lpExt.address, true);
+    await masterChef.add(1, lp.address, true, true);
+    await masterChef.add(2, lpExt.address, true, true);
 
     /// Setup PancakeswapWorker
-    pancakeswapWorker01 = await deployPancakeWorker(
+    pancakeswapWorker01 = await deployPancakeWorkerV2(
       vault,
       "Worker01",
       baseToken,
@@ -212,7 +208,7 @@ describe("Client contract", async () => {
       deployer
     );
 
-    pancakeswapWorker02 = await deployPancakeWorker(
+    pancakeswapWorker02 = await deployPancakeWorkerV2(
       vault,
       "Worker02",
       baseToken,
@@ -249,44 +245,44 @@ describe("Client contract", async () => {
       {
         token0: baseToken,
         token1: targetToken,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: cake,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("100"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("1000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: baseToken,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: targetToken,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: testToken,
         token1: mockWBNB,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: testToken,
         token1: baseToken,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
       {
         token0: testToken,
         token1: targetToken,
-        amount0desired: ethers.utils.parseEther("1000"),
-        amount1desired: ethers.utils.parseEther("1000"),
+        amount0desired: ethers.utils.parseEther("10000"),
+        amount1desired: ethers.utils.parseEther("10000"),
       },
     ]);
 
@@ -357,9 +353,9 @@ describe("Client contract", async () => {
       expect(position.owner).to.be.eql(aliceAddress);
       expect(position.client).to.be.eql(exampleClient.address);
 
-      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.996503864908163004;
+      // Position opened for 1 BASETOKEN initially; subtract swap fees and here we go with ~ 0.996278187948462095;
       expect(positionInfo.toString()).to.be.eql(
-        ethers.utils.parseEther("0.996503864908163004").toString()
+        ethers.utils.parseEther("0.996278187948462095").toString()
       );
     });
 
@@ -399,12 +395,12 @@ describe("Client contract", async () => {
         "first + second not eq 2 ETH"
       );
       expect(amountOfToken0.toString()).to.be.eq(
-        parseEther("1.0000000000000000000").toString(),
-        "amountOfToken0 not eq 1 ETH"
+        parseEther("0.997400509299197405").toString(),
+        "amountOfToken0 not eq ~1 ETH"
       );
       expect(amountOfToken1.toString()).to.be.eq(
-        parseEther("0.996505985279683515").toString(),
-        "amountOfToken1 not eq 0.1 ETH"
+        parseEther("1.0000000000000000000").toString(),
+        "amountOfToken1 not eq 1 ETH"
       );
     });
   });
@@ -462,8 +458,8 @@ describe("Client contract", async () => {
       expect(firstPartOfBaseToken.add(secondPartOfBaseToken).toString()).to.be.eq(
         parseEther("2").toString()
       );
-      expect(amountOfToken0.toString()).to.be.eq(parseEther("0.996505985279683515").toString());
-      expect(amountOfToken1.toString()).to.be.eq(parseEther("0.996505985279683515").toString());
+      expect(amountOfToken0.toString()).to.be.eq(parseEther("0.997400509299197405").toString());
+      expect(amountOfToken1.toString()).to.be.eq(parseEther("0.997400509299197405").toString());
     });
   });
 
@@ -483,14 +479,14 @@ describe("Client contract", async () => {
 
       expect(
         (await exampleClient.amountToWithdraw(pancakeswapWorker01.address, aliceAddress)).toString()
-      ).to.be.eq(parseEther("0.996503864908163004").toString());
+      ).to.be.eq(parseEther("0.996278187948462095").toString());
 
       // Execute withdrawal flow
       await exampleClientAsAlice.withdraw(aliceAddress, pancakeswapWorker01.address, 0);
 
       // Alice received ~= 1 base token after withdraw
       expect((await baseToken.balanceOf(aliceAddress)).toString()).to.be.eql(
-        ethers.utils.parseEther("0.996503741585422602").toString()
+        ethers.utils.parseEther("0.996278186714131827").toString()
       );
     });
 
@@ -660,6 +656,7 @@ describe("Client contract", async () => {
       await protocolManager.approveAdminContract(deployerAddress); // Workaround
       await protocolManager.approveHarvesters([deployerAddress], true);
       await pancakeswapWorker01.setTreasuryFee(1000); // 10% for the protocol owner
+      await pancakeswapWorker02.setTreasuryFee(1000); // 10% for the protocol owner
       await exampleClientAsOperator.setFarmsFee(
         [pancakeswapWorker01.address, pancakeswapWorker02.address],
         500
@@ -670,20 +667,17 @@ describe("Client contract", async () => {
       const DEPOSIT_AMOUNT = ethers.utils.parseEther("1");
       await exampleClientAsOperator.whitelistUsers([aliceAddress], true);
 
-      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
-      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
+      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT.mul(2));
+      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT.mul(2));
+
       await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
+      // + 1/3 * CAKE PER BLOCK = 0.838 (1 alloc point of worker01's farm)
 
-      await baseToken.mint(aliceAddress, DEPOSIT_AMOUNT);
-      await baseTokenAsAlice.approve(exampleClient.address, DEPOSIT_AMOUNT);
       await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT);
-
-      // Transfer previously minted CAKE to the workers (simulate harvesting CAKE from staking pool)
-      await cake.transfer(pancakeswapWorker01.address, ethers.utils.parseEther("2"));
+      // + 3/3 * CAKE PER BLOCK = 2.514 (1 alloc point of worker01's farm + 2 alloc points of worker02's farm)
 
       await pancakeswapWorker01.harvestRewards();
-
-      await cake.transfer(pancakeswapWorker02.address, ethers.utils.parseEther("2"));
+      // + 2/3 * CAKE PER BLOCK = 1.676 (2 alloc points)
 
       await pancakeswapWorker02.harvestRewards();
 
@@ -698,27 +692,27 @@ describe("Client contract", async () => {
         await feeCollector.fees(await vaultConfig.treasuryAccount())
       ).to.be.bignumber.that.is.not.eql(ethers.BigNumber.from("0"));
 
-      // 2 CAKE + 2 CAKE harvested = 4 CAKE = 40 BASE TOKEN
-      // 40 BASE TOKEN - 15 % (10% treasury fee + 5% client fee) = 34 BASE TOKEN + some additional rewards generated during execute test
+      // Pancakeswap MasterChefV2 generates ~ 5.028 CAKE ~= 50.28 BASE TOKEN
+      // 50.28 BASE TOKEN - 15 % (10% treasury fee + 5% client fee) = 42,738 BASE TOKEN - some trading fees
       expect(
         (await exampleClient.allRewardToCollect(aliceAddress, baseToken.address)).toString()
-      ).to.be.eq(parseEther("34.820649428128021984"));
+      ).to.be.eq(parseEther("42.100703218732296893"));
 
       await exampleClient.collectAllRewards(aliceAddress, baseToken.address);
 
       expect((await baseToken.balanceOf(aliceAddress)).toString()).to.be.eq(
-        parseEther("34.820649428128021984").toString()
+        parseEther("42.100703218732296893").toString()
       );
 
-      // Operator can collect fee from harvested rewards
+      // Client can collect fee from harvested rewards 50.28 BASE TOKEN * 5% ~= 2.5 BASE TOKEN - some trading fees
       expect((await exampleClient.feeToCollect()).toString()).to.be.eq(
-        parseEther("1.947955231928522143").toString()
+        parseEther("2.476511954043076287").toString()
       );
 
       await exampleClientAsOperator.collectFee(clientOperatorAddress);
 
       expect((await baseToken.balanceOf(clientOperatorAddress)).toString()).to.be.eq(
-        parseEther("1.947955231928522143").toString()
+        parseEther("2.476511954043076287").toString()
       );
     });
 

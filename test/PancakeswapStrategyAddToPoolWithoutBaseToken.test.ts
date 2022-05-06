@@ -113,7 +113,6 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
 
     [PancakeFactory, PancakeRouterV2] = await deployPancakeV2(
       MockWBNB,
-      CAKE_PER_BLOCK,
       [{ address: deployerAddress, amount: parseEther("200") }],
       deployer
     );
@@ -212,7 +211,7 @@ describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
       parseEther("1").toString()
     );
 
-    expect(
+    await expect(
       strategy__account1.execute(
         defaultAbiCoder.encode(
           ["address", "address", "address", "uint256"],

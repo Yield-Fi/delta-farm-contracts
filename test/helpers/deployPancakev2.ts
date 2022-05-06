@@ -1,25 +1,30 @@
-import { PancakeFactory, PancakeRouterV2 } from "../../typechain";
+import {
+  PancakeMasterChefV2,
+  PancakeFactory,
+  PancakeRouterV2,
+  PancakeMasterChef,
+  MockToken,
+} from "../../typechain";
 
 import { BigNumber } from "@ethersproject/bignumber";
 import { CakeToken } from "../../typechain/CakeToken";
 import { MockWBNB } from "../../typechain/MockWBNB";
-import { PancakeMasterChef } from "../../typechain/PancakeMasterChef";
 import { Signer } from "@ethersproject/abstract-signer";
 import { SyrupBar } from "../../typechain/SyrupBar";
 import { deployContract } from "./deployContract";
 import { ethers } from "hardhat";
+import { deployToken } from "./deployToken";
 
 interface IHolder {
   address: string;
   amount: BigNumber;
 }
 
-export const deployPancake = async (
+export const deployPancakeV2 = async (
   wbnb: MockWBNB,
-  cakePerBlock: BigNumber,
   cakeHolders: IHolder[],
   deployer: Signer
-): Promise<[PancakeFactory, PancakeRouterV2, CakeToken, SyrupBar, PancakeMasterChef]> => {
+): Promise<[PancakeFactory, PancakeRouterV2, CakeToken, SyrupBar, PancakeMasterChefV2]> => {
   const _feeToAddress = ethers.constants.AddressZero;
 
   const PancakeFactory = (await deployContract(
@@ -49,9 +54,24 @@ export const deployPancake = async (
   /// Setup MasterChef
   const PancakeMasterChef = (await deployContract(
     "PancakeMasterChef",
-    [CakeToken.address, SyrupBar.address, await deployer.getAddress(), cakePerBlock, 0],
+    [
+      CakeToken.address,
+      SyrupBar.address,
+      await deployer.getAddress(),
+      ethers.utils.parseEther("40"),
+      0,
+    ],
     deployer
   )) as PancakeMasterChef;
+
+  const DummyToken = (await deployToken(
+    {
+      name: "DummyToken",
+      symbol: "DT",
+      holders: [{ address: await deployer.getAddress(), amount: ethers.utils.parseEther("10") }],
+    },
+    deployer
+  )) as MockToken;
 
   // Transfer ownership so masterChef can mint CAKE
   await Promise.all([
@@ -59,5 +79,18 @@ export const deployPancake = async (
     await SyrupBar.transferOwnership(PancakeMasterChef.address),
   ]);
 
-  return [PancakeFactory, PancakeRouterV2, CakeToken, SyrupBar, PancakeMasterChef];
+  // await PancakeMasterChef.set(0, 0, true);
+  await PancakeMasterChef.add(1, DummyToken.address, true);
+
+  const PancakeMasterChefV2 = (await deployContract(
+    "PancakeMasterChefV2",
+    [PancakeMasterChef.address, CakeToken.address, 1, await deployer.getAddress()],
+    deployer
+  )) as PancakeMasterChefV2;
+
+  await DummyToken.approve(PancakeMasterChefV2.address, ethers.utils.parseEther("10"));
+
+  await PancakeMasterChefV2.init(DummyToken.address);
+
+  return [PancakeFactory, PancakeRouterV2, CakeToken, SyrupBar, PancakeMasterChefV2];
 };

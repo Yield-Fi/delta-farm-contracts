@@ -38,18 +38,6 @@ export default {
     mainnet,
     testnet,
     ["testnet-dev"]: testnet,
-    hardhat: {
-      // chainId: 31337,
-      // gas: 12000000,
-      // blockGasLimit: 0x1fffffffffffff,
-      // allowUnlimitedContractSize: true,
-      // timeout: 1800000,
-      forking: {
-        url: "https://bsc-dataseed1.defibit.io/",
-        //  "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/mainnet",
-        // blockNumber: 16105426,
-      },
-    },
   },
   solidity: {
     version: "0.6.6",

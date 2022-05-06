@@ -6,7 +6,6 @@ import {
   FeeCollector,
   MockWBNB,
   PancakeFactory,
-  PancakeMasterChef,
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
@@ -16,34 +15,35 @@ import {
   PancakeswapStrategyAddToPoolWithoutBaseToken,
   ProtocolManager,
   Admin,
+  PancakeMasterChefV2,
+  PancakeswapWorkerV2,
+  PancakeswapStrategyLiquidate,
 } from "../typechain";
 import { ethers, waffle } from "hardhat";
 import { deployToken, deployWBNB } from "./helpers/deployToken";
 
 import { MockToken } from "../typechain/MockToken";
-import { PancakeswapStrategyLiquidate } from "../typechain/PancakeswapStrategyLiquidate";
-import { PancakeswapWorker } from "../typechain/PancakeswapWorker";
 import { SwapHelper } from "./helpers/swap";
 import chai from "chai";
 import { deployPancakeStrategies } from "./helpers/deployStrategies";
 import { deployPancakeV2, deployProxyContract } from "./helpers";
-import { deployPancakeWorker } from "./helpers/deployWorker";
+import { deployPancakeWorkerV2 } from "./helpers/deployWorker";
 import { deployVault } from "./helpers/deployVault";
 import { solidity } from "ethereum-waffle";
+import { assertAlmostEqual } from "./helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;
 describe("Admin contract - emergency withdrawal", async () => {
-  const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("0.076");
-  const POOL_ID = 1;
+  const POOL_ID = 0;
   const REINVEST_BOUNTY_BPS = "100";
 
   // DEX (PCS)
   let factory: PancakeFactory;
   let router: PancakeRouterV2;
-  let masterChef: PancakeMasterChef;
-  let pancakeswapWorker01: PancakeswapWorker;
-  let pancakeswapWorker02: PancakeswapWorker;
+  let masterChef: PancakeMasterChefV2;
+  let pancakeswapWorker01: PancakeswapWorkerV2;
+  let pancakeswapWorker02: PancakeswapWorkerV2;
   let lp: PancakePair;
   let lpExt: PancakePair;
   let mockWBNB: MockWBNB;
@@ -135,7 +135,6 @@ describe("Admin contract - emergency withdrawal", async () => {
 
     [factory, router, cake, , masterChef] = await deployPancakeV2(
       mockWBNB,
-      CAKE_REWARD_PER_BLOCK,
       [{ address: deployerAddress, amount: ethers.utils.parseEther("10000") }],
       deployer
     );
@@ -194,11 +193,11 @@ describe("Admin contract - emergency withdrawal", async () => {
       deployer
     );
 
-    await masterChef.add(1, lp.address, true);
-    await masterChef.add(2, lpExt.address, true);
+    await masterChef.add(1, lp.address, true, true);
+    await masterChef.add(2, lpExt.address, true, true);
 
     /// Setup PancakeswapWorker
-    pancakeswapWorker01 = await deployPancakeWorker(
+    pancakeswapWorker01 = await deployPancakeWorkerV2(
       vault,
       "Worker01",
       baseToken,
@@ -212,7 +211,7 @@ describe("Admin contract - emergency withdrawal", async () => {
       deployer
     );
 
-    pancakeswapWorker02 = await deployPancakeWorker(
+    pancakeswapWorker02 = await deployPancakeWorkerV2(
       vault,
       "Worker02",
       baseToken,
@@ -355,34 +354,36 @@ describe("Admin contract - emergency withdrawal", async () => {
 
       await baseTokenAsAlice.approve(exampleClient.address, MINT_AMOUNT);
 
-      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
-      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
-      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT);
-      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT);
-      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT);
-      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT);
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT); // + 1 BLOCK
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT); // + 1 BLOCK
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker01.address, DEPOSIT_AMOUNT); // + 1 BLOCK
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT); // + 1 BLOCK
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT); // + 1 BLOCK
+      await exampleClientAsAlice.deposit(aliceAddress, pancakeswapWorker02.address, DEPOSIT_AMOUNT); // + 1 BLOCK
 
       // Emulate rewards gathered
-      await cake.transfer(pancakeswapWorker01.address, ethers.utils.parseEther("10"));
-      await cake.transfer(pancakeswapWorker02.address, ethers.utils.parseEther("10"));
+      await cake.transfer(pancakeswapWorker01.address, ethers.utils.parseEther("10")); // + 1 BLOCK
+      await cake.transfer(pancakeswapWorker02.address, ethers.utils.parseEther("10")); // + 1 BLOCK
 
       // Whole base token should have been utilized
       expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.eql(BigNumber.from("0"));
 
       await adminContract.emergencyWithdraw(
         [pancakeswapWorker01.address, pancakeswapWorker02.address],
-        [exampleClient.address, yieldFiAddress /* Treasury address! */]
+        [exampleClient.address, yieldFiAddress /* Treasury address! */] // + 1 BLOCK
       );
 
-      // 20 CAKE ~= 20 BUSD since 1:1 initial ratio -  2 * 10% fee * 10 CAKE  + 6 USD initial ->  ~= 21.550731836754514394 (price offset due to pool swap)
+      // Pancakeswap MasterChefV2 generates 2.514 CAKE per BLOCK -> 8 BLOCKS * 2.514 CAKE = 20,112 CAKE + 20 CAKE transferred = 40,112 CAKE
+      // 40.112 CAKE ~= 40.112 BUSD - 20% (client + admin fees) ~= 32.1 BUSD
       // Alice should get her assets back
-      expect(await baseToken.balanceOf(aliceAddress)).to.be.bignumber.that.eql(
-        ethers.utils.parseEther("21.550731836754514394")
+      assertAlmostEqual(
+        (await baseToken.balanceOf(aliceAddress)).toString(),
+        ethers.utils.parseEther("32.100619358223023072").toString()
       );
 
       // All rewards should have been paid out
       expect(await vault.rewards(1 /* PID: 1 */)).to.be.bignumber.that.eql(BigNumber.from("0"));
-      expect(await vault.rewards(1 /* PID: 2 */)).to.be.bignumber.that.eql(BigNumber.from("0"));
+      expect(await vault.rewards(2 /* PID: 2 */)).to.be.bignumber.that.eql(BigNumber.from("0"));
       expect(await vault.rewardsToCollect(aliceAddress)).to.be.bignumber.that.eql(
         BigNumber.from("0")
       );
@@ -401,14 +402,14 @@ describe("Admin contract - emergency withdrawal", async () => {
         BigNumber.from("0")
       );
 
-      // Client fee should have been paid out as well - ~ 2 CAKE since 10 % * 10 CAKE total * 2 (may be less)
+      // Client fee should have been paid out as well - ~ 40 CAKE - 10% - trading fees during swap on BUSD ~= 3.3 BUSD
       expect(await baseToken.balanceOf(exampleClient.address)).to.be.bignumber.that.eql(
-        ethers.utils.parseEther("1.947079918089295738")
+        ethers.utils.parseEther("3.265815858272859322")
       );
 
       // YieldFee treasury address has already been supplied with fee, same formula above since both yieldFi and client have 10% fee set
       expect(await baseToken.balanceOf(yieldFiAddress)).to.be.bignumber.that.eql(
-        ethers.utils.parseEther("1.947079918089295738")
+        ethers.utils.parseEther("3.265815858272859322")
       );
     });
   });
