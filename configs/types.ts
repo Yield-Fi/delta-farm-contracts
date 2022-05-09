@@ -6,7 +6,7 @@ const vault = mainnetConfig.vaults[0];
 
 export type VaultConfigType = typeof vault;
 
-const worker = vault.workers[0];
+const worker = vault.workers.pancakeV2[0];
 
 export type WorkerConfigType = typeof worker;
 

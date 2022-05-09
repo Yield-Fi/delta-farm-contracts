@@ -13,7 +13,7 @@ const upgradeFunc: DeployFunction = async () => {
   for (const vault of config.vaults) {
     logger(`  -> Workers for ${vault.name}`);
 
-    for (const worker of vault.workers) {
+    for (const worker of vault.workers.pancake) {
       logger(`  -> Upgrading ${worker.name}...`);
       const PancakeswapWorkerFactory = await ethers.getContractFactory(
         "PancakeswapWorker",

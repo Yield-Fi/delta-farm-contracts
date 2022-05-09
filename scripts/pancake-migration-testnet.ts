@@ -1,18 +1,20 @@
 import { ethers } from "hardhat";
-import { testnetConfig } from "../configs";
+import { testnetDevConfig } from "../configs";
 import { logger } from "../deploy/utils/logger";
 
 async function main() {
   const [deployer] = await ethers.getSigners();
 
   const PancakeMasterChef = (await ethers.getContractFactory("PancakeMasterChef", deployer)).attach(
-    testnetConfig.dex.pancakeswap.MasterChef
+    testnetDevConfig.dex.pancakeswap.MasterChef
   );
 
   let poolLength = await PancakeMasterChef.poolLength();
 
+  console.log("poolLength", poolLength.toNumber());
+
   for (let i = 0; i < poolLength.toNumber(); i++) {
-    await (await PancakeMasterChef.set(i, 0, true)).wait();
+    await (await PancakeMasterChef.set(i, 0, false)).wait();
     logger(`Alloc point for pool with id ${i} updated`);
   }
 
@@ -26,7 +28,7 @@ async function main() {
 
   logger(` - DummyToken deployed at ${DummyToken.address} and minted`);
 
-  await (await PancakeMasterChef.set(0, 0, true)).wait();
+  await (await PancakeMasterChef.set(0, 0, false)).wait();
   await (await PancakeMasterChef.add(1, DummyToken.address, false)).wait();
 
   logger(` - Master pool was set on MasterChefV1`);

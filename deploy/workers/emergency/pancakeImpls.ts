@@ -27,7 +27,9 @@ const upgradeFunc: DeployFunction = async () => {
   logger("--> Setting manual implementation for pancakeswap workers... <--");
 
   for (const vault of config.vaults) {
-    for (const worker of vault.workers.filter((w) => workersToReassignment.includes(w.name))) {
+    for (const worker of vault.workers.pancake.filter((w) =>
+      workersToReassignment.includes(w.name)
+    )) {
       logger(`  -> Setting manual implementation address for ${worker.name}...`);
       try {
         const oldImplementationAddress = await upgrades.erc1967.getImplementationAddress(
@@ -63,7 +65,7 @@ const upgradeFunc: DeployFunction = async () => {
   for (const vault of config.vaults) {
     logger(`  -> Workers for ${vault.name}`);
 
-    for (const worker of vault.workers) {
+    for (const worker of vault.workers.pancake) {
       logger(`  -> Upgrading ${worker.name}...`);
       try {
         const PancakeswapWorkerFactory = await ethers.getContractFactory(

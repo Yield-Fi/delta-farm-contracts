@@ -148,7 +148,7 @@ const deployFunc: DeployFunction = async () => {
     } else console.log(`${vault.name}->Vault->transferOwnership`, "SKIP");
 
     // valuts worker
-    for (const worker of vault.workers) {
+    for (const worker of vault.workers.pancake) {
       if (!worker.address) continue;
 
       const w = PancakeswapWorker__factory.connect(worker.address, deployer);
