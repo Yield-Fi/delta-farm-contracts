@@ -9,18 +9,12 @@ import { parseEther } from "@ethersproject/units";
 const deployFunc: DeployFunction = async () => {
   // The array of workers' names to deploy.
   const workersToDeploy: Array<WorkerConfigType["name"]> = [
-    // "CAKE-WBNB Farm",    # Deployed
-    // "USDT-BUSD Farm",    # Error
-    // "WBNB-BUSD Farm",    # Deployed
-    // "DAI-BUSD Farm",     # Deployed
-    // "USDT-WBNB Farm",    # Error
-    // "CAKE-BUSD Farm",    # Deployed
-    // "CAKE-USDT Farm",    # Deployed
-    // "BBT-BNB Farm",      # Deployed
-    // "ETERNAL-BNB Farm",  # Deployed
-    // "SANTOS-BNB Farm",   # Deployed
-    // "BTCB-BUSD Farm",    # Deployed
-    // "UST-BUSD Farm",     # Deployed
+    "BUSD-USDT Pancakeswap V2",
+    "BUSD-DAI Pancakeswap V2",
+    "USDT-DAI Pancakeswap V2",
+    "WBNB-BUSD Pancakeswap V2",
+    "WBNB-USDT Pancakeswap V2",
+    "WBNB-CAKE Pancakeswap V2",
   ];
 
   const [deployer] = await ethers.getSigners();
@@ -34,10 +28,10 @@ const deployFunc: DeployFunction = async () => {
   logger("---> Deploying pancakeswap workers... <---");
   for (const vault of config.vaults) {
     logger(`-> Deploying workers for ${vault.name}`);
-    for (const worker of vault.workers.pancake.filter(workersFilter)) {
+    for (const worker of vault.workers.pancakeV2.filter(workersFilter)) {
       logger(`  - Deploying ${worker.name}...`);
       const PancakeswapWorkerFactory = await ethers.getContractFactory(
-        "PancakeswapWorker",
+        "PancakeswapWorkerV2",
         deployer
       );
 
@@ -45,7 +39,7 @@ const deployFunc: DeployFunction = async () => {
         worker.name,
         vault.address,
         config.baseToken,
-        config.dex.pancakeswap.MasterChef,
+        config.dex.pancakeswap.MasterChefV2,
         config.dex.pancakeswap.RouterV2,
         worker.poolId,
         [config.tokens.CAKE, config.baseToken],
@@ -57,11 +51,13 @@ const deployFunc: DeployFunction = async () => {
       await PancakeswapWorker.deployed();
       deployedWorkers.push(PancakeswapWorker.address);
 
-      await PancakeswapWorker.setStrategies([
-        config.strategies.pancakeswap.AddToPoolWithBaseToken,
-        config.strategies.pancakeswap.AddToPoolWithoutBaseToken,
-        config.strategies.pancakeswap.Liquidate,
-      ]);
+      await (
+        await PancakeswapWorker.setStrategies([
+          config.strategies.pancakeswap.AddToPoolWithBaseToken,
+          config.strategies.pancakeswap.AddToPoolWithoutBaseToken,
+          config.strategies.pancakeswap.Liquidate,
+        ])
+      ).wait();
 
       logger(`  - ${worker.name} deployed at ${PancakeswapWorker.address}`);
     }
@@ -69,8 +65,8 @@ const deployFunc: DeployFunction = async () => {
 
   const ProtocolManager = ProtocolManager__factory.connect(config.protocolManager, deployer);
 
-  await ProtocolManager.approveWorkers(deployedWorkers, true);
+  await (await ProtocolManager.approveWorkers(deployedWorkers, true, { gasLimit: 300000 })).wait();
 };
 
 export default deployFunc;
-deployFunc.tags = ["PancakeswapWorkers"];
+deployFunc.tags = ["PancakeswapWorkersV2"];

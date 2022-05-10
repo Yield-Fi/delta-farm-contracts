@@ -100,7 +100,7 @@ const deployFunc: DeployFunction = async () => {
     console.log(`${vault.name}->Vault->Owner`, vOwner.toLowerCase() === walletToCompare);
 
     // valuts worker
-    for (const worker of vault.workers) {
+    for (const worker of vault.workers.pancake) {
       if (!worker.address) continue;
 
       const w = PancakeswapWorker__factory.connect(worker.address, deployer);

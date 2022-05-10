@@ -1,0 +1,34 @@
+2022-05-09 11:19:25 ||| Alloc point for pool with id 0 updated
+2022-05-09 11:19:31 ||| Alloc point for pool with id 1 updated
+2022-05-09 11:19:36 ||| Alloc point for pool with id 2 updated
+2022-05-09 11:19:42 ||| Alloc point for pool with id 3 updated
+2022-05-09 11:19:48 ||| Alloc point for pool with id 4 updated
+2022-05-09 11:19:54 ||| Alloc point for pool with id 5 updated
+2022-05-09 11:20:04 ||| Alloc point for pool with id 6 updated
+2022-05-09 11:20:14 ||| Alloc point for pool with id 7 updated
+2022-05-09 11:20:30 |||  - DummyToken deployed at 0x55f5b9072209b3B0bB1DA698A927ba9066622fC4 and minted
+2022-05-09 11:22:21 |||  - Master pool was set on MasterChefV1
+2022-05-09 11:22:27 |||  - Pancake MasterChefV2 deployed at 0xD6F4E36Bc605149E9D90A0b5bb8c135ae8681460
+2022-05-09 11:22:39 |||  - MasterChefV2 initialized
+2022-05-09 11:22:45 ||| Pool with id 1 and lpToken 0x2f17a541Ba6fCe9d98b67061815e58cdC945f803 migrated. Id of pool on MasterChefV2 is 0
+2022-05-09 11:22:52 ||| Pool with id 2 and lpToken 0x1B1eFd3f17fdB551eCA85cCC564c887f4F8Da843 migrated. Id of pool on MasterChefV2 is 1
+2022-05-09 11:22:58 ||| Pool with id 3 and lpToken 0x932520F6628ccE27dc61ca0668F9E342A1ecB0f8 migrated. Id of pool on MasterChefV2 is 2
+2022-05-09 11:23:09 ||| Pool with id 4 and lpToken 0x33Ce97DcE79688124233378857d47ac22CE1FF2D migrated. Id of pool on MasterChefV2 is 3
+2022-05-09 11:23:15 ||| Pool with id 5 and lpToken 0x33E4b9D28FE9D08Fd462783307aBCCd2084f7914 migrated. Id of pool on MasterChefV2 is 4
+2022-05-09 11:23:21 ||| Pool with id 6 and lpToken 0x4866bB7A9811143F1F1CD1a7CAf0648776da88A4 migrated. Id of pool on MasterChefV2 is 5
+2022-05-09 11:29:24 ||| ---> Deploying pancakeswap workers... <---
+2022-05-09 11:29:24 ||| -> Deploying workers for BUSD Vault
+2022-05-09 11:29:24 |||   - Deploying BUSD-USDT Pancakeswap V2...
+2022-05-09 11:29:39 |||   - BUSD-USDT Pancakeswap V2 deployed at 0x5a1ef2d90D743c0AfE36BD171bEf6028Ef957341
+2022-05-09 11:29:39 |||   - Deploying BUSD-DAI Pancakeswap V2...
+2022-05-09 11:29:56 |||   - BUSD-DAI Pancakeswap V2 deployed at 0x18C9f5D77116acaaa423AB83B84d1A9821050Ef8
+2022-05-09 11:29:56 |||   - Deploying USDT-DAI Pancakeswap V2...
+2022-05-09 11:30:09 |||   - USDT-DAI Pancakeswap V2 deployed at 0xBBC4E25aAc6B595447A7176DB0dEc95f25684FD4
+2022-05-09 11:30:09 |||   - Deploying WBNB-BUSD Pancakeswap V2...
+2022-05-09 11:30:26 |||   - WBNB-BUSD Pancakeswap V2 deployed at 0x3b1859e1Bbb3ee2e87dCde4f519F1f83974149C6
+2022-05-09 11:30:26 |||   - Deploying WBNB-USDT Pancakeswap V2...
+2022-05-09 11:30:39 |||   - WBNB-USDT Pancakeswap V2 deployed at 0xb5B39Ff4458d8aDEFA493CfB98eEE3190af8dA19
+2022-05-09 11:30:39 |||   - Deploying WBNB-CAKE Pancakeswap V2...
+2022-05-09 11:30:56 |||   - WBNB-CAKE Pancakeswap V2 deployed at 0x7D6F2D4bCD0a7DB3B690714124a30caCDE19791e
+2022-05-09 11:55:01 ||| ---> Upgrading liquidate strategy implementation for the pancakeswap workers... <---
+2022-05-09 11:59:52 ||| - new implementation of LiquidateStrategy deployed at 0xB17e65D974c84fe85C64712221974654E3148d5f

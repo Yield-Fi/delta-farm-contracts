@@ -11,7 +11,7 @@ const func: DeployFunction = async function ({ network }: HardhatRuntimeEnvironm
     return;
   }
 
-  const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("3");
+  const CAKE_REWARD_PER_BLOCK = ethers.utils.parseEther("40");
 
   const [deployer] = await ethers.getSigners();
   const config = getConfig();
@@ -63,7 +63,31 @@ const func: DeployFunction = async function ({ network }: HardhatRuntimeEnvironm
     0
   );
 
+  await MasterChef.deployed();
+
   logger(` - Pancake MasterChef deployed at ${MasterChef.address}`);
+
+  const TokenFactory = await ethers.getContractFactory("MockToken", deployer);
+
+  const DummyToken = await TokenFactory.deploy("DummyToken", "DUMMY");
+
+  await DummyToken.deployed();
+
+  await MasterChef.set(0, 0, true);
+  await MasterChef.add(1, DummyToken.address, true);
+
+  const MasterChefV2Factory = await ethers.getContractFactory("PancakeMasterChefV2", deployer);
+
+  const MasterChefV2 = await MasterChefV2Factory.deploy(
+    MasterChef.address,
+    CAKE.address,
+    1,
+    deployer.address
+  );
+
+  await MasterChefV2.deployed();
+
+  logger(` - Pancake MasterChefV2 deployed at ${MasterChefV2.address}`);
 
   await CAKE.transferOwnership(MasterChef.address, { gasLimit: "210000" });
   await SYRUP.transferOwnership(MasterChef.address, { gasLimit: "210000" });

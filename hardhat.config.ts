@@ -2,7 +2,7 @@ import "@typechain/hardhat";
 import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-waffle";
 import "@openzeppelin/hardhat-upgrades";
-// import "hardhat-deploy";
+import "hardhat-deploy";
 import "solidity-coverage";
 // import "hardhat-contract-sizer";
 // import "hardhat-abi-exporter";
@@ -23,7 +23,7 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
 });
 
 const testnet = {
-  url: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+  url: "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/testnet",
   accounts: [process.env.TESTNET_PRIVATE_KEY ?? fallbackKey],
 };
 

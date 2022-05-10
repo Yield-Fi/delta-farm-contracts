@@ -99,7 +99,7 @@ const deployFunc: DeployFunction = async () => {
   );
   logger(`- New strategies approved successfully`);
 
-  for (const farm of config.vaults[0].workers) {
+  for (const farm of config.vaults[0].workers.pancake) {
     const _farm = PancakeswapWorker__factory.connect(farm.address, deployer);
     logger(`- Setting new strategies for farm ${farm.name} (${farm.address})`);
 
