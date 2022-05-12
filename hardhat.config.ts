@@ -5,7 +5,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "hardhat-deploy";
 import "solidity-coverage";
 // import "hardhat-contract-sizer";
-// import "hardhat-abi-exporter";
+import "hardhat-abi-exporter";
 
 import { config as dotEnvConfig } from "dotenv";
 import { task } from "hardhat/config";
@@ -38,15 +38,51 @@ export default {
     mainnet,
     testnet,
     ["testnet-dev"]: testnet,
-  },
-  solidity: {
-    version: "0.6.6",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 1,
+    hardhat: {
+      forking: {
+        url: "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/testnet",
       },
     },
+  },
+  solidity: {
+    compilers: [
+      {
+        version: "0.6.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+      {
+        version: "0.8.0",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+      {
+        version: "0.6.12",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+      {
+        version: "0.8.1",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+    ],
   },
   typechain: {
     outDir: "./typechain",

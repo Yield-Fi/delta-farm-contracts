@@ -14,7 +14,8 @@ const deployFunc: DeployFunction = async () => {
 
   const ProtocolManager = (await upgrades.upgradeProxy(
     config.protocolManager,
-    ProtocolManagerFactory
+    ProtocolManagerFactory,
+    { kind: "transparent" }
   )) as ProtocolManager;
 
   await ProtocolManager.deployed();
