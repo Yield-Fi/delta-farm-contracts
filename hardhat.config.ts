@@ -28,9 +28,8 @@ const testnet = {
 };
 
 const mainnet = {
-  url: "https://bsc-dataseed.binance.org/",
-  accounts: [process.env.TESTNET_PRIVATE_KEY ?? fallbackKey],
-  gasPrice: 20000000000,
+  url: "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/mainnet",
+  accounts: [process.env.MAINNET_PRIVATE_KEY ?? fallbackKey],
 };
 
 export default {
@@ -38,11 +37,6 @@ export default {
     mainnet,
     testnet,
     ["testnet-dev"]: testnet,
-    hardhat: {
-      forking: {
-        url: "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/testnet",
-      },
-    },
   },
   solidity: {
     compilers: [
