@@ -9,12 +9,16 @@ import { parseEther } from "@ethersproject/units";
 const deployFunc: DeployFunction = async () => {
   // The array of workers' names to deploy.
   const workersToDeploy: Array<WorkerConfigType["name"]> = [
-    "BUSD-USDT Pancakeswap V2",
-    "BUSD-DAI Pancakeswap V2",
-    "USDT-DAI Pancakeswap V2",
-    "WBNB-BUSD Pancakeswap V2",
-    "WBNB-USDT Pancakeswap V2",
-    "WBNB-CAKE Pancakeswap V2",
+    // "CAKE-WBNB Farm",
+    // "USDT-BUSD Farm",
+    // "WBNB-BUSD Farm",
+    // "DAI-BUSD Farm",
+    // "USDT-WBNB Farm",
+    "CAKE-BUSD Farm",
+    "CAKE-USDT Farm",
+    "SANTOS-BNB Farm",
+    "BTCB-BUSD Farm",
+    "UST-BUSD Farm",
   ];
 
   const [deployer] = await ethers.getSigners();

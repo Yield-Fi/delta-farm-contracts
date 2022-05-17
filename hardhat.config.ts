@@ -5,7 +5,7 @@ import "@openzeppelin/hardhat-upgrades";
 import "hardhat-deploy";
 import "solidity-coverage";
 // import "hardhat-contract-sizer";
-// import "hardhat-abi-exporter";
+import "hardhat-abi-exporter";
 
 import { config as dotEnvConfig } from "dotenv";
 import { task } from "hardhat/config";
@@ -28,9 +28,8 @@ const testnet = {
 };
 
 const mainnet = {
-  url: "https://bsc-dataseed.binance.org/",
-  accounts: [process.env.TESTNET_PRIVATE_KEY ?? fallbackKey],
-  gasPrice: 20000000000,
+  url: "https://speedy-nodes-nyc.moralis.io/83540647ff8090fcdcb13b29/bsc/mainnet",
+  accounts: [process.env.MAINNET_PRIVATE_KEY ?? fallbackKey],
 };
 
 export default {
@@ -40,13 +39,44 @@ export default {
     ["testnet-dev"]: testnet,
   },
   solidity: {
-    version: "0.6.6",
-    settings: {
-      optimizer: {
-        enabled: true,
-        runs: 1,
+    compilers: [
+      {
+        version: "0.6.6",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
       },
-    },
+      {
+        version: "0.8.0",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+      {
+        version: "0.6.12",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+      {
+        version: "0.8.1",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+    ],
   },
   typechain: {
     outDir: "./typechain",

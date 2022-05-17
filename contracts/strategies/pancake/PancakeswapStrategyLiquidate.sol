@@ -154,17 +154,17 @@ contract PancakeswapStrategyLiquidate is
     // 3. Estimate and return amount of base token to receive
     if (token0 == baseToken) {
       return
-        _estimateSwapOutput(token1, baseToken, userToken1, userToken1, userToken0).add(userToken0);
+        _estimateSwapOutput(token1, baseToken, userToken1).add(userToken0);
     }
 
     if (token1 == baseToken) {
       return
-        _estimateSwapOutput(token0, baseToken, userToken0, userToken0, userToken1).add(userToken1);
+        _estimateSwapOutput(token0, baseToken, userToken0).add(userToken1);
     }
 
     return
-      _estimateSwapOutput(token0, baseToken, userToken0, userToken0, 0).add(
-        _estimateSwapOutput(token1, baseToken, userToken1, userToken1, 0)
+      _estimateSwapOutput(token0, baseToken, userToken0).add(
+        _estimateSwapOutput(token1, baseToken, userToken1)
       );
   }
 
@@ -172,9 +172,7 @@ contract PancakeswapStrategyLiquidate is
   function _estimateSwapOutput(
     address tokenIn,
     address tokenOut,
-    uint256 amountIn,
-    uint256 reserveInToSubtract,
-    uint256 reserveOutToSubtract
+    uint256 amountIn
   ) internal view returns (uint256) {
     if (amountIn <= 0) {
       return 0;
