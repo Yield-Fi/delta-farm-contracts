@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import './openzeppelin/SafeERC20.sol';
-import './openzeppelin/SafeMath.sol';
-import '@openzeppelin/contracts/access/Ownable.sol';
+import './openzeppelin/token/ERC20/IERC20.sol';
+import './openzeppelin/token/ERC20/utils/SafeERC20.sol';
+import './openzeppelin/utils/math/SafeMath.sol';
+import './openzeppelin/access/Ownable.sol';
 import "./SpookyToken.sol";
 
 // The Spooky Garden is a fork of MasterChef by SushiSwap

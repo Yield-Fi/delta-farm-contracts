@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "./openzeppelin/draft-EIP712.sol";
-import "./openzeppelin/ECDSA.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "./openzeppelin/token/ERC20/ERC20.sol";
+import "./openzeppelin/utils/cryptography/draft-EIP712.sol";
+import "./openzeppelin/utils/cryptography/ECDSA.sol";
+import "./openzeppelin/utils/Counters.sol";
 
 
 // This version of ERC20Permit is from OpenZeppelin as of commit

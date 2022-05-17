@@ -50,15 +50,6 @@ export default {
         },
       },
       {
-        version: "0.8.0",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 1,
-          },
-        },
-      },
-      {
         version: "0.6.12",
         settings: {
           optimizer: {
@@ -68,7 +59,16 @@ export default {
         },
       },
       {
-        version: "0.8.1",
+        version: "0.8.9",
+        settings: {
+          optimizer: {
+            enabled: true,
+            runs: 1,
+          },
+        },
+      },
+      {
+        version: "0.8.4",
         settings: {
           optimizer: {
             enabled: true,

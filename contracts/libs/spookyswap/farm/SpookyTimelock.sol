@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
-import './openzeppelin/TokenTimelock.sol';
-import './openzeppelin/SafeERC20.sol';
+import './openzeppelin/token/ERC20/IERC20.sol';
+import './openzeppelin/token/ERC20/utils/TokenTimelock.sol';
+import './openzeppelin/token/ERC20/utils/SafeERC20.sol';
 
 // The spookylock leverages using openzeppelin timelock for maximum safety. Its also spooky and haunted.
 // To see openzepplin's audits goto: https://github.com/OpenZeppelin/openzeppelin-contracts/tree/master/audit
