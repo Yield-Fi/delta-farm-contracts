@@ -15,7 +15,7 @@ import {
   PancakeswapWorker,
   PancakeswapWorker__factory,
   ProtocolManager,
-} from "../typechain";
+} from "../../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
 import chai from "chai";
@@ -27,12 +27,12 @@ import {
   deployProxyContract,
   deployTokens,
   time,
-} from "./helpers";
+} from "../helpers";
 import { parseEther } from "@ethersproject/units";
-import { SwapHelper } from "./helpers/swap";
-import { MockWBNB } from "../typechain";
-import { assertAlmostEqual } from "./helpers/assert";
-import { MockVault } from "../typechain/MockVault";
+import { SwapHelper } from "../helpers/swap";
+import { MockWBNB } from "../../typechain";
+import { assertAlmostEqual } from "../helpers/assert";
+import { MockVault } from "../../typechain/MockVault";
 
 chai.use(solidity);
 const { expect } = chai;

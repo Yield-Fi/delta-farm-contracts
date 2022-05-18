@@ -16,21 +16,21 @@ import {
   PancakeswapStrategyAddToPoolWithoutBaseToken,
   ProtocolManager,
   PancakeMasterChefV2,
-} from "../typechain";
+} from "../../typechain";
 import { ethers, waffle } from "hardhat";
-import { deployToken, deployWBNB } from "./helpers/deployToken";
+import { deployToken, deployWBNB } from "../helpers/deployToken";
 
-import { MockToken } from "../typechain/MockToken";
-import { PancakeswapStrategyLiquidate } from "../typechain/PancakeswapStrategyLiquidate";
-import { PancakeswapWorker } from "../typechain/PancakeswapWorker";
-import { SwapHelper } from "./helpers/swap";
+import { MockToken } from "../../typechain/MockToken";
+import { PancakeswapStrategyLiquidate } from "../../typechain/PancakeswapStrategyLiquidate";
+import { PancakeswapWorker } from "../../typechain/PancakeswapWorker";
+import { SwapHelper } from "../helpers/swap";
 import chai from "chai";
-import { deployPancakeStrategies } from "./helpers/deployStrategies";
-import { deployPancakeV2, deployProxyContract } from "./helpers";
-import { deployPancakeWorkerV2 } from "./helpers/deployWorker";
-import { deployVault } from "./helpers/deployVault";
+import { deployPancakeStrategies } from "../helpers/deployStrategies";
+import { deployPancakeV2, deployProxyContract } from "../helpers";
+import { deployPancakeWorkerV2 } from "../helpers/deployWorker";
+import { deployVault } from "../helpers/deployVault";
 import { solidity } from "ethereum-waffle";
-import { assertAlmostEqual } from "./helpers/assert";
+import { assertAlmostEqual } from "../helpers/assert";
 import { parseEther } from "@ethersproject/units";
 
 chai.use(solidity);
@@ -394,13 +394,19 @@ describe("Client contract", async () => {
         parseEther("2").toString(),
         "first + second not eq 2 ETH"
       );
-      expect(amountOfToken0.toString()).to.be.eq(
-        parseEther("0.997400509299197405").toString(),
+      expect(amountOfToken0.toString()).to.be.oneOf(
+        [
+          parseEther("0.997400509299197405").toString(),
+          parseEther("1.0000000000000000000").toString(),
+        ],
         "amountOfToken0 not eq ~1 ETH"
       );
-      expect(amountOfToken1.toString()).to.be.eq(
-        parseEther("1.0000000000000000000").toString(),
-        "amountOfToken1 not eq 1 ETH"
+      expect(amountOfToken1.toString()).to.be.oneOf(
+        [
+          parseEther("0.997400509299197405").toString(),
+          parseEther("1.0000000000000000000").toString(),
+        ],
+        "amountOfToken1 not eq ~1 ETH"
       );
     });
   });

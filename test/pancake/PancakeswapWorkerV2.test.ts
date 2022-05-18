@@ -5,7 +5,6 @@ import {
   MockToken__factory,
   PancakeFactory,
   PancakeMasterChefV2,
-  PancakeMasterChefV2__factory,
   PancakePair,
   PancakePair__factory,
   PancakeRouterV2,
@@ -15,7 +14,7 @@ import {
   PancakeswapWorker,
   PancakeswapWorker__factory,
   ProtocolManager,
-} from "../typechain";
+} from "../../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
 import chai from "chai";
@@ -27,18 +26,17 @@ import {
   deployProxyContract,
   deployTokens,
   time,
-} from "./helpers";
+} from "../helpers";
 import { parseEther } from "@ethersproject/units";
-import { SwapHelper } from "./helpers/swap";
-import { MockWBNB } from "../typechain";
-import { assertAlmostEqual } from "./helpers/assert";
-import { MockVault } from "../typechain/MockVault";
+import { SwapHelper } from "../helpers/swap";
+import { MockWBNB } from "../../typechain";
+import { assertAlmostEqual } from "../helpers/assert";
+import { MockVault } from "../../typechain/MockVault";
 
 chai.use(solidity);
 const { expect } = chai;
 
 describe("PancakeswapWorkerV2", () => {
-  const CAKE_PER_BLOCK = parseEther("2.514");
   const DEFI_FEE_BPS = "100";
 
   let deployer: Signer;
@@ -56,8 +54,6 @@ describe("PancakeswapWorkerV2", () => {
   let WorkerTOK0_TOK1: PancakeswapWorker;
   let PancakeFactory: PancakeFactory;
   let MasterChefV2: PancakeMasterChefV2;
-  let MasterChefV2__account1: PancakeMasterChefV2;
-  let MasterChefV2__account2: PancakeMasterChefV2;
   let PancakeRouterV2: PancakeRouterV2;
   let CakeToken: CakeToken;
 
@@ -70,8 +66,6 @@ describe("PancakeswapWorkerV2", () => {
   let Token0: MockToken;
   let Token1: MockToken;
   let lpBUSD_TOK0__deployer: PancakePair;
-  let lpBUSD_TOK0__account1: PancakePair;
-  let lpBUSD_TOK0__account2: PancakePair;
 
   let lpTOK0_TOK1__deployer: PancakePair;
 
@@ -263,11 +257,6 @@ describe("PancakeswapWorkerV2", () => {
         amount1desired: ethers.utils.parseEther("10000"),
       },
     ]);
-
-    lpBUSD_TOK0__account1 = PancakePair__factory.connect(lpBUSD_TOK0, account1);
-    lpBUSD_TOK0__account2 = PancakePair__factory.connect(lpBUSD_TOK0, account2);
-    MasterChefV2__account1 = PancakeMasterChefV2__factory.connect(MasterChefV2.address, account1);
-    MasterChefV2__account2 = PancakeMasterChefV2__factory.connect(MasterChefV2.address, account2);
 
     BaseToken__account1 = MockToken__factory.connect(BaseToken.address, account1);
   }

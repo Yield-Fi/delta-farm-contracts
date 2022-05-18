@@ -14,14 +14,14 @@ import {
   ProtocolManager,
   WBNB,
   WBNB__factory,
-} from "../typechain";
+} from "../../typechain";
 import { ethers, upgrades, waffle } from "hardhat";
 
 import { Signer } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 import { parseEther } from "@ethersproject/units";
-import { deployProxyContract } from "./helpers";
+import { deployProxyContract } from "../helpers";
 
 chai.use(solidity);
 const { expect } = chai;

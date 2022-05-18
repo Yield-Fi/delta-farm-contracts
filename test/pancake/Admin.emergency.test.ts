@@ -18,19 +18,19 @@ import {
   PancakeMasterChefV2,
   PancakeswapWorkerV2,
   PancakeswapStrategyLiquidate,
-} from "../typechain";
+} from "../../typechain";
 import { ethers, waffle } from "hardhat";
-import { deployToken, deployWBNB } from "./helpers/deployToken";
+import { deployToken, deployWBNB } from "../helpers/deployToken";
 
-import { MockToken } from "../typechain/MockToken";
-import { SwapHelper } from "./helpers/swap";
+import { MockToken } from "../../typechain/MockToken";
+import { SwapHelper } from "../helpers/swap";
 import chai from "chai";
-import { deployPancakeStrategies } from "./helpers/deployStrategies";
-import { deployPancakeV2, deployProxyContract } from "./helpers";
-import { deployPancakeWorkerV2 } from "./helpers/deployWorker";
-import { deployVault } from "./helpers/deployVault";
+import { deployPancakeStrategies } from "../helpers/deployStrategies";
+import { deployPancakeV2, deployProxyContract } from "../helpers";
+import { deployPancakeWorkerV2 } from "../helpers/deployWorker";
+import { deployVault } from "../helpers/deployVault";
 import { solidity } from "ethereum-waffle";
-import { assertAlmostEqual } from "./helpers/assert";
+import { assertAlmostEqual } from "../helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;

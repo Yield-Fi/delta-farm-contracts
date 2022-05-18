@@ -11,24 +11,22 @@ import {
   PancakeswapStrategyAddToPoolWithoutBaseToken,
   PancakeswapStrategyAddToPoolWithoutBaseToken__factory,
   ProtocolManager,
-} from "../typechain";
+} from "../../typechain";
 import { ethers, waffle } from "hardhat";
 
 import { Signer, BigNumber } from "ethers";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";
 import { parseEther } from "@ethersproject/units";
-import { deployContract, deployPancakeV2, deployProxyContract, deployTokens } from "./helpers";
-import { SwapHelper } from "./helpers/swap";
+import { deployContract, deployPancakeV2, deployProxyContract, deployTokens } from "../helpers";
+import { SwapHelper } from "../helpers/swap";
 import { defaultAbiCoder } from "@ethersproject/abi";
-import { assertAlmostEqual } from "./helpers/assert";
+import { assertAlmostEqual } from "../helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;
 
 describe("PancakeswapStrategyAddToPoolWithoutBaseToken", () => {
-  const CAKE_PER_BLOCK = parseEther("1");
-
   let protocolManager: ProtocolManager;
 
   let deployer: Signer;

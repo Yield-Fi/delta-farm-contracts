@@ -1,8 +1,8 @@
 import { ethers, network, upgrades } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { mainnetConfig } from "../configs";
+import { mainnetConfig } from "../../configs";
 import { formatEther, parseEther } from "ethers/lib/utils";
-import { PancakeswapWorkerV2, ProtocolManager__factory } from "../typechain";
+import { PancakeswapWorkerV2, ProtocolManager__factory } from "../../typechain";
 import { expect } from "chai";
 
 // Tests have been written to tests deployment process of new version of workers on mainnet

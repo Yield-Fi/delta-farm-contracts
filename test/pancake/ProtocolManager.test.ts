@@ -15,13 +15,13 @@ import {
   ProtocolManager,
   Client,
   PancakeMasterChefV2,
-} from "../typechain";
+} from "../../typechain";
 import { ethers, waffle } from "hardhat";
-import { deployToken, deployWBNB } from "./helpers/deployToken";
+import { deployToken, deployWBNB } from "../helpers/deployToken";
 import chai from "chai";
-import { deployPancakeV2, deployProxyContract } from "./helpers";
-import { deployPancakeWorkerV2 } from "./helpers/deployWorker";
-import { deployVault } from "./helpers/deployVault";
+import { deployPancakeV2, deployProxyContract } from "../helpers";
+import { deployPancakeWorkerV2 } from "../helpers/deployWorker";
+import { deployVault } from "../helpers/deployVault";
 import { solidity } from "ethereum-waffle";
 
 chai.use(solidity);
@@ -35,7 +35,6 @@ describe("ProtocolManager", async () => {
   let router: PancakeRouterV2;
   let masterChef: PancakeMasterChefV2;
   let pancakeswapWorker01: PancakeswapWorker;
-  let pancakeswapWorker02: PancakeswapWorker;
   let lp: PancakePair;
   let mockWBNB: MockWBNB;
 
@@ -132,20 +131,6 @@ describe("ProtocolManager", async () => {
     pancakeswapWorker01 = await deployPancakeWorkerV2(
       vault,
       "pancakeswapWorker01",
-      baseToken,
-      masterChef,
-      router,
-      POOL_ID,
-      [cake.address, mockWBNB.address, baseToken.address],
-      0,
-      REINVEST_BOUNTY_BPS,
-      protocolManager.address,
-      deployer
-    );
-
-    pancakeswapWorker02 = await deployPancakeWorkerV2(
-      vault,
-      "pancakeswapWorker02",
       baseToken,
       masterChef,
       router,
