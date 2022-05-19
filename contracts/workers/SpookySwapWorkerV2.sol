@@ -2,25 +2,25 @@ pragma solidity 0.6.6;
 
 import "@openzeppelin/contracts-ethereum-package/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts-ethereum-package/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts-ethereum-package/contracts/Initializable.sol";
 
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
+import "../libs/spookyswap/core/interfaces/IUniswapV2Factory.sol";
+import "../libs/spookyswap/core/interfaces/IUniswapV2Pair.sol";
+import "../libs/spookyswap/core/interfaces/IUniswapV2Router02.sol";
+import "../libs/spookyswap/core/libraries/UniswapV2Library.sol";
+import "../libs/spookyswap/farm/interfaces/ISpookySwapMasterChefV2.sol";
 
-import "../libs/pancake/interfaces/IPancakeRouterV2.sol";
-import "../libs/pancake/PancakeLibraryV2.sol";
 import "../interfaces/IStrategy.sol";
 import "../interfaces/IWorker.sol";
-import "../libs/pancake/interfaces/IMasterChef.sol";
 import "../utils/CustomMath.sol";
 import "../utils/SafeToken.sol";
 import "../interfaces/IVault.sol";
 import "../interfaces/IProtocolManager.sol";
 
-/// @dev Contract responsible for Pancakeswap liquidity pool handling.
+/// @dev Contract responsible for Panbooswap liquidity pool handling.
 /// Allows execute specific strategies to add, remove liquidity and harvesting rewards.
-contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWorker {
+contract SpookySwapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IWorker {
   /// @notice Libraries
   using SafeToken for address;
   using SafeMath for uint256;
@@ -86,20 +86,20 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   );
 
   /// @notice Configuration variables
-  IPancakeFactory public factory;
-  IMasterChef public masterChef;
-  IPancakeRouterV2 public router;
+  IUniswapV2Factory public factory;
+  ISpookySwapMasterChefV2 public masterChef;
+  IUniswapV2Router02 public router;
   address public override lpToken;
   address public wNative;
   string name;
   address public override baseToken;
   address public override token0;
   address public override token1;
-  address public cake;
+  address public boo;
   address public override operatingVault;
   uint256 public pid;
   IProtocolManager protocolManager;
-  /// @notice Configuration variables for PancakeswapV2
+  /// @notice Configuration variables for PanbooswapV2
   uint256 public fee;
   uint256 public feeDenom;
 
@@ -124,8 +124,8 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     string calldata _name,
     address _operatingVault,
     address _baseToken,
-    IMasterChef _masterChef,
-    IPancakeRouterV2 _router,
+    ISpookySwapMasterChefV2 _masterChef,
+    IUniswapV2Router02 _router,
     uint256 _pid,
     address[] calldata _harvestPath,
     uint256 _harvestThreshold,
@@ -141,18 +141,18 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     wNative = _router.WETH();
     masterChef = _masterChef;
     router = _router;
-    factory = IPancakeFactory(_router.factory());
+    factory = IUniswapV2Factory(_router.factory());
     protocolManager = _protocolManager;
 
     // 3. Assign tokens state variables
     name = _name;
     baseToken = _baseToken;
     pid = _pid;
-    IERC20 _lpToken = IERC20(address(masterChef.lpToken(_pid)));
+    IERC20 _lpToken = masterChef.lpToken(_pid);
     lpToken = address(_lpToken);
-    token0 = IPancakePair(lpToken).token0();
-    token1 = IPancakePair(lpToken).token1();
-    cake = address(masterChef.CAKE());
+    token0 = IUniswapV2Pair(lpToken).token0();
+    token1 = IUniswapV2Pair(lpToken).token1();
+    boo = address(masterChef.BOO());
     isEnabled = true;
 
     // 5. Assign Re-invest parameters
@@ -160,22 +160,22 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     harvestThreshold = _harvestThreshold;
     harvestPath = _harvestPath;
 
-    // 6. Set PancakeswapV2 swap fees
+    // 6. Set PanbooswapV2 swap fees
     fee = 9975;
     feeDenom = 10000;
 
     // 7. Check if critical parameters are config properly
     require(
-      baseToken != cake,
-      "PancakeswapWorker->initialize: base token cannot be a reward token"
+      baseToken != boo,
+      "Base token cannot be a reward token"
     );
     require(
       _harvestPath.length >= 2,
-      "PancakeswapWorker->setHarvestConfig: _harvestPath length must >= 2"
+      "HarvestPath length must >= 2"
     );
     require(
-      _harvestPath[0] == cake && _harvestPath[_harvestPath.length - 1] == baseToken,
-      "PancakeswapWorker->setHarvestConfig: _harvestPath must start with CAKE, end with baseToken"
+      _harvestPath[0] == boo && _harvestPath[_harvestPath.length - 1] == baseToken,
+      "HarvestPath must start with BOO, end with baseToken"
     );
   }
 
@@ -183,7 +183,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   modifier onlyOperatingVault() {
     require(
       msg.sender == operatingVault,
-      "PancakeswapWorker->onlyOperatingVault: not operatingVault"
+      "Not operatingVault"
     );
     _;
   }
@@ -191,7 +191,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   modifier onlyAdminContract() {
     require(
       protocolManager.isAdminContract(msg.sender),
-      "PancakeswapWorker->onlyAdminContract: not admin contract"
+      "Not admin contract"
     );
     _;
   }
@@ -200,7 +200,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   modifier onlyHarvester() {
     require(
       protocolManager.approvedHarvesters(msg.sender),
-      "PancakeswapWorker->onlyHarvester: not harvester"
+      "Not harvester"
     );
     _;
   }
@@ -208,7 +208,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   modifier onlyClientContract() {
     require(
       protocolManager.approvedClients(msg.sender),
-      "PancakeswapWorker->onlyClientContract: not client contract"
+      "Not client contract"
     );
     _;
   }
@@ -236,12 +236,12 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   function harvestRewards() external override onlyHarvester nonReentrant {
     // 1. Withdraw all the rewards. Return if reward <= _harvestThreshold.
     masterChef.withdraw(pid, 0);
-    uint256 reward = cake.balanceOf(address(this));
+    uint256 reward = boo.balanceOf(address(this));
 
     if (reward <= harvestThreshold) return;
 
     // 2. Approve tokens
-    cake.safeApprove(address(router), uint256(-1));
+    boo.safeApprove(address(router), uint256(-1));
 
     // 3. Convert all rewards to BaseToken according to config path.
     router.swapExactTokensForTokens(reward, 0, getHarvestPath(), address(this), block.timestamp);
@@ -265,7 +265,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     IVault(operatingVault).registerRewards(positionIds, rewardsPerPosition);
 
     // 7. Reset approval
-    cake.safeApprove(address(router), 0);
+    boo.safeApprove(address(router), 0);
 
     emit Harvest(reward, baseTokenBalance, operatingVault);
   }
@@ -284,17 +284,17 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
 
     // Revert transaction when farm is disabled and strategy to add liquidity is used
     if (!isEnabled && (strategy == strategies[0] || strategy == strategies[1])) {
-      revert("PancakeswapWorker->work: given farm is disabled");
+      revert("Given farm is disabled");
     }
 
     addPositionId(positionId);
     // 1. Convert this position back to LP tokens.
     _removeShare(positionId);
     // 2. Transfer funds and perform the worker strategy.
-    require(approvedStrategies[strategy], "PancakeswapWorker->work: unapproved work strategy");
+    require(approvedStrategies[strategy], "Unapproved work strategy");
     require(
-      IPancakePair(lpToken).transfer(strategy, lpToken.balanceOf(address(this))),
-      "PancakeswapWorker->work: unable to transfer lp to strategy"
+      IUniswapV2Pair(lpToken).transfer(strategy, lpToken.balanceOf(address(this))),
+      "Unable to transfer lp to strategy"
     );
 
     baseToken.safeTransfer(strategy, baseToken.myBalance());
@@ -315,10 +315,10 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   function tokensToReceive(uint256 id) external view override returns (uint256) {
     // 1. Get the position's LP balance and LP total supply.
     uint256 lpBalance = shareToBalance(shares[id]);
-    uint256 lpSupply = IPancakePair(lpToken).totalSupply(); // Ignore pending mintFee as it is insignificant
+    uint256 lpSupply = IUniswapV2Pair(lpToken).totalSupply(); // Ignore pending mintFee as it is insignificant
     // 2. Get the reserves of token0 and token1 in the pool
-    (uint256 r0, uint256 r1, ) = IPancakePair(lpToken).getReserves();
-    (uint256 totalToken0, uint256 totalToken1) = IPancakePair(lpToken).token0() == token0 ? (r0, r1) : (r1, r0);
+    (uint256 r0, uint256 r1, ) = IUniswapV2Pair(lpToken).getReserves();
+    (uint256 totalToken0, uint256 totalToken1) = IUniswapV2Pair(lpToken).token0() == token0 ? (r0, r1) : (r1, r0);
     // 3. Convert the position's LP tokens to the underlying assets.
     uint256 userToken0 = lpBalance.mul(totalToken0).div(lpSupply);
     uint256 userToken1 = lpBalance.mul(totalToken1).div(lpSupply);
@@ -337,7 +337,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
       );
   }
 
-  /// Internal function to estimate swap result on pancakeswap router
+  /// Internal function to estimate swap result on panbooswap router
   function _estimateSwapOutput(
     address tokenIn,
     address tokenOut,
@@ -360,7 +360,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
       address(lpToken).safeApprove(address(masterChef), uint256(-1));
       // 2. Convert balance to share
       uint256 share = balanceToShare(balance);
-      // 3. Deposit balance to PancakeMasterChef
+      // 3. Deposit balance to PanbooMasterChef
       masterChef.deposit(pid, balance);
       // 4. Update shares
       shares[id] = shares[id].add(share);
@@ -389,7 +389,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   function setStrategies(address[] calldata supportedStrategies) external override onlyOwner {
     require(
       supportedStrategies.length == 3,
-      "PancakeswapWorker->setStrategies: Array of strategies must have 3 items"
+      "Array of strategies must have 3 items"
     );
     strategies = supportedStrategies;
     for (uint256 i; i < strategies.length; i++) {
@@ -412,11 +412,11 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     address[] memory path;
     if (baseToken == wNative) {
       path = new address[](2);
-      path[0] = address(cake);
+      path[0] = address(boo);
       path[1] = address(wNative);
     } else {
       path = new address[](3);
-      path[0] = address(cake);
+      path[0] = address(boo);
       path[1] = address(wNative);
       path[2] = address(baseToken);
     }
@@ -438,11 +438,11 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   {
     require(
       _harvestPath.length >= 2,
-      "PancakeswapWorker->setHarvestConfig: _harvestPath length must >= 2"
+      "HarvestPath length must >= 2"
     );
     require(
-      _harvestPath[0] == cake && _harvestPath[_harvestPath.length - 1] == baseToken,
-      "PancakeswapWorker->setHarvestConfig: _harvestPath must start with CAKE, end with baseToken"
+      _harvestPath[0] == boo && _harvestPath[_harvestPath.length - 1] == baseToken,
+      "HarvestPath must start with CAKE, end with baseToken"
     );
 
     harvestThreshold = _harvestThreshold;
@@ -500,7 +500,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   }
 
   function getRewardToken() external view override returns (address) {
-    return cake;
+    return boo;
   }
 
   /// @dev harvestRewards equivalent without ACL and payout checks.
@@ -509,10 +509,10 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
   function forceHarvest() external override nonReentrant onlyOperatingVault {
     // 1. Withdraw all the rewards.
     masterChef.withdraw(pid, 0);
-    uint256 reward = cake.balanceOf(address(this));
+    uint256 reward = boo.balanceOf(address(this));
 
     // 2. Approve tokens
-    cake.safeApprove(address(router), uint256(-1));
+    boo.safeApprove(address(router), uint256(-1));
 
     // 3. Convert all rewards to BaseToken according to config path.
     router.swapExactTokensForTokens(reward, 0, getHarvestPath(), address(this), block.timestamp);
@@ -536,7 +536,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     IVault(operatingVault).registerRewards(positionIds, rewardsPerPosition);
 
     // 7. Reset approval
-    cake.safeApprove(address(router), 0);
+    boo.safeApprove(address(router), 0);
 
     emit Harvest(reward, baseTokenBalance, operatingVault);
   }
@@ -557,8 +557,8 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     _removeShare(positionId);
     // 2. Transfer funds and perform the worker strategy.
     require(
-      IPancakePair(lpToken).transfer(liquidation, lpToken.balanceOf(address(this))),
-      "PancakeswapWorker->emergencyWithdraw: unable to transfer lp to strategy"
+      IUniswapV2Pair(lpToken).transfer(liquidation, lpToken.balanceOf(address(this))),
+      "Unable to transfer lp to strategy"
     );
 
     bytes memory data = abi.encode(
@@ -588,13 +588,13 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
 
     address[] memory bestPath = new address[](3);
 
-    (uint256 reserveIn, uint256 reserveOut) = PancakeLibraryV2.getReserves(
+    (uint256 reserveIn, uint256 reserveOut) = UniswapV2Library.getReserves(
       address(factory),
       _token0,
       _token1
     );
 
-    uint256 bestAmountOut = PancakeLibraryV2.getAmountOut(amountIn, reserveIn, reserveOut);
+    uint256 bestAmountOut = UniswapV2Library.getAmountOut(amountIn, reserveIn, reserveOut);
     bestPath[0] = _token0;
     bestPath[1] = _token1;
 
@@ -608,7 +608,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
         path[1] = stable;
         path[2] = _token1;
 
-        uint256[] memory tempAmountOut = PancakeLibraryV2.getAmountsOut(
+        uint256[] memory tempAmountOut = UniswapV2Library.getAmountsOut(
           address(factory),
           amountIn,
           path
@@ -632,7 +632,7 @@ contract PancakeswapWorkerV2 is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, 
     view
     returns (uint256)
   {
-    uint256[] memory amounts = PancakeLibraryV2.getAmountsOut(address(factory), amountIn, _path);
+    uint256[] memory amounts = UniswapV2Library.getAmountsOut(address(factory), amountIn, _path);
 
     return amounts[amounts.length - 1];
   }

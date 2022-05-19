@@ -89,7 +89,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   IPancakeFactory public factory;
   IPancakeMasterChef public masterChef;
   IPancakeRouterV2 public router;
-  IPancakePair public override lpToken;
+  address public override lpToken;
   address public wNative;
   string name;
   address public override baseToken;
@@ -149,9 +149,9 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     baseToken = _baseToken;
     pid = _pid;
     (IERC20 _lpToken, , , ) = masterChef.poolInfo(_pid);
-    lpToken = IPancakePair(address(_lpToken));
-    token0 = lpToken.token0();
-    token1 = lpToken.token1();
+    lpToken = address(_lpToken);
+    token0 = IPancakePair(lpToken).token0();
+    token1 = IPancakePair(lpToken).token1();
     cake = address(masterChef.cake());
     isEnabled = true;
 
@@ -293,14 +293,14 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     // 2. Transfer funds and perform the worker strategy.
     require(approvedStrategies[strategy], "PancakeswapWorker->work: unapproved work strategy");
     require(
-      lpToken.transfer(strategy, lpToken.balanceOf(address(this))),
+      IPancakePair(lpToken).transfer(strategy, IPancakePair(lpToken).balanceOf(address(this))),
       "PancakeswapWorker->work: unable to transfer lp to strategy"
     );
 
     baseToken.safeTransfer(strategy, baseToken.myBalance());
 
     uint256 amount_to_receive = IStrategy(strategy).execute(stratParams);
-    
+
     // 3. Add LP tokens back to the farming pool.
     _addShare(positionId);
     // 4. Return any remaining BaseToken back to the operatingVault.
@@ -315,10 +315,10 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
   function tokensToReceive(uint256 id) external view override returns (uint256) {
     // 1. Get the position's LP balance and LP total supply.
     uint256 lpBalance = shareToBalance(shares[id]);
-    uint256 lpSupply = lpToken.totalSupply(); // Ignore pending mintFee as it is insignificant
+    uint256 lpSupply = IPancakePair(lpToken).totalSupply(); // Ignore pending mintFee as it is insignificant
     // 2. Get the reserves of token0 and token1 in the pool
-    (uint256 r0, uint256 r1, ) = lpToken.getReserves();
-    (uint256 totalToken0, uint256 totalToken1) = lpToken.token0() == token0 ? (r0, r1) : (r1, r0);
+    (uint256 r0, uint256 r1, ) = IPancakePair(lpToken).getReserves();
+    (uint256 totalToken0, uint256 totalToken1) = IPancakePair(lpToken).token0() == token0 ? (r0, r1) : (r1, r0);
     // 3. Convert the position's LP tokens to the underlying assets.
     uint256 userToken0 = lpBalance.mul(totalToken0).div(lpSupply);
     uint256 userToken1 = lpBalance.mul(totalToken1).div(lpSupply);
@@ -557,7 +557,7 @@ contract PancakeswapWorker is OwnableUpgradeSafe, ReentrancyGuardUpgradeSafe, IW
     _removeShare(positionId);
     // 2. Transfer funds and perform the worker strategy.
     require(
-      lpToken.transfer(liquidation, lpToken.balanceOf(address(this))),
+      IPancakePair(lpToken).transfer(liquidation, lpToken.balanceOf(address(this))),
       "PancakeswapWorker->emergencyWithdraw: unable to transfer lp to strategy"
     );
 

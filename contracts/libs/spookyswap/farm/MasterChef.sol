@@ -17,7 +17,7 @@ import "./SpookyToken.sol";
 // distributed and the community can show to govern itself.
 //
 // Have fun reading it. Hopefully it's bug-free.
-contract MasterChef is Ownable {
+contract SpookySwapMasterChef is Ownable {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 

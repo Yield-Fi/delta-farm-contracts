@@ -9,8 +9,6 @@ import './libraries/SafeMath.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IWETH.sol';
 
-import "hardhat/console.sol";
-
 contract UniswapV2Router02 is IUniswapV2Router02 {
     using SafeMath for uint;
 
