@@ -1423,7 +1423,6 @@ contract SyrupBar is BEP20("SyrupBar Token", "SYRUP") {
   }
 }
 
-// import "@nomiclabs/buidler/console.sol";
 interface IMigratorChef {
   // Perform LP token migration from legacy PancakeSwap to CakeSwap.
   // Take the current LP token address and return the new LP token address.

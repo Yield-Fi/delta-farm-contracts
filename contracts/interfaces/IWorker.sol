@@ -1,8 +1,5 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity 0.6.6;
-
-import "@pancakeswap-libs/pancake-swap-core/contracts/interfaces/IPancakePair.sol";
 
 interface IWorker {
   /// @dev Work on a (potentially new) position. Optionally send token back to Vault.
@@ -21,7 +18,7 @@ interface IWorker {
   function getStrategies() external view returns (address[] memory);
 
   /// @dev LP token holds by worker
-  function lpToken() external view returns (IPancakePair);
+  function lpToken() external view returns (address);
 
   /// @dev Token that is swapped for tokens from pool
   function baseToken() external view returns (address);

@@ -8,6 +8,13 @@ import {
   PancakeswapStrategyLiquidate,
   PancakeswapStrategyLiquidate__factory,
   ProtocolManager,
+  SpookySwapStrategyAddToPoolWithBaseToken,
+  SpookySwapStrategyAddToPoolWithBaseToken__factory,
+  SpookySwapStrategyAddToPoolWithoutBaseToken,
+  SpookySwapStrategyAddToPoolWithoutBaseToken__factory,
+  SpookySwapStrategyLiquidate,
+  SpookySwapStrategyLiquidate__factory,
+  UniswapV2Router02,
 } from "../../typechain";
 import { ethers, upgrades } from "hardhat";
 
@@ -59,5 +66,54 @@ export const deployPancakeStrategies = async (
     PancakeswapStrategyAddToPoolWithBaseToken,
     PancakeswapStrategyAddToPoolWithoutBaseToken,
     PancakeswapStrategyLiquidate,
+  ];
+};
+
+export const deploySpookySwapStrategies = async (
+  router: UniswapV2Router02,
+  deployer: Signer,
+  protocolManager: ProtocolManager
+): Promise<
+  [
+    SpookySwapStrategyAddToPoolWithBaseToken,
+    SpookySwapStrategyAddToPoolWithoutBaseToken,
+    SpookySwapStrategyLiquidate
+  ]
+> => {
+  /// Setup strategy
+  const SpookySwapStrategyAddToPoolWithBaseTokenFactory = (await ethers.getContractFactory(
+    "SpookySwapStrategyAddToPoolWithBaseToken",
+    deployer
+  )) as SpookySwapStrategyAddToPoolWithBaseToken__factory;
+  const SpookySwapStrategyAddToPoolWithBaseToken = (await upgrades.deployProxy(
+    SpookySwapStrategyAddToPoolWithBaseTokenFactory,
+    [router.address, protocolManager.address]
+  )) as SpookySwapStrategyAddToPoolWithBaseToken;
+  await SpookySwapStrategyAddToPoolWithBaseToken.deployed();
+
+  const SpookySwapStrategyAddToPoolWithoutBaseTokenFactory = (await ethers.getContractFactory(
+    "SpookySwapStrategyAddToPoolWithoutBaseToken",
+    deployer
+  )) as SpookySwapStrategyAddToPoolWithoutBaseToken__factory;
+  const SpookySwapStrategyAddToPoolWithoutBaseToken = (await upgrades.deployProxy(
+    SpookySwapStrategyAddToPoolWithoutBaseTokenFactory,
+    [router.address, protocolManager.address]
+  )) as SpookySwapStrategyAddToPoolWithoutBaseToken;
+  await SpookySwapStrategyAddToPoolWithoutBaseToken.deployed();
+
+  const SpookySwapStrategyLiquidateFactory = (await ethers.getContractFactory(
+    "SpookySwapStrategyLiquidate",
+    deployer
+  )) as SpookySwapStrategyLiquidate__factory;
+  const SpookySwapStrategyLiquidate = (await upgrades.deployProxy(
+    SpookySwapStrategyLiquidateFactory,
+    [router.address, protocolManager.address]
+  )) as SpookySwapStrategyLiquidate;
+  await SpookySwapStrategyLiquidate.deployed();
+
+  return [
+    SpookySwapStrategyAddToPoolWithBaseToken,
+    SpookySwapStrategyAddToPoolWithoutBaseToken,
+    SpookySwapStrategyLiquidate,
   ];
 };
