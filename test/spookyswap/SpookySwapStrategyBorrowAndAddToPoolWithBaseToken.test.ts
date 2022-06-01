@@ -26,11 +26,12 @@ import { solidity } from "ethereum-waffle";
 import { parseEther, formatEther } from "@ethersproject/units";
 import { deployProxyContract } from "../helpers";
 import { deployGeistFinance } from "../helpers/deployGeistFinance";
+import { assertAlmostEqual } from "../helpers/assert";
 
 chai.use(solidity);
 const { expect } = chai;
 
-describe.only("SpookySwapStrategyBorrowAndAddToPoolWithBaseToken", () => {
+describe("SpookySwapStrategyBorrowAndAddToPoolWithBaseToken", () => {
   const FOREVER = "2000000000";
 
   let protocolManager: ProtocolManager;
@@ -222,10 +223,11 @@ describe.only("SpookySwapStrategyBorrowAndAddToPoolWithBaseToken", () => {
       )
     ).wait();
 
-    expect(formatEther(await lpV2.balanceOf(bobAddress))).to.eq("0.140545673785261302");
-    expect(formatEther(await GTokenAsBob.balanceOf(bobAddress))).to.eq("0.055555555555555555");
-    expect(formatEther(await VariableDebtTokenAsBob.balanceOf(bobAddress))).to.eq(
-      "0.44444444444444444"
+    assertAlmostEqual(await lpV2.balanceOf(bobAddress), parseEther("0.140545673785261302"));
+    assertAlmostEqual(await GTokenAsBob.balanceOf(bobAddress), parseEther("0.055555555555555555"));
+    assertAlmostEqual(
+      await VariableDebtTokenAsBob.balanceOf(bobAddress),
+      parseEther("0.44444444444444444")
     );
     expect(formatEther(await lpV2.balanceOf(strat.address))).to.eq("0.0");
 
@@ -239,10 +241,11 @@ describe.only("SpookySwapStrategyBorrowAndAddToPoolWithBaseToken", () => {
       )
     );
 
-    expect(formatEther(await lpV2.balanceOf(bobAddress))).to.eq("0.28109134757048299");
-    expect(formatEther(await GTokenAsBob.balanceOf(bobAddress))).to.eq("0.111111111111111111");
-    expect(formatEther(await VariableDebtTokenAsBob.balanceOf(bobAddress))).to.eq(
-      "0.888888888888888889"
+    assertAlmostEqual(await lpV2.balanceOf(bobAddress), parseEther("0.28109134757048299"));
+    assertAlmostEqual(await GTokenAsBob.balanceOf(bobAddress), parseEther("0.111111111111111111"));
+    assertAlmostEqual(
+      await VariableDebtTokenAsBob.balanceOf(bobAddress),
+      parseEther("0.888888888888888889")
     );
     expect(formatEther(await lpV2.balanceOf(strat.address))).to.eq("0.0");
 
