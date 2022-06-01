@@ -116,6 +116,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
 
     address aToken = reserve.aTokenAddress;
 
+
     reserve.updateState();
     reserve.updateInterestRates(asset, aToken, amount, 0);
 
@@ -895,6 +896,7 @@ contract LendingPool is VersionedInitializable, ILendingPool, LendingPoolStorage
         vars.amount,
         currentStableRate
       );
+
     } else {
       isFirstBorrowing = IVariableDebtToken(reserve.variableDebtTokenAddress).mint(
         vars.user,

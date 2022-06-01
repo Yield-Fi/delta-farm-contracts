@@ -131,6 +131,7 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
     //avoid stack too deep
     availableLiquidity = availableLiquidity.add(liquidityAdded).sub(liquidityTaken);
 
+
     return
       calculateInterestRates(
         reserve,
@@ -212,6 +213,7 @@ contract DefaultReserveInterestRateStrategy is IReserveInterestRateStrategy {
         vars.utilizationRate.rayMul(_variableRateSlope1).rayDiv(OPTIMAL_UTILIZATION_RATE)
       );
     }
+
 
     vars.currentLiquidityRate = _getOverallBorrowRate(
       totalStableDebt,

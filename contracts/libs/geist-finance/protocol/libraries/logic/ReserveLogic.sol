@@ -216,6 +216,7 @@ library ReserveLogic {
       .scaledTotalSupply()
       .rayMul(reserve.variableBorrowIndex);
 
+
     (
       vars.newLiquidityRate,
       vars.newStableRate,
