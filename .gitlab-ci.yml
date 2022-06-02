@@ -25,21 +25,22 @@ solhint:
     - npm run solhint
   allow_failure: true
 
-test:
-  image: node:14.17.6
-  stage: test
-  script:
-    - npm install
-    - apt-get update && apt-get install -y gawk
-    - npm run compile
-    - npm run coverage
-  coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
-  artifacts:
-    paths:
-      - coverage
-    expire_in: 10 days
-    reports:
-      cobertura: coverage/cobertura-coverage.xml
+# test:
+#   image: node:14.17.6
+#   stage: test
+#   script:
+#     - npm install
+#     - apt-get update && apt-get install -y gawk
+#     - npm run compile
+#     - npm run coverage
+#   coverage: /All files[^|]*\|[^|]*\s+([\d\.]+)/
+#   allow_failure: true
+#   artifacts:
+#     paths:
+#       - coverage
+#     expire_in: 10 days
+#     reports:
+#       cobertura: coverage/cobertura-coverage.xml
 
 slither:
   image: python
