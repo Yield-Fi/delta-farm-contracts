@@ -6,6 +6,7 @@ import "hardhat-deploy";
 import "solidity-coverage";
 // import "hardhat-contract-sizer";
 import "hardhat-abi-exporter";
+import "hardhat-gas-reporter";
 
 import { config as dotEnvConfig } from "dotenv";
 import { task } from "hardhat/config";
@@ -94,5 +95,9 @@ export default {
   },
   abiExporter: {
     clear: true,
+  },
+  gasReporter: {
+    currency: "USD",
+    gasPrice: 21,
   },
 };
